@@ -1,9 +1,11 @@
 CREATE TABLE IF NOT EXISTS users (
 	uid INT NOT NULL AUTO_INCREMENT,
 	username VARCHAR(20) UNIQUE NOT NULL,
-    password VARCHAR(100) NOT NULL
+    password VARCHAR(100) NOT NULL,
     PRIMARY KEY(uid)
 )ENGINE=InnoDB;
+
+
 CREATE TABLE IF NOT EXISTS user_details(
 	uid INT NOT NULL,
     email VARCHAR(25) NOT NULL,
@@ -15,16 +17,20 @@ CREATE TABLE IF NOT EXISTS user_details(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (uid) REFERENCES users(uid)
 )ENGINE=InnoDB;
-CREATE TABLE sessions(
+
+
+CREATE TABLE IF NOT EXISTS sessions(
 	token INT NOT NULL,
 	uid INT NOT NULL, 
 	expireAt DATETIME,
 	PRIMARY KEY (token),
 	FOREIGN KEY (uid) REFERENCES users(uid)
-)
-CREATE TABLE blog_posts(
+)ENGINE=InnoDB;
+
+
+CREATE TABLE IF NOT EXISTS blog_posts(
 	post_id INT NOT NULL AUTO_INCREMENT,
-    author_id INT UNIQUE,
+    author_id INT,
     banner VARCHAR(50) NOT NULL,
     title VARCHAR(50) NOT NULL,
     body TEXT,
@@ -32,18 +38,24 @@ CREATE TABLE blog_posts(
     PRIMARY KEY (post_id),
     FOREIGN KEY (author_id) REFERENCES users(uid)
 )ENGINE=InnoDB;
-CREATE TABLE categories(
+
+
+CREATE TABLE IF NOT EXISTS categories(
 	category_id INT NOT NULL AUTO_INCREMENT,
     category_name VARCHAR(25) NOT NULL,
     PRIMARY KEY (category_id)
 )ENGINE=InnoDB;
-CREATE TABLE category_associations(
+
+
+CREATE TABLE IF NOT EXISTS category_associations(
 	post_id INT UNIQUE NOT NULL,
     category_id INT UNIQUE NOT NULL,
     FOREIGN KEY (post_id) REFERENCES blog_posts(post_id),
     FOREIGN KEY (category_id) REFERENCES categories(category_id)
 )ENGINE=InnoDB;
-CREATE TABLE comment(
+
+
+CREATE TABLE IF NOT EXISTS comment(
 	comment_id INT NOT NULL AUTO_INCREMENT,
     post_id INT UNIQUE NOT NULL,
     uid INT UNIQUE NOT NULL,
