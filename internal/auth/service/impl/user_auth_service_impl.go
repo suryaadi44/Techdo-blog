@@ -13,7 +13,8 @@ import (
 )
 
 type UserAuthServiceImpl struct {
-	Repository UserAuthRepositoryImpl
+	Repository     UserAuthRepositoryImpl
+	SessionService SessionServiceImpl
 }
 
 func (u UserAuthServiceImpl) RegisterUser(ctx context.Context, user dto.AuthRequest) error {
@@ -49,10 +50,10 @@ func (u UserAuthServiceImpl) AuthenticateUser(ctx context.Context, user dto.Auth
 		ExpireAt: time.Now().Add(time.Duration(global.SESSION_EXPIRE_IN_SECOND) * time.Second),
 	}
 
-	// err = u.SessionService.NewSession(ctx, session)
-	// if err != nil {
-	// 	return entity.Session{}, err
-	// }
+	err = u.SessionService.NewSession(ctx, session)
+	if err != nil {
+		return entity.Session{}, err
+	}
 
 	return session, nil
 }

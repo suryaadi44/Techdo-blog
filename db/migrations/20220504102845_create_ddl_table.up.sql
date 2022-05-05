@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS user_details(
 
 
 CREATE TABLE IF NOT EXISTS sessions(
-	token VARCHAR(30) NOT NULL,
+	token VARCHAR(40) NOT NULL,
 	uid INT NOT NULL, 
 	expireAt DATETIME,
 	PRIMARY KEY (token),

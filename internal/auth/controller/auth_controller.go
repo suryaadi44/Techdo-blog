@@ -12,7 +12,6 @@ import (
 	"github.com/suryaadi44/Techdo-blog/internal/auth/dto"
 	"github.com/suryaadi44/Techdo-blog/internal/auth/service"
 	globalDTO "github.com/suryaadi44/Techdo-blog/pkg/dto"
-	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 
 type UserAuthController struct {
@@ -82,8 +81,8 @@ func (u *UserAuthController) signUpHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if ok := utils.IsValidEmail(payload.Username); !ok {
-		globalDTO.NewBaseResponse(http.StatusBadRequest, true, "Email not valid").SendResponse(&w)
+	if len(payload.Username) > 20 {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, "Username must be shorter than 20 character").SendResponse(&w)
 		return
 	}
 
