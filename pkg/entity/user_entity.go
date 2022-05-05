@@ -24,3 +24,10 @@ type Session struct {
 	UID      int64     `db:"uid"`
 	ExpireAt time.Time `db:"expireAt"`
 }
+
+type SessionDetail struct {
+	Token    string    `db:"token"`
+	UID      int64     `db:"uid"`
+	Username string    `db:"username"`
+	ExpireAt time.Time `db:"expireAt"`
+}

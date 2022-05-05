@@ -12,7 +12,6 @@ import (
 	"github.com/suryaadi44/Techdo-blog/internal/auth/dto"
 	"github.com/suryaadi44/Techdo-blog/internal/auth/service"
 	globalDTO "github.com/suryaadi44/Techdo-blog/pkg/dto"
-	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 
 type UserAuthController struct {
@@ -79,11 +78,6 @@ func (u *UserAuthController) signUpHandler(w http.ResponseWriter, r *http.Reques
 	if err := decoder.Decode(&payload); err != nil {
 		log.Println("[Decode] Error decoding JSON")
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
-		return
-	}
-
-	if ok := utils.IsValidEmail(payload.Username); !ok {
-		globalDTO.NewBaseResponse(http.StatusBadRequest, true, "Email not valid").SendResponse(&w)
 		return
 	}
 

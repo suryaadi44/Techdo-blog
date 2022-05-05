@@ -15,8 +15,13 @@ type UserAuthServiceApi interface {
 }
 
 func NewUserAuthService(DB *sql.DB) UserAuthServiceApi {
-	repo := impl.NewUserAuthRepository(DB)
+	authRepository := impl.NewUserAuthRepository(DB)
+	sessionRepository := impl.NewSessionRepository(DB)
+
 	return impl.UserAuthServiceImpl{
-		Repository: repo,
+		Repository: authRepository,
+		SessionService: impl.SessionServiceImpl{
+			Repository: sessionRepository,
+		},
 	}
 }
