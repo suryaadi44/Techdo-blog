@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 26.0.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 640 576" style="enable-background:new 0 0 640 576;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill-rule:evenodd;clip-rule:evenodd;fill:#3F2178;}
+	.st1{fill-rule:evenodd;clip-rule:evenodd;fill:#FF9E00;}
+	.st2{fill-rule:evenodd;clip-rule:evenodd;fill:#FF3041;}
+	.st3{fill:#3F2178;}
+	.st4{fill:#FF6016;}
+	.st5{fill-rule:evenodd;clip-rule:evenodd;fill:#000B47;}
+	.st6{fill:#00C4CF;}
+	.st7{fill-rule:evenodd;clip-rule:evenodd;fill:#00C4CF;}
+	.st8{fill:#000B47;}
+	.st9{fill:#FF3041;}
+	.st10{fill:#FF9E00;}
+</style>
+<g id="Layer_2_00000091709077077310793990000008115633646799359373_">
+	<g id="Layer_1-2">
+		<path class="st0" d="M192,64L192,64c-35.3,0-64-28.7-64-64h128C256,35.3,227.3,64,192,64z"/>
+		<path class="st1" d="M192,64L192,64c35.3,0,64,28.7,64,64H128C128,92.7,156.7,64,192,64z"/>
+		<path class="st1" d="M576,128L576,128c-35.3,0-64-28.7-64-64h128C640,99.3,611.3,128,576,128z"/>
+		<polygon class="st0" points="128,0 64,0 0,64 64,64 		"/>
+		<polygon class="st2" points="384,64 320,64 256,128 320,128 		"/>
+		<circle class="st3" cx="416.8" cy="96" r="32"/>
+		<circle class="st4" cx="480.8" cy="96" r="32"/>
+		<circle class="st4" cx="288" cy="32" r="32"/>
+		<polygon class="st0" points="576,64 512,0 640,0 		"/>
+		<polygon class="st5" points="64,64 128,128 0,128 		"/>
+		<path class="st6" d="M384,64V0l0,0c35.3,0,64,28.7,64,64H384"/>
+		<path class="st3" d="M512,64h-64c0-35.3,28.7-64,64-64l0,0V64"/>
+		<polygon class="st2" points="352,0 320,64 384,64 		"/>
+		<path class="st7" d="M64,256L64,256c-35.3,0-64-28.7-64-64h128C128,227.3,99.3,256,64,256z"/>
+		<path class="st0" d="M192,448L192,448c-35.3,0-64-28.7-64-64h128C256,419.3,227.3,448,192,448z"/>
+		<path class="st1" d="M192,448L192,448c35.3,0,64,28.7,64,64H128C128,476.7,156.7,448,192,448z"/>
+		<path class="st1" d="M576,320L576,320c-35.3,0-64-28.7-64-64h128C640,291.3,611.3,320,576,320z"/>
+		<path class="st2" d="M64,192L64,192c-35.3,0-64-28.7-64-64h128C128,163.3,99.3,192,64,192z"/>
+		<path class="st1" d="M576,512L576,512c-35.3,0-64-28.7-64-64h128C640,483.3,611.3,512,576,512z"/>
+		<path class="st1" d="M64,256L64,256c35.3,0,64,28.7,64,64v64H0v-64C0,284.7,28.7,256,64,256z"/>
+		<polygon class="st0" points="384.2,128 320.2,128 256.2,192 320.2,192 		"/>
+		<polygon class="st0" points="128,384 64,384 0,448 64,448 		"/>
+		<polygon class="st7" points="512,192 448,192 384,256 448,256 		"/>
+		<polygon class="st7" points="512,128 448,128 384,192 448,192 		"/>
+		<polygon class="st2" points="384,448 320,448 256,512 320,512 		"/>
+		<circle class="st8" cx="64" cy="320" r="38.6"/>
+		<circle class="st9" cx="575.9" cy="191.9" r="63.9"/>
+		<circle class="st3" cx="160" cy="224" r="32"/>
+		<circle class="st4" cx="224" cy="224" r="32"/>
+		<circle class="st3" cx="416.8" cy="480" r="32"/>
+		<circle class="st4" cx="480.8" cy="480" r="32"/>
+		<circle class="st6" cx="160" cy="288" r="32"/>
+		<circle class="st4" cx="288" cy="416" r="32"/>
+		<circle class="st8" cx="224" cy="288" r="32"/>
+		<circle class="st6" cx="544" cy="352.2" r="32"/>
+		<circle class="st8" cx="604.7" cy="352.4" r="31.9"/>
+		<polygon class="st0" points="192,192 128,128 256,128 		"/>
+		<polygon class="st0" points="576,448 512,384 640,384 		"/>
+		<polygon class="st5" points="320.8,192 384.8,256 256.8,256 		"/>
+		<path class="st2" d="M64,576L64,576c-35.3,0-64-28.7-64-64h128C128,547.3,99.3,576,64,576z"/>
+		<path class="st2" d="M576,576L576,576c-35.3,0-64-28.7-64-64h128C640,547.3,611.4,576,576,576z"/>
+		<polygon class="st0" points="384.2,512 320.2,512 256.2,576 320.2,576 		"/>
+		<polygon class="st7" points="512,512 448,512 384,576 448,576 		"/>
+		<polygon class="st0" points="192,576 128,512 256,512 		"/>
+		<polygon class="st5" points="64,448 128,512 0,512 		"/>
+		<path class="st10" d="M128,384v-64l0,0c35.3,0,64,28.7,64,64H128"/>
+		<path class="st6" d="M192,384v-64l0,0c35.3,0,64,28.7,64,64H192"/>
+		<path class="st6" d="M384,448v-64l0,0c35.3,0,64,28.7,64,64H384"/>
+		<path class="st3" d="M512,448h-64c0-35.3,28.7-64,64-64l0,0V448"/>
+		<path class="st9" d="M256,320v-64l0,0c35.3,0,64,28.7,64,64H256"/>
+		<path class="st10" d="M384,320h-64c0-35.3,28.7-64,64-64l0,0V320"/>
+		<polygon class="st0" points="416,320 448,256 384,256 		"/>
+		<polygon class="st5" points="480,320 512,256 448,256 		"/>
+		<polygon class="st2" points="288,384 320,320 256,320 		"/>
+		<polygon class="st1" points="352,384 384,320 320,320 		"/>
+		<polygon class="st2" points="352,384 320,448 384,448 		"/>
+		<polygon class="st7" points="480,384 512,320 448,320 		"/>
+		<polygon class="st2" points="416,384 448,320 384,320 		"/>
+	</g>
+</g>
+</svg>

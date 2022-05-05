@@ -2,20 +2,21 @@ package server
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gorilla/mux"
 )
 
 type Server struct {
 	Address string
-	Engine  *gin.Engine
+	Router  *mux.Router
 }
 
 func (s *Server) Run() {
 	go func() {
-		if err := s.Engine.Run(s.Address); err != nil {
+		if err := http.ListenAndServe(s.Address, s.Router); err != nil {
 			log.Printf("[SERVER] error starting server at %s: %v\n", s.Address, err)
 		}
 	}()
@@ -29,9 +30,9 @@ func (s *Server) Run() {
 	log.Printf("[SERVER] server stopped")
 }
 
-func NewServer(address string, engine *gin.Engine) Server {
+func NewServer(address string, router *mux.Router) Server {
 	return Server{
 		Address: address,
-		Engine:  engine,
+		Router:  router,
 	}
 }
