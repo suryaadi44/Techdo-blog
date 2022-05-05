@@ -81,6 +81,11 @@ func (u *UserAuthController) signUpHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	if len(payload.Username) > 20 {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, "Username must be shorter than 20 character").SendResponse(&w)
+		return
+	}
+
 	err := u.userAuthService.RegisterUser(r.Context(), payload)
 	if err == nil {
 		log.Println("[Auth] Success :", payload.Username, "created")
