@@ -1,12 +1,13 @@
 package controller
 
 import (
+	"bytes"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/suryaadi44/Techdo-blog/internal/post/dto"
 	"github.com/suryaadi44/Techdo-blog/internal/post/service"
 	globalDTO "github.com/suryaadi44/Techdo-blog/pkg/dto"
 )
@@ -63,15 +64,21 @@ func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Req
 }
 
 func (p *PostController) uploadImageHandler(w http.ResponseWriter, r *http.Request) {
-	var image dto.Image
-	err := image.FromJSON(r.Body)
+	reader, err := r.MultipartReader()
 	if err != nil {
-		log.Println("[Decode] Error decoding JSON")
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return
 	}
 
-	response, err := p.postService.UploadImage(r.Context(), image)
+	part, err := reader.NextPart()
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	file := StreamToByte(part)
+
+	response, err := p.postService.UploadImage(r.Context(), part.FileName(), file)
 	if err != nil {
 		log.Println("[Post] Error Uploading image")
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
@@ -79,4 +86,10 @@ func (p *PostController) uploadImageHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	globalDTO.NewBaseResponse(http.StatusOK, false, response).SendResponse(&w)
+}
+
+func StreamToByte(stream io.Reader) []byte {
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(stream)
+	return buf.Bytes()
 }

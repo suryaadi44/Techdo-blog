@@ -1,42 +1,45 @@
 $('#summernote').summernote({
     height: ($(window).height() - 400),
     callbacks: {
-        onImageUpload: function(image) {
+        onImageUpload: function (image) {
             uploadImage(image[0]);
         },
-        onMediaDelete : function(target) {
-            deleteImage(target[0].src);
+        onMediaDelete: function (target) {
+            deleteImage(target[0].id);
         }
     }
 });
 
-function uploadImage(image, editor) {
+function uploadImage(image) {
     var data = new FormData();
     data.append("image", image);
-    $.ajax({
-        url: '/api/upload/image',
-        cache: false,
-        contentType: false,
-        processData: false,
-        data: data,
-        type: "post",
-        success: function(url) {
-            let image = $('<img>').attr('src', url);
-            editor.summernote("insertNode", image[0]);
-        },
-        error: function(data) {
-        }
-    });
+
+    const uploadUrl = "/api/upload/image"
+
+    fetch(uploadUrl, {
+        method: "post",
+        body: data,
+    })
+        .then((response) => response.json())
+        .then((result) => {
+            if (!result.error) {
+                let image = $('<img>').attr('src', result.data.url).attr('id', result.data.fileId).attr("readonly", "readonly");
+                $('#summernote').summernote("insertNode", image[0]);
+            }
+            // TODO: Add indication if upload error
+        });
 }
 
-function deleteImage(src) {
-    $.ajax({
-        data: {src : src},
-        type: "POST",
-        url: "YOUR DELETE SCRIPT", 
-        cache: false,
-        success: function(data) {
-            alert(data);
-        }
-    });
+function deleteImage(id) {
+    const deleteUrl = "/api/delete/image"
+    fetch(deleteUrl, {
+        method: "post",
+        body: JSON.stringify({
+            fileId: id,
+        }),
+    })
+        .then((response) => response.json())
+        .then((result) => {
+            // TODO: Add indication if delete error
+        });
 }

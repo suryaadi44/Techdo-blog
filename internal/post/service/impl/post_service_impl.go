@@ -49,7 +49,7 @@ func (p PostServiceImpl) GetCategoryList(ctx context.Context) (dto.CategoryList,
 	return dto.NewCategoryList(categories), nil
 }
 
-func (p PostServiceImpl) UploadImage(ctx context.Context, image dto.Image) (*imagekit.UploadResponse, error) {
+func (p PostServiceImpl) UploadImage(ctx context.Context, filename string, image []byte) (*imagekit.UploadResponse, error) {
 	folder := "/posts"
-	return utils.UploadImage(ctx, image.FileName, image.Data, folder)
+	return utils.UploadImage(ctx, filename, image, folder)
 }

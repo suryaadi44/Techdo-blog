@@ -8,7 +8,7 @@ import (
 	"github.com/codedius/imagekit-go"
 )
 
-func UploadImage(ctx context.Context, name string, data string, folder string) (*imagekit.UploadResponse, error) {
+func UploadImage(ctx context.Context, name string, data []byte, folder string) (*imagekit.UploadResponse, error) {
 	opts := imagekit.Options{
 		PrivateKey: os.Getenv("IMGKIT_PRIVKEY"),
 		PublicKey:  os.Getenv("IMGKIT_PUBKEY"),
@@ -38,4 +38,25 @@ func UploadImage(ctx context.Context, name string, data string, folder string) (
 	}
 
 	return upr, nil
+}
+
+func DeleteImage(ctx context.Context, id string) error {
+	opts := imagekit.Options{
+		PrivateKey: os.Getenv("IMGKIT_PRIVKEY"),
+		PublicKey:  os.Getenv("IMGKIT_PUBKEY"),
+	}
+
+	ik, err := imagekit.NewClient(&opts)
+	if err != nil {
+		log.Println("[IMGKIT] Error creating imgkit client -> error:", err)
+		return err
+	}
+
+	err = ik.Media.DeleteFile(ctx, id)
+	if err != nil {
+		log.Println("[IMGKIT] Error deleting -> error:", err)
+		return err
+	}
+
+	return nil
 }
