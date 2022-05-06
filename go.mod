@@ -10,3 +10,5 @@ require (
 	github.com/joho/godotenv v1.4.0
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f
 )
+
+require github.com/codedius/imagekit-go v1.1.1

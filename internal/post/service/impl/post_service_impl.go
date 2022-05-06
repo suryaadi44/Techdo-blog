@@ -4,7 +4,9 @@ import (
 	"context"
 	"log"
 
+	"github.com/codedius/imagekit-go"
 	"github.com/suryaadi44/Techdo-blog/internal/post/dto"
+	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 
 type PostServiceImpl struct {
@@ -45,4 +47,9 @@ func (p PostServiceImpl) GetCategoryList(ctx context.Context) (dto.CategoryList,
 	}
 
 	return dto.NewCategoryList(categories), nil
+}
+
+func (p PostServiceImpl) UploadImage(ctx context.Context, image dto.Image) (*imagekit.UploadResponse, error) {
+	folder := "/posts"
+	return utils.UploadImage(ctx, image.FileName, image.Data, folder)
 }

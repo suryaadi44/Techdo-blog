@@ -1,3 +1,5 @@
+github.com/codedius/imagekit-go v1.1.1 h1:UksHT0GZX20HL66zVAHAtqXO6h4m35ephWN/AD33g8c=
+github.com/codedius/imagekit-go v1.1.1/go.mod h1:oj3VK8Lzpd21sZWEtHhzelIW2GWvgxmqu1M1aSDAyMc=
 github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=
 github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
