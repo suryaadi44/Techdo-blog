@@ -8,6 +8,7 @@ import (
 	authControllerPkg "github.com/suryaadi44/Techdo-blog/internal/auth/controller"
 	authServicePkg "github.com/suryaadi44/Techdo-blog/internal/auth/service"
 	postControllerPkg "github.com/suryaadi44/Techdo-blog/internal/post/controller"
+	postServicePkg "github.com/suryaadi44/Techdo-blog/internal/post/service"
 )
 
 func InitializeController(router *mux.Router, db *sql.DB) {
@@ -19,6 +20,7 @@ func InitializeController(router *mux.Router, db *sql.DB) {
 	AuthController := authControllerPkg.NewController(router, AuthService)
 	AuthController.InitializeController()
 
-	PostController := postControllerPkg.NewController(router)
+	PostService := postServicePkg.NewPostService(db)
+	PostController := postControllerPkg.NewController(router, PostService)
 	PostController.InitializeController()
 }
