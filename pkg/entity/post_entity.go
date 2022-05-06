@@ -27,3 +27,4 @@ type Comment struct {
 }
 
 type Categories []*Category
+type Comments []*Comment
