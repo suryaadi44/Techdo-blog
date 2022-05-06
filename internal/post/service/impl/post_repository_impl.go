@@ -13,8 +13,11 @@ type PostRepositoryImpl struct {
 }
 
 var (
-	INSERT_POST = "INSERT INTO users(username, password) VALUE (?, ?)"
-	SELECT_POST = "SELECT uid, username, password FROM users WHERE username = ?"
+	//INSERT_POST = "INSERT INTO users(username, password) VALUE (?, ?)"
+	SELECT_POST = "SELECT b.post_id, b.banner, b.title, b.body, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author, u.picture FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
+
+	SELECT_CATEGORY_OF_POST = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
+	SELECT_CATEGORY         = "SELECT category_id, category_name FROM categories"
 )
 
 func NewPostRepository(DB *sql.DB) PostRepositoryImpl {
@@ -23,55 +26,114 @@ func NewPostRepository(DB *sql.DB) PostRepositoryImpl {
 	}
 }
 
-func (p PostRepositoryImpl) NewPost(ctx context.Context, user entity.User) error {
-	prpd, err := p.DB.PrepareContext(ctx, INSERT_POST)
-	if err != nil {
-		log.Println("[ERROR] NewPost -> error :", err)
-		return err
-	}
+// func (p PostRepositoryImpl) NewPost(ctx context.Context, user entity.User) error {
+// 	prpd, err := p.DB.PrepareContext(ctx, INSERT_POST)
+// 	if err != nil {
+// 		log.Println("[ERROR] NewPost -> error :", err)
+// 		return err
+// 	}
 
-	result, err := prpd.ExecContext(ctx, user.Username, user.Password)
-	if err != nil {
-		log.Println("[ERROR] NewPost -> error on executing query :", err)
-		return err
-	}
+// 	result, err := prpd.ExecContext(ctx, user.Username, user.Password)
+// 	if err != nil {
+// 		log.Println("[ERROR] NewPost -> error on executing query :", err)
+// 		return err
+// 	}
 
-	rows, err := result.RowsAffected()
-	if err != nil {
-		log.Println("[ERROR] NewPost -> error on getting rows affected :", err)
-		return err
-	}
-	if rows != 1 {
-		log.Println("[ERROR] NewPost -> error on inserting row :", err)
-		return err
-	}
+// 	rows, err := result.RowsAffected()
+// 	if err != nil {
+// 		log.Println("[ERROR] NewPost -> error on getting rows affected :", err)
+// 		return err
+// 	}
+// 	if rows != 1 {
+// 		log.Println("[ERROR] NewPost -> error on inserting row :", err)
+// 		return err
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
-func (p PostRepositoryImpl) GetPost(ctx context.Context, username string) (entity.User, error) {
+func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int) (entity.BlogPostFull, error) {
+	var post entity.BlogPostFull
+
 	prpd, err := p.DB.PrepareContext(ctx, SELECT_POST)
 	if err != nil {
-		log.Println("[ERROR] GetPost -> error :", err)
-		return entity.User{}, err
+		log.Println("[ERROR] GetFullPost -> error :", err)
+		return post, err
 	}
 
-	rows, err := prpd.Query(username)
+	rows, err := prpd.QueryContext(ctx, id)
 	if err != nil {
-		log.Println("[ERROR] GetPost -> error on executing query :", err)
-		return entity.User{}, err
+		log.Println("[ERROR] GetFullPost -> error on executing query :", err)
+		return post, err
 	}
 
-	var user entity.User
 	if rows.Next() {
-		err = rows.Scan(&user.UserID, &user.Username, &user.Password)
+		err = rows.Scan(&post.PostID, &post.Banner, &post.Title, &post.Body, &post.CreatedAt, &post.UpdatedAt, &post.Author, &post.Picture)
 		if err != nil {
-			log.Println("[ERROR] GetPost -> error scanning row :", err)
-			return entity.User{}, err
+			log.Println("[ERROR] GetFullPost -> error scanning row :", err)
+			return post, err
 		}
 
-		return user, nil
+		return post, nil
 	}
 
-	return entity.User{}, err
+	return post, err
+}
+
+func (p PostRepositoryImpl) GetCategoriesFromID(ctx context.Context, id int) (entity.Categories, error) {
+	var categories entity.Categories
+
+	prpd, err := p.DB.PrepareContext(ctx, SELECT_CATEGORY_OF_POST)
+	if err != nil {
+		log.Println("[ERROR] GetCategoriesFromID -> error :", err)
+		return categories, err
+	}
+
+	rows, err := prpd.QueryContext(ctx, id)
+	if err != nil {
+		log.Println("[ERROR] GetCategoriesFromID -> error on executing query :", err)
+		return categories, err
+	}
+
+	for rows.Next() {
+		var postCategory entity.Category
+
+		err = rows.Scan(&postCategory.CategoryID, &postCategory.CategoryName)
+		if err != nil {
+			log.Println("[ERROR] GetCategoriesFromID -> error scanning row :", err)
+			return categories, err
+		}
+		categories = append(categories, &postCategory)
+
+	}
+	return categories, nil
+}
+
+func (p PostRepositoryImpl) GetCategoryList(ctx context.Context) (entity.Categories, error) {
+	var categories entity.Categories
+
+	prpd, err := p.DB.PrepareContext(ctx, SELECT_CATEGORY)
+	if err != nil {
+		log.Println("[ERROR] GetCategoryList -> error :", err)
+		return categories, err
+	}
+
+	rows, err := prpd.QueryContext(ctx)
+	if err != nil {
+		log.Println("[ERROR] GetCategoryList -> error on executing query :", err)
+		return categories, err
+	}
+
+	for rows.Next() {
+		var postCategory entity.Category
+
+		err = rows.Scan(&postCategory.CategoryID, &postCategory.CategoryName)
+		if err != nil {
+			log.Println("[ERROR] GetCategoryList -> error scanning row :", err)
+			return categories, err
+		}
+		categories = append(categories, &postCategory)
+
+	}
+	return categories, nil
 }
