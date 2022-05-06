@@ -31,7 +31,7 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 
 	categoryList, err := p.postService.GetCategoryList(r.Context())
 	data := map[string]interface{}{
-		"categories": categoryList,
+		"Categories": categoryList,
 	}
 
 	if err == nil {
