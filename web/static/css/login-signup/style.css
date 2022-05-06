@@ -10,12 +10,12 @@
     background-size: auto 100%;
 }
 
-.login__logo {
+.login-signup__logo {
     font-family: 'arcade-classic', monospace;
     color: #7102DF;
 }
 
-.login__login-btn {
+.login-signup__btn {
     background-color: #7102DF;
     color: #fff;
 }
