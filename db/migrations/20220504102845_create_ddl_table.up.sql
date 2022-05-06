@@ -50,8 +50,8 @@ CREATE TABLE IF NOT EXISTS categories(
 
 
 CREATE TABLE IF NOT EXISTS category_associations(
-	post_id INT UNIQUE NOT NULL,
-    category_id INT UNIQUE NOT NULL,
+	post_id INT NOT NULL,
+    category_id INT NOT NULL,
     FOREIGN KEY (post_id) REFERENCES blog_posts(post_id),
     FOREIGN KEY (category_id) REFERENCES categories(category_id)
 )ENGINE=InnoDB;
@@ -59,8 +59,8 @@ CREATE TABLE IF NOT EXISTS category_associations(
 
 CREATE TABLE IF NOT EXISTS comment(
 	comment_id INT NOT NULL AUTO_INCREMENT,
-    post_id INT UNIQUE NOT NULL,
-    uid INT UNIQUE NOT NULL,
+    post_id INT NOT NULL,
+    uid INT NOT NULL,
     comment_body TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
