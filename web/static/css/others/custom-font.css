@@ -1,0 +1,8 @@
+/* Custom Font */
+@font-face {
+    font-family: 'arcade-classic';
+    src: url('../../font/arcade-classic/arcadeclassic.woff2') format('woff2'),
+    url('../../font/arcade-classic/arcadeclassic.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
