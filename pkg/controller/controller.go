@@ -19,7 +19,7 @@ func InitializeController(router *mux.Router, db *sql.DB) {
 
 	SessionService := authServicePkg.NewSessionAuthService(db)
 	AuthService := authServicePkg.NewUserAuthService(db, SessionService)
-	AuthController := authControllerPkg.NewController(router, AuthService)
+	AuthController := authControllerPkg.NewController(router, AuthService, SessionService)
 	AuthController.InitializeController()
 
 	UserService := userServicePkg.NewUserService(db)

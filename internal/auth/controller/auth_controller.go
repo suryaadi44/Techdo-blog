@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/suryaadi44/Techdo-blog/internal/auth/dto"
@@ -17,12 +18,14 @@ import (
 type UserAuthController struct {
 	router          *mux.Router
 	userAuthService service.UserAuthServiceApi
+	sessionService  service.SessionServiceApi
 }
 
-func NewController(router *mux.Router, userAuthService service.UserAuthServiceApi) *UserAuthController {
+func NewController(router *mux.Router, userAuthService service.UserAuthServiceApi, sessionService service.SessionServiceApi) *UserAuthController {
 	return &UserAuthController{
 		router:          router,
 		userAuthService: userAuthService,
+		sessionService:  sessionService,
 	}
 }
 
@@ -31,6 +34,7 @@ func (u *UserAuthController) InitializeController() {
 	u.router.HandleFunc("/login", u.loginPageHandler).Methods(http.MethodGet)
 	u.router.HandleFunc("/signup", u.signUpHandler).Methods(http.MethodPost)
 	u.router.HandleFunc("/signup", u.signUpPageHandler).Methods(http.MethodGet)
+	u.router.HandleFunc("/logout", u.logOutHandler).Methods(http.MethodGet)
 }
 
 func (u *UserAuthController) loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -112,4 +116,18 @@ func (u *UserAuthController) signUpPageHandler(w http.ResponseWriter, r *http.Re
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return
 	}
+}
+
+func (u *UserAuthController) logOutHandler(w http.ResponseWriter, r *http.Request) {
+	if storedCookie, _ := r.Cookie("session_token"); storedCookie != nil {
+		u.sessionService.DeleteSession(r.Context(), storedCookie.Value)
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_token",
+		MaxAge:  -1,
+		Expires: time.Unix(0, 0),
+	})
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
