@@ -68,6 +68,20 @@ func (p PostServiceImpl) GetFullPost(ctx context.Context, id int64) (dto.BlogPos
 	return dto.NewBlogPostResponse(post, categories), nil
 }
 
+func (p PostServiceImpl) GetBriefsBlogPost(ctx context.Context, page int64, limit int64) (dto.BriefsBlogPostResponse, error) {
+	var postList dto.BriefsBlogPostResponse
+	offset := (page - 1) * limit
+
+	postListEntity, err := p.Repository.GetBriefsBlogPostData(ctx, offset, limit)
+	if err != nil {
+		log.Println("[ERROR] Fetching list of post -> error:", err)
+		return postList, err
+	}
+
+	postList = dto.NewBriefsBlogPostResponse(postListEntity)
+	return postList, nil
+}
+
 func (p PostServiceImpl) GetCategoriesFromID(ctx context.Context, id int64) (dto.CategoryList, error) {
 	categories, err := p.Repository.GetCategoriesFromID(ctx, id)
 	if err != nil {

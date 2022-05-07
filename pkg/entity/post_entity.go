@@ -12,6 +12,15 @@ type BlogPost struct {
 	UpdatedAt time.Time `db:"updated_at"`
 }
 
+type BriefBlogPost struct {
+	PostID    int64     `db:"post_id"`
+	Banner    string    `db:"banner"`
+	Title     string    `db:"title"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
+	Author    string    `db:"author"`
+}
+
 type BlogPostFull struct {
 	PostID    int64     `db:"post_id"`
 	Banner    string    `db:"banner"`
@@ -39,3 +48,4 @@ type Comment struct {
 
 type Categories []*Category
 type Comments []*Comment
+type BriefsBlogPost []*BriefBlogPost
