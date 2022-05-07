@@ -71,7 +71,6 @@
         <div class="col">
           Column
         </div>
-
         <div class="col-6">
           <div class="row">
             <nav class="nav">
@@ -81,19 +80,20 @@
             </nav>
           </div>
 
+          {{range $elem := .Data.Posts}}
           <div class="row posts-container">
             <div class="card mb-3 post" style="width: 100%;">
-              <div class="blog-cover" style="background-image: url('/static/img/3.jpg');"></div>
+              <div class="blog-cover" style="background-image: url('{{$elem.Banner}}');"></div>
               <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
+                <h5 class="card-title">{{$elem.Title}}</h5>
+                <!-- <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
+                <a href="/post/{{$elem.PostID}}" class="btn btn-primary">Read More</a>
               </div>
             </div>
           </div>
+          {{end}}
           
         </div>    
-
         <div class="col">
           Column
         </div>

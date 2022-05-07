@@ -42,9 +42,28 @@ func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Req
 	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
 	var err error
 
+	queryVar := r.URL.Query()
+	limit := queryVar.Get("limit")
+	if limit == "" {
+		limit = "8"
+	}
+	page := queryVar.Get("page")
+	if page == "" {
+		page = "1"
+	}
+	limitConv, _ := strconv.ParseInt(limit, 10, 64)
+	pageConv, _ := strconv.ParseInt(page, 10, 64)
+
+	postData, err := p.postService.GetBriefsBlogPost(r.Context(), pageConv, limitConv)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
 	token, isLoggedIn := utils.GetSessionToken(r)
 	data := map[string]interface{}{
 		"LoggedIn": isLoggedIn,
+		"Posts":    postData,
 	}
 
 	if isLoggedIn {
@@ -86,10 +105,6 @@ func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Re
 func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Request) {
 	token, _ := utils.GetSessionToken(r)
 	session, _ := p.sessionService.GetSession(r.Context(), token)
-	// if !loggedIn {
-	// 	globalDTO.NewBaseResponse(http.StatusForbidden, true, "Authentication required").SendResponse(&w)
-	// 	return
-	// }
 
 	if err := r.ParseMultipartForm(32 << 20); err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)

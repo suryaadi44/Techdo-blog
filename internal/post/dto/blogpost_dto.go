@@ -17,6 +17,15 @@ type BlogPostResponse struct {
 	UpdatedAt  time.Time
 }
 
+type BriefBlogPostResponse struct {
+	PostID    int64
+	Author    string
+	Banner    string
+	Title     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 type BlogPostRequest struct {
 	Category   int64
 	Banner     []byte
@@ -31,6 +40,7 @@ type Category struct {
 }
 
 type CategoryList []Category
+type BriefsBlogPostResponse []BriefBlogPostResponse
 
 func NewCategory(c entity.Category) Category {
 	return Category{
@@ -61,6 +71,29 @@ func NewBlogPostResponse(post entity.BlogPostFull, categories entity.Categories)
 		CreatedAt:  post.CreatedAt,
 		UpdatedAt:  post.UpdatedAt,
 	}
+}
+
+func NewBriefBlogPostResponse(post entity.BriefBlogPost) BriefBlogPostResponse {
+	return BriefBlogPostResponse{
+		PostID:    post.PostID,
+		Author:    post.Author,
+		Banner:    post.Banner,
+		Title:     post.Title,
+		CreatedAt: post.CreatedAt,
+		UpdatedAt: post.UpdatedAt,
+	}
+
+}
+
+func NewBriefsBlogPostResponse(posts entity.BriefsBlogPost) BriefsBlogPostResponse {
+	var postList BriefsBlogPostResponse
+
+	for _, each := range posts {
+		eachPost := NewBriefBlogPostResponse(*each)
+		postList = append(postList, eachPost)
+	}
+
+	return postList
 }
 
 func (b *BlogPostRequest) ToDAO(PostID int64, AuthorID int64, BannerURL string) entity.BlogPost {
