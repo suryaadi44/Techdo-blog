@@ -49,11 +49,6 @@ func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Re
 	} else {
 		err = tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
 	}
-
-	if err != nil {
-		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
-		return
-	}
 }
 
 func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Request) {
@@ -92,22 +87,22 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Request) {
+	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
+
 	token, isLoggedIn := utils.GetSessionToken(r)
-	session, _ := p.sessionService.GetSession(r.Context(), token)
+	session, err := p.sessionService.GetSession(r.Context(), token)
 
 	//TODO : Get user detail and pass its value to front end
-
-	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
+	user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
 
 	data := map[string]interface{}{
 		"LoggedIn": isLoggedIn,
-		"User":     session, //only placehodler
+		"User":     user, //only placehodler
 	}
 
-	var err = tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
-
-	if err != nil {
-		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
-		return
+	if err == nil {
+		err = tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
+	} else {
+		err = tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
 	}
 }
