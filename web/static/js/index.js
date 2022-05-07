@@ -5,9 +5,3 @@ $(".navbar .navbar__auth-nav-btn").click((e) => {
 $(".navbar .user-profile-container").click((e) => {
     $(".user-nav").toggleClass("active");
 });
-
-$(document).ready(function() {
-    $('#summernote').summernote({
-        height: 250
-    });
-});
