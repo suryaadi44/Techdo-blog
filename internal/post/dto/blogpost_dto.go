@@ -18,10 +18,11 @@ type BlogPostResponse struct {
 }
 
 type BlogPostRequest struct {
-	Category int64
-	Banner   string
-	Title    string
-	Body     string
+	Category   int64
+	Banner     []byte
+	BannerName string
+	Title      string
+	Body       string
 }
 
 type Category struct {
@@ -62,11 +63,11 @@ func NewBlogPostResponse(post entity.BlogPostFull, categories entity.Categories)
 	}
 }
 
-func (b *BlogPostRequest) ToDAO(PostID int64, AuthorID int64) entity.BlogPost {
+func (b *BlogPostRequest) ToDAO(PostID int64, AuthorID int64, BannerURL string) entity.BlogPost {
 	return entity.BlogPost{
 		PostID:   PostID,
 		AuthorID: AuthorID,
-		Banner:   b.Banner,
+		Banner:   BannerURL,
 		Title:    b.Title,
 		Body:     b.Body,
 	}

@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"bytes"
 	"html/template"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -89,7 +91,7 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 	// 	return
 	// }
 
-	if err := r.ParseForm(); err != nil {
+	if err := r.ParseMultipartForm(32 << 20); err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return
 	}
@@ -100,11 +102,25 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	uploadedFile, handler, err := r.FormFile("banner")
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+	defer uploadedFile.Close()
+
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, uploadedFile); err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
 	post := dto.BlogPostRequest{
-		Category: category,
-		Banner:   r.FormValue("cover"),
-		Title:    r.FormValue("title"),
-		Body:     r.FormValue("editordata"),
+		Category:   category,
+		Banner:     buf.Bytes(),
+		BannerName: handler.Filename,
+		Title:      r.FormValue("title"),
+		Body:       r.FormValue("editordata"),
 	}
 
 	err = p.postService.AddPost(r.Context(), post, session.UID)
