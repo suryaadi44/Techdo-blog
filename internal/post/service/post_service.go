@@ -10,7 +10,8 @@ import (
 )
 
 type PostServiceApi interface {
-	AddPost(ctx context.Context, post dto.BlogPostRequest, authorID int64) error
+	AddPost(ctx context.Context, post dto.BlogPostRequest, authorID int64) (int64, error)
+
 	GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error)
 	GetCategoriesFromID(ctx context.Context, id int64) (dto.CategoryList, error)
 	GetCategoryList(ctx context.Context) (dto.CategoryList, error)

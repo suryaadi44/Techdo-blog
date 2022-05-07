@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -90,13 +91,13 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = p.postService.AddPost(r.Context(), post, session.UID)
+	postID, err := p.postService.AddPost(r.Context(), post, session.UID)
 	if err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return
 	}
 
-	globalDTO.NewBaseResponse(http.StatusCreated, false, nil).SendResponse(&w)
+	globalDTO.NewBaseResponse(http.StatusCreated, false, fmt.Sprintf("/post/%d", postID)).SendResponse(&w)
 }
 
 func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Request) {
