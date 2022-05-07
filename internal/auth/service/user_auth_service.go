@@ -14,14 +14,11 @@ type UserAuthServiceApi interface {
 	AuthenticateUser(ctx context.Context, user dto.AuthRequest) (entity.Session, error)
 }
 
-func NewUserAuthService(DB *sql.DB) UserAuthServiceApi {
+func NewUserAuthService(DB *sql.DB, SessionService impl.SessionServiceImpl) UserAuthServiceApi {
 	authRepository := impl.NewUserAuthRepository(DB)
-	sessionRepository := impl.NewSessionRepository(DB)
 
 	return impl.UserAuthServiceImpl{
-		Repository: authRepository,
-		SessionService: impl.SessionServiceImpl{
-			Repository: sessionRepository,
-		},
+		Repository:     authRepository,
+		SessionService: SessionService,
 	}
 }

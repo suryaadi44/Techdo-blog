@@ -6,7 +6,7 @@ import (
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
 )
 
-type BlogPost struct {
+type BlogPostResponse struct {
 	PostID     int64
 	Author     string
 	Categories CategoryList
@@ -15,6 +15,13 @@ type BlogPost struct {
 	Body       string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+}
+
+type BlogPostRequest struct {
+	Category int64
+	Banner   string
+	Title    string
+	Body     string
 }
 
 type Category struct {
@@ -42,8 +49,8 @@ func NewCategoryList(c entity.Categories) CategoryList {
 	return categoryList
 }
 
-func NewBlogPost(post entity.BlogPostFull, categories entity.Categories) BlogPost {
-	return BlogPost{
+func NewBlogPostResponse(post entity.BlogPostFull, categories entity.Categories) BlogPostResponse {
+	return BlogPostResponse{
 		PostID:     post.PostID,
 		Author:     post.Author,
 		Categories: NewCategoryList(categories),
@@ -52,5 +59,15 @@ func NewBlogPost(post entity.BlogPostFull, categories entity.Categories) BlogPos
 		Body:       post.Body,
 		CreatedAt:  post.CreatedAt,
 		UpdatedAt:  post.UpdatedAt,
+	}
+}
+
+func (b *BlogPostRequest) ToDAO(PostID int64, AuthorID int64) entity.BlogPost {
+	return entity.BlogPost{
+		PostID:   PostID,
+		AuthorID: AuthorID,
+		Banner:   b.Banner,
+		Title:    b.Title,
+		Body:     b.Body,
 	}
 }

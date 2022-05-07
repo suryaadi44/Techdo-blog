@@ -16,11 +16,12 @@ func InitializeController(router *mux.Router, db *sql.DB) {
 		http.StripPrefix("/static/",
 			http.FileServer(http.Dir("web/static/"))))
 
-	AuthService := authServicePkg.NewUserAuthService(db)
+	SessionService := authServicePkg.NewSessionAuthService(db)
+	AuthService := authServicePkg.NewUserAuthService(db, SessionService)
 	AuthController := authControllerPkg.NewController(router, AuthService)
 	AuthController.InitializeController()
 
 	PostService := postServicePkg.NewPostService(db)
-	PostController := postControllerPkg.NewController(router, PostService)
+	PostController := postControllerPkg.NewController(router, PostService, SessionService)
 	PostController.InitializeController()
 }

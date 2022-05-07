@@ -13,8 +13,12 @@ type PostRepositoryImpl struct {
 }
 
 var (
-	//INSERT_POST = "INSERT INTO users(username, password) VALUE (?, ?)"
-	SELECT_POST = "SELECT b.post_id, b.banner, b.title, b.body, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author, u.picture FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
+	INSERT_BLANK_POST = "INSERT INTO blog_posts() VALUE ()"
+
+	UPDATE_POST = "UPDATE blog_posts SET author_id = ?, banner = ?, title = ?, body = ? WHERE post_id = ?"
+
+	SELECT_POST              = "SELECT b.post_id, b.banner, b.title, b.body, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author, u.picture FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
+	SELECT_ID_OF_LAST_INSERT = "SELECT LAST_INSERT_ID() as uid"
 
 	SELECT_CATEGORY_OF_POST = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
 	SELECT_CATEGORY         = "SELECT category_id, category_name FROM categories"
@@ -26,33 +30,50 @@ func NewPostRepository(DB *sql.DB) PostRepositoryImpl {
 	}
 }
 
-// func (p PostRepositoryImpl) NewPost(ctx context.Context, user entity.User) error {
-// 	prpd, err := p.DB.PrepareContext(ctx, INSERT_POST)
-// 	if err != nil {
-// 		log.Println("[ERROR] NewPost -> error :", err)
-// 		return err
-// 	}
+func (p PostRepositoryImpl) ReserveID(ctx context.Context) (int64, error) {
+	res, err := p.DB.ExecContext(ctx, INSERT_BLANK_POST)
+	if err != nil {
+		log.Println("[ERROR] ReserveID -> error inserting blank row :", err)
+		return -1, err
+	}
 
-// 	result, err := prpd.ExecContext(ctx, user.Username, user.Password)
-// 	if err != nil {
-// 		log.Println("[ERROR] NewPost -> error on executing query :", err)
-// 		return err
-// 	}
+	lid, err := res.LastInsertId()
+	if err != nil {
+		log.Println("[ERROR] ReserveID -> error getting row :", err)
+		return -1, err
+	}
 
-// 	rows, err := result.RowsAffected()
-// 	if err != nil {
-// 		log.Println("[ERROR] NewPost -> error on getting rows affected :", err)
-// 		return err
-// 	}
-// 	if rows != 1 {
-// 		log.Println("[ERROR] NewPost -> error on inserting row :", err)
-// 		return err
-// 	}
+	return lid, nil
+}
 
-// 	return nil
-// }
+func (p PostRepositoryImpl) UpdatePost(ctx context.Context, post entity.BlogPost) error {
+	prpd, err := p.DB.PrepareContext(ctx, UPDATE_POST)
+	if err != nil {
+		log.Println("[ERROR] NewPost -> error :", err)
+		return err
+	}
 
-func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int) (entity.BlogPostFull, error) {
+	log.Println(post.AuthorID, post.Banner, post.Title, post.Body, post.PostID)
+	result, err := prpd.ExecContext(ctx, post.AuthorID, post.Banner, post.Title, post.Body, post.PostID)
+	if err != nil {
+		log.Println("[ERROR] NewPost -> error on executing query :", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] NewPost -> error on getting rows affected :", err)
+		return err
+	}
+	if rowsAffected != 1 {
+		log.Println("[ERROR] NewPost -> error on inserting row :", err)
+		return err
+	}
+
+	return err
+}
+
+func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int64) (entity.BlogPostFull, error) {
 	var post entity.BlogPostFull
 
 	prpd, err := p.DB.PrepareContext(ctx, SELECT_POST)
@@ -80,7 +101,7 @@ func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int) (entity.Blo
 	return post, err
 }
 
-func (p PostRepositoryImpl) GetCategoriesFromID(ctx context.Context, id int) (entity.Categories, error) {
+func (p PostRepositoryImpl) GetCategoriesFromID(ctx context.Context, id int64) (entity.Categories, error) {
 	var categories entity.Categories
 
 	prpd, err := p.DB.PrepareContext(ctx, SELECT_CATEGORY_OF_POST)

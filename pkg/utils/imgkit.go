@@ -8,7 +8,7 @@ import (
 	"github.com/codedius/imagekit-go"
 )
 
-func UploadImage(ctx context.Context, name string, data []byte, folder string) (*imagekit.UploadResponse, error) {
+func UploadImage(ctx context.Context, name string, data string, folder string) (*imagekit.UploadResponse, error) {
 	opts := imagekit.Options{
 		PrivateKey: os.Getenv("IMGKIT_PRIVKEY"),
 		PublicKey:  os.Getenv("IMGKIT_PUBKEY"),
