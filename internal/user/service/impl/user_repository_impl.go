@@ -14,7 +14,8 @@ type UserRepositoryImpl struct {
 
 var (
 	INSERT_USER_DETAIL = "INSERT INTO user_details(uid, email, first_name, last_name, picture, phone, about_me) VALUE (?, ?, ?, ?, ?, ?, ?)"
-	SELECT_USER_DETAIL = "SELECT (uid, email, first_name, last_name, picture, phone, about_me, craeted_at, updated_at FROM user_details WHERE username = ?"
+
+	SELECT_USER_DETAIL = "SELECT uid, email, first_name, last_name, picture, phone, about_me, created_at, updated_at FROM user_details WHERE uid = ?"
 )
 
 func NewUserRepository(DB *sql.DB) UserRepositoryImpl {

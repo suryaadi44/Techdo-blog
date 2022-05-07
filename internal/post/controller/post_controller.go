@@ -36,6 +36,31 @@ func (p *PostController) InitializeController() {
 	p.router.HandleFunc("/", p.postDashboardHandler).Methods(http.MethodGet)
 }
 
+func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Request) {
+	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
+	var err error
+
+	token, isLoggedIn := utils.GetSessionToken(r)
+	data := map[string]interface{}{
+		"LoggedIn": isLoggedIn,
+	}
+
+	if isLoggedIn {
+		session, err := p.sessionService.GetSession(r.Context(), token)
+		user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
+
+		if err == nil {
+			data["User"] = user
+		}
+	}
+
+	if err == nil {
+		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
+	} else {
+		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+	}
+}
+
 func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Request) {
 	var tmpl = template.Must(template.ParseFiles("web/template/post/createPost.html"))
 
@@ -48,6 +73,11 @@ func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Re
 		err = tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
 	} else {
 		err = tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+	}
+
+	if err != nil {
+		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+		return
 	}
 }
 
@@ -84,25 +114,4 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	globalDTO.NewBaseResponse(http.StatusCreated, false, nil).SendResponse(&w)
-}
-
-func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Request) {
-	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
-
-	token, isLoggedIn := utils.GetSessionToken(r)
-	session, err := p.sessionService.GetSession(r.Context(), token)
-
-	//TODO : Get user detail and pass its value to front end
-	user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
-
-	data := map[string]interface{}{
-		"LoggedIn": isLoggedIn,
-		"User":     user, //only placehodler
-	}
-
-	if err == nil {
-		err = tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
-	} else {
-		err = tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
-	}
 }
