@@ -53,7 +53,6 @@ func (p PostRepositoryImpl) UpdatePost(ctx context.Context, post entity.BlogPost
 		return err
 	}
 
-	log.Println(post.AuthorID, post.Banner, post.Title, post.Body, post.PostID)
 	result, err := prpd.ExecContext(ctx, post.AuthorID, post.Banner, post.Title, post.Body, post.PostID)
 	if err != nil {
 		log.Println("[ERROR] NewPost -> error on executing query :", err)

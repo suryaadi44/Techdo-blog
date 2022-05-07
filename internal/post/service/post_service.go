@@ -14,7 +14,7 @@ type PostServiceApi interface {
 	GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error)
 	GetCategoriesFromID(ctx context.Context, id int64) (dto.CategoryList, error)
 	GetCategoryList(ctx context.Context) (dto.CategoryList, error)
-	UploadImage(ctx context.Context, filename string, image string, folderID string) (*imagekit.UploadResponse, error)
+	UploadImage(ctx context.Context, filename string, image interface{}, folderID string) (*imagekit.UploadResponse, error)
 }
 
 func NewPostService(DB *sql.DB) PostServiceApi {

@@ -28,10 +28,13 @@
           </form>
 
           <div class="right-nav">
-            <!-- <a class="navbar__login-btn" href="#">Login</a>
-            <a class="navbar__create-acc-btn" href="#">Create Account</a> -->
-            <a class="navbar__create-post-btn" href="/post/create">Create Post</a>
-            <div class="user-profile-container" style="background-image: url('/static/img/Makaroni.jpg');"></div>
+          {{if .Data.LoggedIn}}
+              <a class="navbar__create-post-btn" href="/post/create">Create Post</a>
+              <div class="user-profile-container" style="background-image: url('{{.Data.User.Picture}}');"></div>
+          {{else}}
+              <a class="navbar__login-btn" href="/login">Login</a>
+              <a class="navbar__create-acc-btn" href="/signup">Create Account</a>
+          {{end}}
           </div>
           <button href="" class="navbar__auth-nav-btn"><i class="fa-solid fa-user"></i></button>
         </div>
@@ -41,13 +44,13 @@
     <div class="card user-nav" style="width: 18rem;">
       <div class="card-body">
         <ul>
-          <li><a href="">alitdarmaputra</a></li>
+          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
           <hr>
           <li><a href="">Dashboard</a></li>
           <li><a href="">Create Post</a></li>
           <li><a href="">Settings</a></li>
           <hr>
-          <li><a href="">Sign Out</a></li>
+          <li><a href="/logout">Sign Out</a></li>
         </ul>
       </div>
     </div>
@@ -56,8 +59,8 @@
     <div class="card auth-nav" style="width: 18rem;">
       <div class="card-body">
         <ul>
-          <li><a href="">Login</a></li>
-          <li><a href="">Create Account</a></li>
+          <li><a href="/login">Login</a></li>
+          <li><a href="/signup">Create Account</a></li>
         </ul>
       </div>
     </div>

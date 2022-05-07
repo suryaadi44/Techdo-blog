@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"bytes"
 	"html/template"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -11,6 +13,7 @@ import (
 	"github.com/suryaadi44/Techdo-blog/internal/post/service"
 	userServicePkg "github.com/suryaadi44/Techdo-blog/internal/user/service"
 	globalDTO "github.com/suryaadi44/Techdo-blog/pkg/dto"
+	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 
 type PostController struct {
@@ -35,6 +38,31 @@ func (p *PostController) InitializeController() {
 	p.router.HandleFunc("/", p.postDashboardHandler).Methods(http.MethodGet)
 }
 
+func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Request) {
+	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
+	var err error
+
+	token, isLoggedIn := utils.GetSessionToken(r)
+	data := map[string]interface{}{
+		"LoggedIn": isLoggedIn,
+	}
+
+	if isLoggedIn {
+		session, err := p.sessionService.GetSession(r.Context(), token)
+		user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
+
+		if err == nil {
+			data["User"] = user
+		}
+	}
+
+	if err == nil {
+		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
+	} else {
+		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+	}
+}
+
 func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Request) {
 	var tmpl = template.Must(template.ParseFiles("web/template/post/createPost.html"))
 
@@ -56,16 +84,14 @@ func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Request) {
-	loggedIn := true
-	c := &http.Cookie{}
-	if storedCookie, _ := r.Cookie("session_token"); storedCookie != nil {
-		c = storedCookie
-	}
-	if c.Value == "" {
-		loggedIn = false
-	}
+	token, _ := utils.GetSessionToken(r)
+	session, _ := p.sessionService.GetSession(r.Context(), token)
+	// if !loggedIn {
+	// 	globalDTO.NewBaseResponse(http.StatusForbidden, true, "Authentication required").SendResponse(&w)
+	// 	return
+	// }
 
-	if err := r.ParseForm(); err != nil {
+	if err := r.ParseMultipartForm(32 << 20); err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return
 	}
@@ -75,22 +101,26 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return
 	}
+
+	uploadedFile, handler, err := r.FormFile("banner")
 	if err != nil {
-		loggedIn = false
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+	defer uploadedFile.Close()
+
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, uploadedFile); err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
 	}
 
 	post := dto.BlogPostRequest{
-		Category: category,
-		Banner:   r.FormValue("cover"),
-		Title:    r.FormValue("title"),
-		Body:     r.FormValue("editordata"),
-	}
-
-	session, _ := p.sessionService.GetSession(r.Context(), c.Value)
-
-	if !loggedIn {
-		globalDTO.NewBaseResponse(http.StatusForbidden, true, "Authentication required").SendResponse(&w)
-		return
+		Category:   category,
+		Banner:     buf.Bytes(),
+		BannerName: handler.Filename,
+		Title:      r.FormValue("title"),
+		Body:       r.FormValue("editordata"),
 	}
 
 	err = p.postService.AddPost(r.Context(), post, session.UID)
@@ -100,15 +130,4 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	globalDTO.NewBaseResponse(http.StatusCreated, false, nil).SendResponse(&w)
-}
-
-func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Request) {
-	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
-
-	var err = tmpl.Execute(w, nil)
-
-	if err != nil {
-		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
-		return
-	}
 }
