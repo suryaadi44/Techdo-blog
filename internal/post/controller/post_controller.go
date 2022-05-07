@@ -10,6 +10,7 @@ import (
 	"github.com/suryaadi44/Techdo-blog/internal/post/dto"
 	"github.com/suryaadi44/Techdo-blog/internal/post/service"
 	globalDTO "github.com/suryaadi44/Techdo-blog/pkg/dto"
+	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 
 type PostController struct {
@@ -53,14 +54,12 @@ func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Request) {
-	loggedIn := true
-	c := &http.Cookie{}
-	if storedCookie, _ := r.Cookie("session_token"); storedCookie != nil {
-		c = storedCookie
-	}
-	if c.Value == "" {
-		loggedIn = false
-	}
+	token, _ := utils.GetSessionToken(r)
+	session, _ := p.sessionService.GetSession(r.Context(), token)
+	// if !loggedIn {
+	// 	globalDTO.NewBaseResponse(http.StatusForbidden, true, "Authentication required").SendResponse(&w)
+	// 	return
+	// }
 
 	if err := r.ParseForm(); err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
@@ -72,22 +71,12 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return
 	}
-	if err != nil {
-		loggedIn = false
-	}
 
 	post := dto.BlogPostRequest{
 		Category: category,
 		Banner:   r.FormValue("cover"),
 		Title:    r.FormValue("title"),
 		Body:     r.FormValue("editordata"),
-	}
-
-	session, _ := p.sessionService.GetSession(r.Context(), c.Value)
-
-	if !loggedIn {
-		globalDTO.NewBaseResponse(http.StatusForbidden, true, "Authentication required").SendResponse(&w)
-		return
 	}
 
 	err = p.postService.AddPost(r.Context(), post, session.UID)
@@ -100,9 +89,19 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Request) {
+	token, isLoggedIn := utils.GetSessionToken(r)
+	session, _ := p.sessionService.GetSession(r.Context(), token)
+
+	//TODO : Get user detail and pass its value to front end
+
 	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
 
-	var err = tmpl.Execute(w, nil)
+	data := map[string]interface{}{
+		"LoggedIn": isLoggedIn,
+		"User":     session, //only placehodler
+	}
+
+	var err = tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
 
 	if err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
