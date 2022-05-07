@@ -30,8 +30,8 @@
     | DB_USERNAME    | Database username that have acces to CRUD operation in table       |
     | DB_PASSWORD    | Database password for username                                     |
     | DB_NAME        | Database name where table is stored                                |
-    | IMGKIT_PRIVKEY | Database name where table is stored                                |
-    | IMGKIT_PUBKEY  | Database name where table is stored                                |
+    | IMGKIT_PRIVKEY | Private key for IMGKIT account                                     |
+    | IMGKIT_PUBKEY  | Public key for IMGKIT account                                      |
     
 4. Run app
     App can be started with this command:

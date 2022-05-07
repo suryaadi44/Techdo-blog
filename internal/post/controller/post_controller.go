@@ -9,6 +9,7 @@ import (
 	authServicePkg "github.com/suryaadi44/Techdo-blog/internal/auth/service"
 	"github.com/suryaadi44/Techdo-blog/internal/post/dto"
 	"github.com/suryaadi44/Techdo-blog/internal/post/service"
+	userServicePkg "github.com/suryaadi44/Techdo-blog/internal/user/service"
 	globalDTO "github.com/suryaadi44/Techdo-blog/pkg/dto"
 	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
@@ -17,13 +18,15 @@ type PostController struct {
 	router         *mux.Router
 	postService    service.PostServiceApi
 	sessionService authServicePkg.SessionServiceApi
+	userService    userServicePkg.UserServiceApi
 }
 
-func NewController(router *mux.Router, postService service.PostServiceApi, sessionService authServicePkg.SessionServiceApi) *PostController {
+func NewController(router *mux.Router, postService service.PostServiceApi, sessionService authServicePkg.SessionServiceApi, userService userServicePkg.UserServiceApi) *PostController {
 	return &PostController{
 		router:         router,
 		postService:    postService,
 		sessionService: sessionService,
+		userService:    userService,
 	}
 }
 
