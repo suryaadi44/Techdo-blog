@@ -56,16 +56,6 @@
     </div>
   </div>
 
-  <!-- Auth Nav Menu -->
-  <div class="card auth-nav" style="width: 18rem;">
-    <div class="card-body">
-      <ul>
-        <li><a href="">Login</a></li>
-        <li><a href="">Create Account</a></li>
-      </ul>
-    </div>
-  </div>
-
   <!-- Index Body -->
   <div class="container-fluid pt-4 ps-5 pe-5">
     <form action="/post/create" method="post" enctype="multipart/form-data">
@@ -81,7 +71,7 @@
       <div class="input-group mb-3">
         <label class="input-group-text" for="inputGroupSelect01">Category</label>
         <select class="form-select" id="inputGroupSelect01" name="category" required>
-          <option selected disabled>Choose...</option>
+          <option value="" disabled selected>Please select</option>
           {{range $elem := .Data.Categories}}
             <option value="{{$elem.CategoryID}}">{{$elem.CategoryName}}</option>
           {{end}}
