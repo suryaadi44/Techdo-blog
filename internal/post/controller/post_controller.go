@@ -9,6 +9,7 @@ import (
 
 	"github.com/gorilla/mux"
 	authServicePkg "github.com/suryaadi44/Techdo-blog/internal/auth/service"
+	middlewarePkg "github.com/suryaadi44/Techdo-blog/internal/middleware"
 	"github.com/suryaadi44/Techdo-blog/internal/post/dto"
 	"github.com/suryaadi44/Techdo-blog/internal/post/service"
 	userServicePkg "github.com/suryaadi44/Techdo-blog/internal/user/service"
@@ -20,21 +21,26 @@ type PostController struct {
 	router         *mux.Router
 	postService    service.PostServiceApi
 	sessionService authServicePkg.SessionServiceApi
+	authMiddleware middlewarePkg.AuthMiddleware
 	userService    userServicePkg.UserServiceApi
 }
 
-func NewController(router *mux.Router, postService service.PostServiceApi, sessionService authServicePkg.SessionServiceApi, userService userServicePkg.UserServiceApi) *PostController {
+func NewController(router *mux.Router, postService service.PostServiceApi, sessionService authServicePkg.SessionServiceApi, authMiddleware middlewarePkg.AuthMiddleware, userService userServicePkg.UserServiceApi) *PostController {
 	return &PostController{
 		router:         router,
 		postService:    postService,
 		sessionService: sessionService,
+		authMiddleware: authMiddleware,
 		userService:    userService,
 	}
 }
 
 func (p *PostController) InitializeController() {
-	p.router.HandleFunc("/post/create", p.createPostPageHandler).Methods(http.MethodGet)
-	p.router.HandleFunc("/post/create", p.createPostHandler).Methods(http.MethodPost)
+	createRouter := p.router.PathPrefix("/").Subrouter()
+	createRouter.Use(p.authMiddleware.AuthMiddleware())
+	createRouter.HandleFunc("/post/create", p.createPostPageHandler).Methods(http.MethodGet)
+	createRouter.HandleFunc("/post/create", p.createPostHandler).Methods(http.MethodPost)
+
 	p.router.HandleFunc("/", p.postDashboardHandler).Methods(http.MethodGet)
 }
 
