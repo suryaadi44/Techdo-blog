@@ -22,10 +22,15 @@ func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest, 
 		log.Println("[ERROR] AddPost: Error geting reserved ID-> error:", err)
 		return -1, err
 	}
-
-	r := regexp.MustCompile(`src="([^"]+)"`)
-	matches := r.FindAllStringSubmatch(post.Body, -1)
 	pictureFolder := fmt.Sprintf("/%d", reservedID)
+
+	r := regexp.MustCompile(`\.(\w*)$`)
+	extension := r.FindString(post.BannerName)
+	bannerName := fmt.Sprintf("%d%s", reservedID, extension)
+	bannerUrl, err := utils.UploadImage(ctx, bannerName, post.Banner, pictureFolder)
+
+	r = regexp.MustCompile(`src="([^"]+)"`)
+	matches := r.FindAllStringSubmatch(post.Body, -1)
 	for _, v := range matches {
 		r := regexp.MustCompile(`image/(\w*)`)
 		extension := r.FindAllStringSubmatch(v[1], -1)[0][1]
@@ -38,7 +43,7 @@ func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest, 
 		}
 	}
 
-	err = p.Repository.UpdatePost(ctx, post.ToDAO(reservedID, authorID))
+	err = p.Repository.UpdatePost(ctx, post.ToDAO(reservedID, authorID, bannerUrl.URL))
 	if err != nil {
 		log.Println("[ERROR] AddPost: Error adding post data -> error:", err)
 		return -1, err
@@ -63,6 +68,20 @@ func (p PostServiceImpl) GetFullPost(ctx context.Context, id int64) (dto.BlogPos
 	return dto.NewBlogPostResponse(post, categories), nil
 }
 
+func (p PostServiceImpl) GetBriefsBlogPost(ctx context.Context, page int64, limit int64) (dto.BriefsBlogPostResponse, error) {
+	var postList dto.BriefsBlogPostResponse
+	offset := (page - 1) * limit
+
+	postListEntity, err := p.Repository.GetBriefsBlogPostData(ctx, offset, limit)
+	if err != nil {
+		log.Println("[ERROR] Fetching list of post -> error:", err)
+		return postList, err
+	}
+
+	postList = dto.NewBriefsBlogPostResponse(postListEntity)
+	return postList, nil
+}
+
 func (p PostServiceImpl) GetCategoriesFromID(ctx context.Context, id int64) (dto.CategoryList, error) {
 	categories, err := p.Repository.GetCategoriesFromID(ctx, id)
 	if err != nil {
@@ -83,7 +102,6 @@ func (p PostServiceImpl) GetCategoryList(ctx context.Context) (dto.CategoryList,
 	return dto.NewCategoryList(categories), nil
 }
 
-func (p PostServiceImpl) UploadImage(ctx context.Context, filename string, image string, folderID string) (*imagekit.UploadResponse, error) {
-
+func (p PostServiceImpl) UploadImage(ctx context.Context, filename string, image interface{}, folderID string) (*imagekit.UploadResponse, error) {
 	return utils.UploadImage(ctx, filename, image, folderID)
 }

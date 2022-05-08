@@ -28,10 +28,13 @@
           </form>
 
           <div class="right-nav">
-            <!-- <a class="navbar__login-btn" href="#">Login</a>
-            <a class="navbar__create-acc-btn" href="#">Create Account</a> -->
-            <a class="navbar__create-post-btn" href="/post/create">Create Post</a>
-            <div class="user-profile-container" style="background-image: url('/static/img/Makaroni.jpg');"></div>
+          {{if .Data.LoggedIn}}
+              <a class="navbar__create-post-btn" href="/post/create">Create Post</a>
+              <div class="user-profile-container" style="background-image: url('{{.Data.User.Picture}}');"></div>
+          {{else}}
+              <a class="navbar__login-btn" href="/login">Login</a>
+              <a class="navbar__create-acc-btn" href="/signup">Create Account</a>
+          {{end}}
           </div>
           <button href="" class="navbar__auth-nav-btn"><i class="fa-solid fa-user"></i></button>
         </div>
@@ -41,13 +44,13 @@
     <div class="card user-nav" style="width: 18rem;">
       <div class="card-body">
         <ul>
-          <li><a href="">alitdarmaputra</a></li>
+          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
           <hr>
           <li><a href="">Dashboard</a></li>
           <li><a href="">Create Post</a></li>
           <li><a href="">Settings</a></li>
           <hr>
-          <li><a href="">Sign Out</a></li>
+          <li><a href="/logout">Sign Out</a></li>
         </ul>
       </div>
     </div>
@@ -56,8 +59,8 @@
     <div class="card auth-nav" style="width: 18rem;">
       <div class="card-body">
         <ul>
-          <li><a href="">Login</a></li>
-          <li><a href="">Create Account</a></li>
+          <li><a href="/login">Login</a></li>
+          <li><a href="/signup">Create Account</a></li>
         </ul>
       </div>
     </div>
@@ -68,7 +71,6 @@
         <div class="col">
           Column
         </div>
-
         <div class="col-6">
           <div class="row">
             <nav class="nav">
@@ -78,19 +80,20 @@
             </nav>
           </div>
 
+          {{range $elem := .Data.Posts}}
           <div class="row posts-container">
             <div class="card mb-3 post" style="width: 100%;">
-              <div class="blog-cover" style="background-image: url('/static/img/3.jpg');"></div>
+              <div class="blog-cover" style="background-image: url('{{$elem.Banner}}');"></div>
               <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
+                <h5 class="card-title">{{$elem.Title}}</h5>
+                <!-- <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
+                <a href="/post/{{$elem.PostID}}" class="btn btn-primary">Read More</a>
               </div>
             </div>
           </div>
+          {{end}}
           
         </div>    
-
         <div class="col">
           Column
         </div>

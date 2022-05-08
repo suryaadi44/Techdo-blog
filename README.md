@@ -22,14 +22,16 @@
 3. Change `.env` file value according to your own value.
     Variable description:
     
-    | Variable    | Description                                                        |
-    | ----------- | ------------------------------------------------------------------ |
-    | APP_NAME    | Current app name, not affecting front end, only used for logging   |
-    | ADDRESS     | Address which server will listen to, eg: localhost:80 / :80        |
-    | DB_ADDRESS  | DBMS address, eg: localhost:3307 / :3307                           |
-    | DB_USERNAME | Database username that have acces to CRUD operation in table       |
-    | DB_PASSWORD | Database password for username                                     |
-    | DB_NAME     | Database name where table is stored                                |
+    | Variable       | Description                                                        |
+    | -------------- | ------------------------------------------------------------------ |
+    | APP_NAME       | Current app name, not affecting front end, only used for logging   |
+    | ADDRESS        | Address which server will listen to, eg: localhost:80 / :80        |
+    | DB_ADDRESS     | DBMS address, eg: localhost:3307 / :3307                           |
+    | DB_USERNAME    | Database username that have acces to CRUD operation in table       |
+    | DB_PASSWORD    | Database password for username                                     |
+    | DB_NAME        | Database name where table is stored                                |
+    | IMGKIT_PRIVKEY | Private key for IMGKIT account                                     |
+    | IMGKIT_PUBKEY  | Public key for IMGKIT account                                      |
     
 4. Run app
     App can be started with this command:

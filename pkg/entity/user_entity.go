@@ -17,6 +17,7 @@ type UserDetail struct {
 	Phone     string    `db:"phone"`
 	AboutMe   string    `db:"about_me"`
 	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 }
 
 type Session struct {

@@ -68,19 +68,19 @@
 
   <!-- Index Body -->
   <div class="container-fluid pt-4 ps-5 pe-5">
-    <form action="/post/create" method="post">
+    <form action="/post/create" method="post" enctype="multipart/form-data">
       <div class="mb-3">
-        <label for="formFile" class="form-label">Blog Cover</label>
-        <input class="form-control" type="file" id="formFile" name="cover">
+        <label for="banner" class="form-label">Blog Cover</label>
+        <input class="form-control" type="file" id="banner" name="banner" required>
       </div>
       <div class="input-group input-group-lg mb-3">
         <span class="input-group-text" id="inputGroup-sizing-lg">Title</span>
         <input type="text" class="form-control" aria-label="Sizing example input"
-          aria-describedby="inputGroup-sizing-lg" name="title">
+          aria-describedby="inputGroup-sizing-lg" name="title" required>
       </div>
       <div class="input-group mb-3">
         <label class="input-group-text" for="inputGroupSelect01">Category</label>
-        <select class="form-select" id="inputGroupSelect01" name="category">
+        <select class="form-select" id="inputGroupSelect01" name="category" required>
           <option selected disabled>Choose...</option>
           {{range $elem := .Data.Categories}}
             <option value="{{$elem.CategoryID}}">{{$elem.CategoryName}}</option>
@@ -88,7 +88,7 @@
         </select>
       </div>
       <div class="mb-3">
-        <textarea id="summernote" name="editordata"></textarea>
+        <textarea id="summernote" name="editordata" required></textarea>
       </div>
       <button type="submit" class="btn-lg btn-primary">Post</button>
     </form>
