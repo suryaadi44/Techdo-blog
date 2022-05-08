@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 	authServicePkg "github.com/suryaadi44/Techdo-blog/internal/auth/service"
@@ -123,9 +124,17 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	title := r.FormValue("title")
+	body := r.FormValue("editordata")
+
 	category, err := strconv.ParseInt(r.FormValue("category"), 10, 64)
 	if err != nil {
-		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, "Category error").SendResponse(&w)
+		return
+	}
+
+	if strings.TrimSpace(title) == "" {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, "Title and Body are required").SendResponse(&w)
 		return
 	}
 
@@ -146,8 +155,8 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 		Category:   category,
 		Banner:     buf.Bytes(),
 		BannerName: handler.Filename,
-		Title:      r.FormValue("title"),
-		Body:       r.FormValue("editordata"),
+		Title:      title,
+		Body:       body,
 	}
 
 	postID, err := p.postService.AddPost(r.Context(), post, session.UID)

@@ -26,6 +26,8 @@ $("#post-form").submit(function (e) {
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                 });
+                document.getElementById("submit-btn").innerHTML = "Post"
+                document.getElementById("submit-btn").disabled = false
             } else {
                 document.getElementById("submit-btn").innerHTML = "Post"
                 Swal.fire({
