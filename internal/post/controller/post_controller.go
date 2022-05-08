@@ -42,6 +42,7 @@ func (p *PostController) InitializeController() {
 	createRouter.Use(p.authMiddleware.AuthMiddleware())
 	createRouter.HandleFunc("/post/create", p.createPostPageHandler).Methods(http.MethodGet)
 	createRouter.HandleFunc("/post/create", p.createPostHandler).Methods(http.MethodPost)
+	createRouter.HandleFunc("/post/delete/{id:[0-9]+}", p.deletePostHandlder).Methods(http.MethodDelete)
 
 	p.router.HandleFunc("/", p.postDashboardHandler).Methods(http.MethodGet)
 }
@@ -113,6 +114,37 @@ func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Re
 		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
 		return
 	}
+}
+
+func (p *PostController) deletePostHandlder(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, _ := strconv.ParseInt(vars["id"], 10, 64)
+
+	token, _ := utils.GetSessionToken(r)
+	session, err := p.sessionService.GetSession(r.Context(), token)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	postAuthor, err := p.postService.GetPostAuthorIdFromId(r.Context(), id)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	if postAuthor != session.UID {
+		globalDTO.NewBaseResponse(http.StatusUnauthorized, true, "Cannot delete other user post").SendResponse(&w)
+		return
+	}
+
+	err = p.postService.DeletePost(r.Context(), id)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	globalDTO.NewBaseResponse(http.StatusOK, true, "Post deleted").SendResponse(&w)
 }
 
 func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Request) {

@@ -15,9 +15,10 @@ type PostRepositoryImpl struct {
 var (
 	INSERT_BLANK_POST = "INSERT INTO blog_posts() VALUE ()"
 
-	UPDATE_POST = "UPDATE blog_posts SET author_id = ?, banner = ?, title = ?, body = ? WHERE post_id = ?"
-
+	UPDATE_POST              = "UPDATE blog_posts SET author_id = ?, banner = ?, title = ?, body = ? WHERE post_id = ?"
+	DELETE_POST              = "DELETE FROM blog_posts WHERE post_id = ?"
 	SELECT_POST              = "SELECT b.post_id, b.banner, b.title, b.body, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author, u.picture FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
+	SELECT_POST_AUTHOR       = "SELECT author_id FROM blog_posts WHERE post_id = ?"
 	SELECT_ID_OF_LAST_INSERT = "SELECT LAST_INSERT_ID() as uid"
 	SELECT_LIST_OF_POST      = "SELECT b.post_id, b.banner, b.title, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid ORDER BY b.created_at DESC LIMIT ?, ? "
 
@@ -50,27 +51,53 @@ func (p PostRepositoryImpl) ReserveID(ctx context.Context) (int64, error) {
 func (p PostRepositoryImpl) UpdatePost(ctx context.Context, post entity.BlogPost) error {
 	prpd, err := p.DB.PrepareContext(ctx, UPDATE_POST)
 	if err != nil {
-		log.Println("[ERROR] NewPost -> error :", err)
+		log.Println("[ERROR] UpdatePost -> error :", err)
 		return err
 	}
 
 	result, err := prpd.ExecContext(ctx, post.AuthorID, post.Banner, post.Title, post.Body, post.PostID)
 	if err != nil {
-		log.Println("[ERROR] NewPost -> error on executing query :", err)
+		log.Println("[ERROR] UpdatePost -> error on executing query :", err)
 		return err
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		log.Println("[ERROR] NewPost -> error on getting rows affected :", err)
+		log.Println("[ERROR] UpdatePost -> error on getting rows affected :", err)
 		return err
 	}
 	if rowsAffected != 1 {
-		log.Println("[ERROR] NewPost -> error on inserting row :", err)
+		log.Println("[ERROR] UpdatePost -> error on updating row :", err)
 		return err
 	}
 
-	return err
+	return nil
+}
+
+func (p PostRepositoryImpl) DeletePost(ctx context.Context, id int64) error {
+	prpd, err := p.DB.PrepareContext(ctx, DELETE_POST)
+	if err != nil {
+		log.Println("[ERROR] DeletePost -> error :", err)
+		return err
+	}
+
+	result, err := prpd.ExecContext(ctx, id)
+	if err != nil {
+		log.Println("[ERROR] DeletePost -> error on executing query :", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] DeletePost -> error on getting rows affected :", err)
+		return err
+	}
+	if rowsAffected != 1 {
+		log.Println("[ERROR] DeletePost -> error on deleting row :", err)
+		return err
+	}
+
+	return nil
 }
 
 func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int64) (entity.BlogPostFull, error) {
@@ -128,6 +155,33 @@ func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset in
 	}
 
 	return postList, nil
+}
+
+func (p PostRepositoryImpl) GetPostAuthorId(ctx context.Context, postID int64) (int64, error) {
+	prpd, err := p.DB.PrepareContext(ctx, SELECT_POST_AUTHOR)
+	if err != nil {
+		log.Println("[ERROR] GetPostAuthorId -> error :", err)
+		return -1, err
+	}
+
+	rows, err := prpd.QueryContext(ctx, postID)
+	if err != nil {
+		log.Println("[ERROR] GetPostAuthorId -> error on executing query :", err)
+		return -1, err
+	}
+
+	var authorID int64
+	if rows.Next() {
+		err = rows.Scan(&authorID)
+		if err != nil {
+			log.Println("[ERROR] GetPostAuthorId -> error scanning row :", err)
+			return -1, err
+		}
+
+		return authorID, nil
+	}
+
+	return -1, err
 }
 
 func (p PostRepositoryImpl) GetCategoriesFromID(ctx context.Context, id int64) (entity.Categories, error) {
