@@ -19,6 +19,7 @@
     crossorigin="anonymous"></script>
   <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -27,17 +28,8 @@
     <div class="container-fluid">
       <a href="/" class="navbar__logo">Techdo-Blog</a>
 
-      <form class="navbar__search-box-container">
-        <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search"
-          value="">
-        <div class="navbar__search-button"><i class="fa-solid fa-magnifying-glass"></i></div>
-      </form>
-
       <div class="right-nav">
-        <!-- <a class="navbar__login-btn" href="#">Login</a>
-            <a class="navbar__create-acc-btn" href="#">Create Account</a> -->
-        <a class="navbar__create-post-btn" href="/post/create">Create Post</a>
-        <div class="user-profile-container" style="background-image: url('/static/img/Makaroni.jpg');"></div>
+        <div class="user-profile-container" style="background-image: url('{{.Data.User.Picture}}');"></div>
       </div>
       <button href="" class="navbar__auth-nav-btn"><i class="fa-solid fa-user"></i></button>
     </div>
@@ -47,30 +39,19 @@
   <div class="card user-nav" style="width: 18rem;">
     <div class="card-body">
       <ul>
-        <li><a href="">alitdarmaputra</a></li>
+        <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
         <hr>
-        <li><a href="">Dashboard</a></li>
-        <li><a href="">Create Post</a></li>
+        <li><a href="/">Dashboard</a></li>
         <li><a href="">Settings</a></li>
         <hr>
-        <li><a href="">Sign Out</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Auth Nav Menu -->
-  <div class="card auth-nav" style="width: 18rem;">
-    <div class="card-body">
-      <ul>
-        <li><a href="">Login</a></li>
-        <li><a href="">Create Account</a></li>
+        <li><a href="/logout">Sign Out</a></li>
       </ul>
     </div>
   </div>
 
   <!-- Index Body -->
   <div class="container-fluid pt-4 ps-5 pe-5">
-    <form action="/post/create" method="post" enctype="multipart/form-data">
+    <form id="post-form">
       <div class="mb-3">
         <label for="banner" class="form-label">Blog Cover</label>
         <input class="form-control" type="file" id="banner" name="banner" required>
@@ -78,12 +59,12 @@
       <div class="input-group input-group-lg mb-3">
         <span class="input-group-text" id="inputGroup-sizing-lg">Title</span>
         <input type="text" class="form-control" aria-label="Sizing example input"
-          aria-describedby="inputGroup-sizing-lg" name="title" required>
+          aria-describedby="inputGroup-sizing-lg" name="title" id="title" required>
       </div>
       <div class="input-group mb-3">
-        <label class="input-group-text" for="inputGroupSelect01">Category</label>
-        <select class="form-select" id="inputGroupSelect01" name="category" required>
-          <option selected disabled>Choose...</option>
+        <label class="input-group-text" for="category">Category</label>
+        <select class="form-select" id="category" name="category"  required>
+          <option value="" disabled selected>Please select</option>
           {{range $elem := .Data.Categories}}
             <option value="{{$elem.CategoryID}}">{{$elem.CategoryName}}</option>
           {{end}}
@@ -92,7 +73,9 @@
       <div class="mb-3">
         <textarea id="summernote" name="editordata" required></textarea>
       </div>
-      <button type="submit" class="btn-lg btn-primary">Post</button>
+      <button type="submit" class="btn-lg btn-primary" id="submit-btn">
+        Post
+      </button>
     </form>
   </div>
 
@@ -102,6 +85,7 @@
     crossorigin="anonymous"></script>
 
   <script src="/static/js/index.js"></script>
+  <script src="/static/js/post-form.js"></script>
   <script src="/static/js/summernote.js"></script>
 </body>
 

@@ -16,11 +16,11 @@ type PostServiceImpl struct {
 	Repository PostRepositoryImpl
 }
 
-func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest, authorID int64) error {
+func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest, authorID int64) (int64, error) {
 	reservedID, err := p.Repository.ReserveID(ctx)
 	if err != nil {
 		log.Println("[ERROR] AddPost: Error geting reserved ID-> error:", err)
-		return err
+		return -1, err
 	}
 	pictureFolder := fmt.Sprintf("/%d", reservedID)
 
@@ -46,10 +46,10 @@ func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest, 
 	err = p.Repository.UpdatePost(ctx, post.ToDAO(reservedID, authorID, bannerUrl.URL))
 	if err != nil {
 		log.Println("[ERROR] AddPost: Error adding post data -> error:", err)
-		return err
+		return -1, err
 	}
 
-	return nil
+	return reservedID, nil
 }
 
 func (p PostServiceImpl) GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error) {
