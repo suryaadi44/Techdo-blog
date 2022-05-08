@@ -86,9 +86,14 @@ func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Req
 func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Request) {
 	var tmpl = template.Must(template.ParseFiles("web/template/post/createPost.html"))
 
+	token, _ := utils.GetSessionToken(r)
+	session, err := p.sessionService.GetSession(r.Context(), token)
+	user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
+
 	categoryList, err := p.postService.GetCategoryList(r.Context())
 	data := map[string]interface{}{
 		"Categories": categoryList,
+		"User":       user,
 	}
 
 	if err == nil {
