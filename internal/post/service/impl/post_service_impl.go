@@ -6,6 +6,7 @@ import (
 	"log"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/codedius/imagekit-go"
 	"github.com/suryaadi44/Techdo-blog/internal/post/dto"
@@ -102,11 +103,11 @@ func (p PostServiceImpl) GetBriefsBlogPost(ctx context.Context, page int64, limi
 	return postList, nil
 }
 
-func (p PostServiceImpl) SearchBlogPost(ctx context.Context, q string, page int64, limit int64) (dto.BriefsBlogPostResponse, error) {
+func (p PostServiceImpl) SearchBlogPost(ctx context.Context, q string, page int64, limit int64, dateStart *time.Time, dateEnd *time.Time) (dto.BriefsBlogPostResponse, error) {
 	var postList dto.BriefsBlogPostResponse
 	offset := (page - 1) * limit
 
-	postListEntity, err := p.Repository.GetBriefsBlogPostFromSearch(ctx, q, offset, limit)
+	postListEntity, err := p.Repository.GetBriefsBlogPostFromSearch(ctx, q, offset, limit, dateStart, dateEnd)
 	if err != nil {
 		log.Println("[ERROR] Fetching list of post -> error:", err)
 		return postList, err

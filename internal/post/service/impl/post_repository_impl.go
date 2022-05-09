@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
 )
@@ -24,8 +25,8 @@ var (
 	SELECT_POST              = "SELECT b.post_id, b.banner, b.title, b.body, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author, u.picture FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
 	SELECT_POST_AUTHOR       = "SELECT author_id FROM blog_posts WHERE post_id = ?"
 	SELECT_ID_OF_LAST_INSERT = "SELECT LAST_INSERT_ID() as uid"
-	SELECT_LIST_OF_POST      = "SELECT b.post_id, b.banner, b.title, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid ORDER BY b.created_at DESC LIMIT ?, ? "
-	SELECT_FULL_TEXT_POST    = "SELECT b.post_id, b.banner, b.title, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE) ORDER BY b.created_at DESC LIMIT ?, ? "
+	SELECT_LIST_OF_POST      = "SELECT b.post_id, b.banner, b.title, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid"
+	SELECT_FULL_TEXT_POST    = "SELECT b.post_id, b.banner, b.title, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
 	SELECT_CATEGORY_OF_POST  = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
 	SELECT_CATEGORY          = "SELECT category_id, category_name FROM categories"
 )
@@ -135,7 +136,8 @@ func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int64) (entity.B
 func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset int64, limit int64) (entity.BriefsBlogPost, error) {
 	var postList entity.BriefsBlogPost
 
-	prpd, err := p.DB.PrepareContext(ctx, SELECT_LIST_OF_POST)
+	query := SELECT_LIST_OF_POST + " ORDER BY b.created_at DESC LIMIT ?, ? "
+	prpd, err := p.DB.PrepareContext(ctx, query)
 	if err != nil {
 		log.Println("[ERROR] GetFullPost -> error :", err)
 		return postList, err
@@ -161,16 +163,35 @@ func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset in
 	return postList, nil
 }
 
-func (p PostRepositoryImpl) GetBriefsBlogPostFromSearch(ctx context.Context, q string, offset int64, limit int64) (entity.BriefsBlogPost, error) {
+func (p PostRepositoryImpl) GetBriefsBlogPostFromSearch(ctx context.Context, q string, offset int64, limit int64, dateStart *time.Time, dateEnd *time.Time) (entity.BriefsBlogPost, error) {
 	var postList entity.BriefsBlogPost
+	var query string
+	var args []interface{}
 
-	prpd, err := p.DB.PrepareContext(ctx, SELECT_FULL_TEXT_POST)
+	args = append(args, q)
+	query = SELECT_FULL_TEXT_POST
+
+	if dateStart != nil && dateEnd != nil {
+		query = query + " AND b.created_at BETWEEN ? AND ?"
+		args = append(args, dateStart.Format("2006-01-02"), dateEnd.Format("2006-01-02"))
+	} else if dateStart != nil {
+		query = query + " AND b.created_at > ?"
+		args = append(args, dateStart.Format("2006-01-02"))
+	} else if dateEnd != nil {
+		query = query + " AND b.created_at < ?"
+		args = append(args, dateEnd.Format("2006-01-02"))
+	}
+
+	query = query + " ORDER BY b.created_at DESC LIMIT ?, ?"
+	args = append(args, offset, limit)
+
+	prpd, err := p.DB.PrepareContext(ctx, query)
 	if err != nil {
 		log.Println("[ERROR] GetBriefsBlogPostFromSearch -> error :", err)
 		return postList, err
 	}
 
-	rows, err := prpd.QueryContext(ctx, q, offset, limit)
+	rows, err := prpd.QueryContext(ctx, args...)
 	if err != nil {
 		log.Println("[ERROR] GetBriefsBlogPostFromSearch -> error on executing query :", err)
 		return postList, err
