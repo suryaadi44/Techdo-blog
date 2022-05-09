@@ -56,7 +56,20 @@ func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest, 
 }
 
 func (p PostServiceImpl) DeletePost(ctx context.Context, id int64) error {
-	return p.Repository.DeletePost(ctx, id)
+	err := p.Repository.DeletePost(ctx, id)
+	if err != nil {
+		log.Println("[ERROR] DeletePost: Error deleting post -> error:", err)
+		return err
+	}
+
+	imgFodlerPath := fmt.Sprintf("%d/", id)
+	err = utils.DeleteFolder(ctx, imgFodlerPath)
+	if err != nil {
+		log.Println("[ERROR] DeletePost: Error deleting imgkit folder -> error:", err)
+		return err
+	}
+
+	return nil
 }
 
 func (p PostServiceImpl) GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error) {

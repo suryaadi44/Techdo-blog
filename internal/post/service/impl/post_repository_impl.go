@@ -3,6 +3,8 @@ package impl
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"log"
 
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
@@ -125,7 +127,7 @@ func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int64) (entity.B
 		return post, nil
 	}
 
-	return post, err
+	return post, errors.New(fmt.Sprintf("No post with id %d", id))
 }
 
 func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset int64, limit int64) (entity.BriefsBlogPost, error) {
@@ -181,7 +183,7 @@ func (p PostRepositoryImpl) GetPostAuthorId(ctx context.Context, postID int64) (
 		return authorID, nil
 	}
 
-	return -1, err
+	return -1, errors.New(fmt.Sprintf("No post with id %d", postID))
 }
 
 func (p PostRepositoryImpl) GetCategoriesFromID(ctx context.Context, id int64) (entity.Categories, error) {

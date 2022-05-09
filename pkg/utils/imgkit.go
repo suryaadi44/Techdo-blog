@@ -60,3 +60,28 @@ func DeleteImage(ctx context.Context, id string) error {
 
 	return nil
 }
+
+func DeleteFolder(ctx context.Context, path string) error {
+	opts := imagekit.Options{
+		PrivateKey: os.Getenv("IMGKIT_PRIVKEY"),
+		PublicKey:  os.Getenv("IMGKIT_PUBKEY"),
+	}
+
+	ik, err := imagekit.NewClient(&opts)
+	if err != nil {
+		log.Println("[IMGKIT] Error creating imgkit client -> error:", err)
+		return err
+	}
+
+	r := imagekit.DeleteFolderRequest{
+		FolderPath: path,
+	}
+
+	err = ik.Media.DeleteFolder(ctx, &r)
+	if err != nil {
+		log.Println("[IMGKIT] Error deleting -> error:", err)
+		return err
+	}
+
+	return nil
+}
