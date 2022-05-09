@@ -10,7 +10,7 @@ import (
 )
 
 type UserAuthServiceApi interface {
-	RegisterUser(ctx context.Context, user dto.AuthRequest) error
+	RegisterUser(ctx context.Context, user dto.SignUpRequest) error
 	AuthenticateUser(ctx context.Context, user dto.AuthRequest) (entity.Session, error)
 }
 

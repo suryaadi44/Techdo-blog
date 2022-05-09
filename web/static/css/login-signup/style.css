@@ -1,7 +1,6 @@
 /* Custom Font */
 @import url("../others/custom-font.css");
 
-/* Login CSS */
 .bg-image-vertical {
     position: relative;
     overflow: hidden;
@@ -23,4 +22,11 @@
 .login__login-btn:hover {
     background-color: #4c0097;
     color: #fff;
+}
+
+.alert {
+    color: red;
+    text-align: left;
+    padding: 0;
+    margin: 0;
 }
