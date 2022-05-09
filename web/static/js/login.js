@@ -1,5 +1,5 @@
 const form = {
-    email: $("#email-form"),
+    username: $("#username-form"),
     password: $("#password-form"),
     submit: $(".login-signup__btn"),
     pass_alert: $("#pass-alert"),
@@ -11,7 +11,7 @@ let checkForm = () => {
     let isFailed = false;
 
     // Check if email is empty
-    if(form.email.val() === "") {
+    if(form.username.val() === "") {
         form.email_alert.html("Please provide email");
         isFailed = true;
     } else {
@@ -43,7 +43,7 @@ form.submit.on("click", async (e) => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                username: form.email.val(),
+                username: form.username.val(),
                 password: form.password.val(),
             }),
         })

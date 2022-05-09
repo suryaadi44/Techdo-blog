@@ -7,14 +7,11 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <!-- CSS -->
-    <link rel="stylesheet" href="/web/static/css/login-signup/style.css">
+    <link rel="stylesheet" href="/static/css/login-signup/style.css">
     <!-- Icon -->
     <script src="https://kit.fontawesome.com/ede9e54d69.js" crossorigin="anonymous"></script>
     <!-- Summer Note -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
-    <title>Techdo</title>
 </head>
 <body>
     <section class="vh-100">
@@ -26,57 +23,58 @@
                 <p class="px-5 mx-xl-4 text-muted">Express your idea in a blog.</p>
                 <div class="d-flex align-items-center mt-3 h-custom-1 px-5 ms-xl-4">
                     
-                    <form style="width: 23rem;">
+                    <form id="form" style="width: 23rem;">
         
                     <h3 class="fw-normal mb-3 pb-1" style="letter-spacing: 1px;">Sign Up</h3>
-        
-                    <div class="form-outline mb-2">
-                        <input type="email" id="email-form" class="form-control" placeholder="Email" />
-                        <label class="form-label" for="email-form">Email address</label>
-                        <br>
-                        <span class="email-alert" style="color: red;"></span>
-                    </div>
                     
+                    <div class="form-outline mb-2">
+                        <label class="form-label" for="email-form">Email address</label>
+                        <input type="email" id="email-form" class="form-control" placeholder="Email" />
+                        <span class="email-alert alert"></span>
+                    </div>
+
+                    <div class="form-outline mb-2">
+                        <label class="form-label" for="username-form">Username</label>
+                        <input type="text" id="username-form" class="form-control" placeholder="Username" />
+                        <span class="username-alert alert"></span>
+                    </div>
+
                     <div class="form-outline mb-2">
                         <div class="row">
                             <div class="col">
-                                <input type="text" id="first-name-form" class="form-control" placeholder="First name" aria-label="First name">
                                 <label class="form-label" for="first-name-form">First name</label>
-                                <br>
-                                <span class="first-name-alert" style="color: red; font-size: .9em;"></span>
+                                <input type="text" id="first-name-form" class="form-control" placeholder="First name" aria-label="First name">      
+                                <span class="first-name-alert alert" style="font-size: .9em;"></span>
                             </div>
                             <div class="col">
-                                <input type="text" id="last-name-form" class="form-control" placeholder="Last name" aria-label="Last name">
                                 <label class="form-label" for="last-name-form">Last name</label>
-                                <br>
-                                <span class="last-name-alert" style="color: red; font-size: .9em;"></span>
+                                <input type="text" id="last-name-form" class="form-control" placeholder="Last name" aria-label="Last name">
+                                <span class="last-name-alert alert" style="font-size: .9em;"></span>
                             </div>
                         </div>
                     </div>
         
                     <div class="form-outline mb-2">
-                        <input type="password" id="password-form" class="form-control" />
                         <label class="form-label" for="password-form">Password</label>
-                        <br>
-                        <span class="password-alert" style="color: red;"></span>
+                        <input type="password" id="password-form" class="form-control" />
+                        <span class="password-alert alert"></span>
                     </div>
 
                     <div class="form-outline mb-2">
-                        <input type="password" id="retype-password-form" class="form-control" />
                         <label class="form-label" for="retype-password-form">Re-type Password</label>
-                        <br>
-                        <span class="retype-password-alert" style="color: red;"></span>
+                        <input type="password" id="retype-password-form" class="form-control" />
+                        <span class="retype-password-alert alert"></span>
                         <span class="password-match-alert"></span>
                     </div>
                     
-                    <span class="signup__message-alert"></span>
+                    <span class="signup__message-alert alert"></span>
 
                     <div class="pt-1 mb-3">
                         <button class="btn btn-lg btn-block login-signup__btn" type="button">Sign up</button>
                     </div>
         
                     <!-- <p class="small mb-5 pb-lg-2"><a class="text-muted" href="#!">Forgot password?</a></p> -->
-                    <p>Already have an account? <a href="/web/template/login/login.html" class="link-info">Login here</a></p>
+                    <p>Already have an account? <a href="/login" class="link-info">Login here</a></p>
         
                     </form>
         
@@ -84,7 +82,7 @@
       
             </div>
             <div class="col-sm-6 px-0 d-none d-sm-block">
-              <img src="/web/static/css/css-images/login-signup-bg.jpg"
+              <img src="/static/css/css-images/login-signup-bg.jpg"
                 alt="Login image" class="w-100 vh-100" style="object-fit: cover; object-position: left;">
             </div>
           </div>
@@ -94,6 +92,6 @@
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 
-    <script src="/web/static/js/signup.js"></script>
+    <script src="/static/js/signup.js"></script>
 </body>
 </html>

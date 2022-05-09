@@ -1,5 +1,6 @@
 const form = {
     email: $("#email-form"),
+    username: $("#username-form"),
     firstName: $("#first-name-form"),
     lastName: $("#last-name-form"),
     password: $("#password-form"),
@@ -8,6 +9,7 @@ const form = {
 
 const alert = {
     emailAlert: $(".email-alert"),
+    usernameAlert: $(".username-alert"),
     firstNameAlert: $(".first-name-alert"),
     lastNameAlert: $(".last-name-alert"),
     passwordAlert: $(".password-alert"),
@@ -26,6 +28,13 @@ const checkForm = () => {
         isFailed = true 
     } else {
         alert.emailAlert.html("");
+    }
+
+    if(form.username.val() === "") {
+        alert.usernameAlert.html("*Please provide username");
+        isFailed = true 
+    } else {
+        alert.usernameAlert.html("");
     }
 
     if(form.firstName.val() === "") {
@@ -59,16 +68,20 @@ const checkForm = () => {
     return isFailed? false:true; 
 }
 
-form.confirm_pass.on("keyup", () => {
+form.confirm_pass.on("focusout keyup", () => {
     if (form.confirm_pass.val() === "") {
         alert.passwordMatchAlert.html("");
+        isFailed = true 
     } else {
+        alert.retypeAlert.html("");
         if (form.password.val() != form.confirm_pass.val()) {
             alert.passwordMatchAlert.css("color", "red");
             alert.passwordMatchAlert.html("*Password is not match")
+            isFailed = true 
         } else {
             alert.passwordMatchAlert.css("color", "green");
             alert.passwordMatchAlert.html("*Password match")
+            filled += 1;
         }
     }
 
@@ -76,10 +89,8 @@ form.confirm_pass.on("keyup", () => {
 
 signupBtn.on("click", () => {
     alert.signupMessage.html("");
-
     if (checkForm()) {
         const signup = "/signup";
-
         fetch(signup, {
             method: "POST",
             redirect: "follow",
@@ -88,7 +99,8 @@ signupBtn.on("click", () => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                email: form.email.val(),
+                email: form.username.val(),
+                username: form.username.val(),
                 firstName: form.firstName.val(),
                 lastName: form.lastName.val(),
                 password: form.password.val(),
@@ -102,5 +114,6 @@ signupBtn.on("click", () => {
                     window.location.href = result.data;
                 }
             });
-    }
+    } 
+
 });
