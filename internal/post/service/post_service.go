@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/codedius/imagekit-go"
 	"github.com/suryaadi44/Techdo-blog/internal/post/dto"
@@ -10,7 +11,7 @@ import (
 )
 
 type PostServiceApi interface {
-	SearchBlogPost(ctx context.Context, q string, page int64, limit int64) (dto.BriefsBlogPostResponse, error)
+	SearchBlogPost(ctx context.Context, q string, page int64, limit int64, dateStart *time.Time, dateEnd *time.Time) (dto.BriefsBlogPostResponse, error)
 
 	AddPost(ctx context.Context, post dto.BlogPostRequest, authorID int64) (int64, error)
 	DeletePost(ctx context.Context, id int64) error

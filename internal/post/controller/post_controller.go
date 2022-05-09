@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	authServicePkg "github.com/suryaadi44/Techdo-blog/internal/auth/service"
@@ -96,6 +97,7 @@ func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Re
 	// TODO : Change search page template
 	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
 	var err error
+	var dateStart, dateEnd time.Time
 
 	queryVar := r.URL.Query()
 	limit := queryVar.Get("limit")
@@ -107,12 +109,27 @@ func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Re
 		page = "1"
 	}
 
+	start := queryVar.Get("start")
+	end := queryVar.Get("end")
+
+	dateStart, err = time.Parse("2006-01-02", start)
+	dateStartPtr := &dateStart
+	if err != nil || start == "" {
+		dateStartPtr = nil
+	}
+
+	dateEnd, err = time.Parse("2006-01-02", end)
+	dateEndPtr := &dateEnd
+	if err != nil || end == "" {
+		dateEndPtr = nil
+	}
+
 	q := queryVar.Get("q")
 
 	limitConv, _ := strconv.ParseInt(limit, 10, 64)
 	pageConv, _ := strconv.ParseInt(page, 10, 64)
 
-	postData, err := p.postService.SearchBlogPost(r.Context(), q, pageConv, limitConv)
+	postData, err := p.postService.SearchBlogPost(r.Context(), q, pageConv, limitConv, dateStartPtr, dateEndPtr)
 	if err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return
