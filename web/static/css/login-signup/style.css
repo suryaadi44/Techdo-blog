@@ -23,3 +23,10 @@
     background-color: #4c0097;
     color: #fff;
 }
+
+.alert {
+    color: red;
+    text-align: left;
+    padding: 0;
+    margin: 0;
+}

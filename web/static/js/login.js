@@ -2,9 +2,9 @@ const form = {
     email: $("#email-form"),
     password: $("#password-form"),
     submit: $(".login-signup__btn"),
-    pass_alert: $(".pass-alert"),
-    email_alert: $(".email-alert"),
-    form_message: $(".form-message")
+    pass_alert: $("#pass-alert"),
+    email_alert: $("#email-alert"),
+    form_message: $("#form-message")
 };
 
 let checkForm = () => {
@@ -29,10 +29,10 @@ let checkForm = () => {
     return isFailed? false:true;
 }
 
-form.submit.on("click",async () => {
+form.submit.on("click", async (e) => {
     e.preventDefault();
     if(checkForm()) {
-        form_message.html("");
+        form.form_message.html("");
         const login = "/login";
 
         fetch(login, {
@@ -50,7 +50,7 @@ form.submit.on("click",async () => {
             .then((response) => response.json())
             .then((result) => {
                 if (result.error) {
-                    form.form_message.html("result.data");
+                    form.form_message.html(result.data);
                 } else {
                     window.location.href = result.data;
                 }

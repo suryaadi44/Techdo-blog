@@ -65,7 +65,7 @@ func (u *UserAuthController) loginHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (u *UserAuthController) loginPageHandler(w http.ResponseWriter, r *http.Request) {
-	var tmpl = template.Must(template.ParseFiles("web/template/login/index.html"))
+	var tmpl = template.Must(template.ParseFiles("web/template/login/login.html"))
 
 	var err = tmpl.Execute(w, nil)
 
@@ -108,7 +108,7 @@ func (u *UserAuthController) signUpHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (u *UserAuthController) signUpPageHandler(w http.ResponseWriter, r *http.Request) {
-	var tmpl = template.Must(template.ParseFiles("web/template/signup/index.html"))
+	var tmpl = template.Must(template.ParseFiles("web/template/signup/signup.html"))
 
 	var err = tmpl.Execute(w, nil)
 
