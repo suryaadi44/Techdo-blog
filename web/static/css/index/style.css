@@ -1,11 +1,5 @@
 /* Custom Font */
-@font-face {
-    font-family: 'arcade-classic';
-    src: url('/static/font/arcade-classic/arcadeclassic.woff2') format('woff2'),
-    url('/static/font/arcade-classic/arcadeclassic.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
+@import url("../others/custom-font.css");
 
 /* Navbar-CSS */
 .navbar{
@@ -141,7 +135,10 @@
         cursor: pointer;
         box-shadow: 0 0 0 3px #4c0097;
     }
-    
+
+    .h-custom-2 {
+        height: 100%;
+    }
 }
 
 /* Ukuran Tablet */
@@ -158,7 +155,3 @@
         display: inline;
     }
 }
-
-
-
-
