@@ -29,13 +29,16 @@ func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest, 
 	bannerName := fmt.Sprintf("%d%s", reservedID, extension)
 	bannerUrl, err := utils.UploadImage(ctx, bannerName, post.Banner, pictureFolder)
 
-	r = regexp.MustCompile(`src="([^"]+)"`)
+	r = regexp.MustCompile(`src=\"([^\"]+)\"`)
 	matches := r.FindAllStringSubmatch(post.Body, -1)
 	for _, v := range matches {
 		r := regexp.MustCompile(`image/(\w*)`)
-		extension := r.FindAllStringSubmatch(v[1], -1)[0][1]
+		extension := r.FindAllStringSubmatch(v[1], -1)
+		if len(extension) == 0 {
+			continue
+		}
 
-		pictureName := fmt.Sprintf("%d.%s", reservedID, extension)
+		pictureName := fmt.Sprintf("%d.%s", reservedID, extension[0][1])
 		imgkitResponse, err := utils.UploadImage(ctx, pictureName, v[1], pictureFolder)
 
 		if err == nil {
@@ -50,6 +53,23 @@ func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest, 
 	}
 
 	return reservedID, nil
+}
+
+func (p PostServiceImpl) DeletePost(ctx context.Context, id int64) error {
+	err := p.Repository.DeletePost(ctx, id)
+	if err != nil {
+		log.Println("[ERROR] DeletePost: Error deleting post -> error:", err)
+		return err
+	}
+
+	imgFodlerPath := fmt.Sprintf("%d/", id)
+	err = utils.DeleteFolder(ctx, imgFodlerPath)
+	if err != nil {
+		log.Println("[ERROR] DeletePost: Error deleting imgkit folder -> error:", err)
+		return err
+	}
+
+	return nil
 }
 
 func (p PostServiceImpl) GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error) {
@@ -80,6 +100,10 @@ func (p PostServiceImpl) GetBriefsBlogPost(ctx context.Context, page int64, limi
 
 	postList = dto.NewBriefsBlogPostResponse(postListEntity)
 	return postList, nil
+}
+
+func (p PostServiceImpl) GetPostAuthorIdFromId(ctx context.Context, postId int64) (int64, error) {
+	return p.Repository.GetPostAuthorId(ctx, postId)
 }
 
 func (p PostServiceImpl) GetCategoriesFromID(ctx context.Context, id int64) (dto.CategoryList, error) {

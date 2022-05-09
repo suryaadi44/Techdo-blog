@@ -11,11 +11,15 @@ import (
 
 type PostServiceApi interface {
 	AddPost(ctx context.Context, post dto.BlogPostRequest, authorID int64) (int64, error)
+	DeletePost(ctx context.Context, id int64) error
 
 	GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error)
 	GetBriefsBlogPost(ctx context.Context, page int64, limit int64) (dto.BriefsBlogPostResponse, error)
+	GetPostAuthorIdFromId(ctx context.Context, postId int64) (int64, error)
+
 	GetCategoriesFromID(ctx context.Context, id int64) (dto.CategoryList, error)
 	GetCategoryList(ctx context.Context) (dto.CategoryList, error)
+
 	UploadImage(ctx context.Context, filename string, image interface{}, folderID string) (*imagekit.UploadResponse, error)
 }
 

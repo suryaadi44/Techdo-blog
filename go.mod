@@ -12,3 +12,5 @@ require (
 )
 
 require github.com/codedius/imagekit-go v1.1.1
+
+replace github.com/codedius/imagekit-go => github.com/suryaadi44/imagekit-go v1.1.2
