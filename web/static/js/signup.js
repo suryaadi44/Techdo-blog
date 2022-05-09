@@ -81,7 +81,6 @@ form.confirm_pass.on("focusout keyup", () => {
         } else {
             alert.passwordMatchAlert.css("color", "green");
             alert.passwordMatchAlert.html("*Password match")
-            filled += 1;
         }
     }
 
@@ -99,7 +98,7 @@ signupBtn.on("click", () => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                email: form.username.val(),
+                email: form.email.val(),
                 username: form.username.val(),
                 firstName: form.firstName.val(),
                 lastName: form.lastName.val(),

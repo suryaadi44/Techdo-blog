@@ -77,7 +77,7 @@ func (u *UserAuthController) loginPageHandler(w http.ResponseWriter, r *http.Req
 
 func (u *UserAuthController) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
-	payload := dto.AuthRequest{}
+	payload := dto.SignUpRequest{}
 
 	if err := decoder.Decode(&payload); err != nil {
 		log.Println("[Decode] Error decoding JSON")

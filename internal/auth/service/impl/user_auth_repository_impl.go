@@ -14,8 +14,9 @@ type UserAuthRepositoryImpl struct {
 }
 
 var (
-	INSERT_USER = "INSERT INTO users(username, password) VALUE (?, ?)"
-	FIND_USER   = "SELECT uid, username, password FROM users WHERE username = ?"
+	INSERT_USER        = "INSERT INTO users(username, password) VALUE (?, ?)"
+	INSERT_USER_DETAIL = "INSERT INTO user_details(uid, email, first_name, last_name, pciture) VALUE (?, ?, ?, ?, ?)"
+	FIND_USER          = "SELECT uid, username, password FROM users WHERE username = ?"
 )
 
 func NewUserAuthRepository(DB *sql.DB) UserAuthRepositoryImpl {
@@ -24,27 +25,45 @@ func NewUserAuthRepository(DB *sql.DB) UserAuthRepositoryImpl {
 	}
 }
 
-func (u UserAuthRepositoryImpl) NewUser(ctx context.Context, user entity.User) error {
-	prpd, err := u.DB.PrepareContext(ctx, INSERT_USER)
+func (u UserAuthRepositoryImpl) NewUser(ctx context.Context, user entity.User, userDetail entity.UserDetail) error {
+	result, err := u.DB.ExecContext(ctx, INSERT_USER, user.Username, user.Password)
 	if err != nil {
-		log.Println("[ERROR] NewUser -> error :", err)
-		return err
-	}
-
-	result, err := prpd.ExecContext(ctx, user.Username, user.Password)
-	if err != nil {
-		log.Println("[ERROR] NewUser -> error on executing query :", err)
+		log.Println("[ERROR] NewUser -> error on executing insert user query :", err)
 		return err
 	}
 
 	rows, err := result.RowsAffected()
 	if err != nil {
-		log.Println("[ERROR] NewUser -> error on getting rows affected :", err)
+		log.Println("[ERROR] NewUser -> error on getting insert user rows affected :", err)
 		return err
 	}
+
 	if rows != 1 {
-		log.Println("[ERROR] NewUser -> error on inserting row :", err)
+		log.Println("[ERROR] NewUser -> error on inserting insert user row :", err)
+		return errors.New("Cant creare new user")
+	}
+
+	lid, err := result.LastInsertId()
+	if err != nil {
+		log.Println("[ERROR] NewUser -> error on getting uid :", err)
 		return err
+	}
+
+	result, err = u.DB.ExecContext(ctx, INSERT_USER_DETAIL, lid, userDetail.Email, userDetail.FirstName, userDetail.LastName, userDetail.Picture)
+	if err != nil {
+		log.Println("[ERROR] NewUser -> error on executing insert user details query :", err)
+		return err
+	}
+
+	rows, err = result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] NewUser -> error on getting insert user details rows affected :", err)
+		return err
+	}
+
+	if rows != 1 {
+		log.Println("[ERROR] NewUser -> error on inserting insert user details row  :", err)
+		return errors.New("Cant creare new user")
 	}
 
 	return nil

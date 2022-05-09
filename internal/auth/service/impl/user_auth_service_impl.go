@@ -18,18 +18,25 @@ type UserAuthServiceImpl struct {
 	SessionService SessionServiceImpl
 }
 
-func (u UserAuthServiceImpl) RegisterUser(ctx context.Context, user dto.AuthRequest) error {
+func (u UserAuthServiceImpl) RegisterUser(ctx context.Context, user dto.SignUpRequest) error {
 	hash, err := utils.HashPassword(user.Password)
 	if err != nil {
 		return err
 	}
 
-	data := entity.User{
+	userEntity := entity.User{
 		Username: user.Username,
 		Password: hash,
 	}
 
-	err = u.Repository.NewUser(ctx, data)
+	userDetailEntity := entity.UserDetail{
+		Email:     user.Email,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Picture:   global.PICTURE_DEFAULT,
+	}
+
+	err = u.Repository.NewUser(ctx, userEntity, userDetailEntity)
 
 	return err
 }
