@@ -102,6 +102,20 @@ func (p PostServiceImpl) GetBriefsBlogPost(ctx context.Context, page int64, limi
 	return postList, nil
 }
 
+func (p PostServiceImpl) SearchBlogPost(ctx context.Context, q string, page int64, limit int64) (dto.BriefsBlogPostResponse, error) {
+	var postList dto.BriefsBlogPostResponse
+	offset := (page - 1) * limit
+
+	postListEntity, err := p.Repository.GetBriefsBlogPostFromSearch(ctx, q, offset, limit)
+	if err != nil {
+		log.Println("[ERROR] Fetching list of post -> error:", err)
+		return postList, err
+	}
+
+	postList = dto.NewBriefsBlogPostResponse(postListEntity)
+	return postList, nil
+}
+
 func (p PostServiceImpl) GetPostAuthorIdFromId(ctx context.Context, postId int64) (int64, error) {
 	return p.Repository.GetPostAuthorId(ctx, postId)
 }
