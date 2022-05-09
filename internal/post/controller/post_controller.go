@@ -45,6 +45,7 @@ func (p *PostController) InitializeController() {
 	createRouter.HandleFunc("/post/delete/{id:[0-9]+}", p.deletePostHandlder).Methods(http.MethodDelete)
 
 	p.router.HandleFunc("/", p.postDashboardHandler).Methods(http.MethodGet)
+	p.router.HandleFunc("/search", p.searchBlogPostHandler).Methods(http.MethodGet)
 }
 
 func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Request) {
@@ -64,6 +65,54 @@ func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Req
 	pageConv, _ := strconv.ParseInt(page, 10, 64)
 
 	postData, err := p.postService.GetBriefsBlogPost(r.Context(), pageConv, limitConv)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	token, isLoggedIn := utils.GetSessionToken(r)
+	data := map[string]interface{}{
+		"LoggedIn": isLoggedIn,
+		"Posts":    postData,
+	}
+
+	if isLoggedIn {
+		session, err := p.sessionService.GetSession(r.Context(), token)
+		user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
+
+		if err == nil {
+			data["User"] = user
+		}
+	}
+
+	if err == nil {
+		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
+	} else {
+		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+	}
+}
+
+func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO : Change search page template
+	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
+	var err error
+
+	queryVar := r.URL.Query()
+	limit := queryVar.Get("limit")
+	if limit == "" {
+		limit = "8"
+	}
+	page := queryVar.Get("page")
+	if page == "" {
+		page = "1"
+	}
+
+	q := queryVar.Get("q")
+
+	limitConv, _ := strconv.ParseInt(limit, 10, 64)
+	pageConv, _ := strconv.ParseInt(page, 10, 64)
+
+	postData, err := p.postService.SearchBlogPost(r.Context(), q, pageConv, limitConv)
 	if err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return

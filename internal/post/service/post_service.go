@@ -10,6 +10,8 @@ import (
 )
 
 type PostServiceApi interface {
+	SearchBlogPost(ctx context.Context, q string, page int64, limit int64) (dto.BriefsBlogPostResponse, error)
+
 	AddPost(ctx context.Context, post dto.BlogPostRequest, authorID int64) (int64, error)
 	DeletePost(ctx context.Context, id int64) error
 
