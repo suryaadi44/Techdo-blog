@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
@@ -40,7 +41,7 @@ func (u UserAuthServiceImpl) AuthenticateUser(ctx context.Context, user dto.Auth
 	}
 
 	if !utils.CheckPasswordHash(user.Password, saved.Password) {
-		return entity.Session{}, nil
+		return entity.Session{}, errors.New("Inccorect Username or Password")
 	}
 
 	log.Println("[Auth] Login :", user.Username, "approved")

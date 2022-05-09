@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"log"
 
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
@@ -50,19 +51,20 @@ func (u UserAuthRepositoryImpl) NewUser(ctx context.Context, user entity.User) e
 }
 
 func (u UserAuthRepositoryImpl) GetUser(ctx context.Context, username string) (entity.User, error) {
+	var user entity.User
+
 	prpd, err := u.DB.PrepareContext(ctx, FIND_USER)
 	if err != nil {
 		log.Println("[ERROR] GetUser -> error :", err)
-		return entity.User{}, err
+		return user, err
 	}
 
 	rows, err := prpd.Query(username)
 	if err != nil {
 		log.Println("[ERROR] GetUser -> error on executing query :", err)
-		return entity.User{}, err
+		return user, err
 	}
 
-	var user entity.User
 	if rows.Next() {
 		err = rows.Scan(&user.UserID, &user.Username, &user.Password)
 		if err != nil {
@@ -73,5 +75,5 @@ func (u UserAuthRepositoryImpl) GetUser(ctx context.Context, username string) (e
 		return user, nil
 	}
 
-	return entity.User{}, err
+	return user, errors.New("Inccorect Username or Password")
 }
