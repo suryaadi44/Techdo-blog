@@ -1,0 +1,7 @@
+services:
+  blog:
+    container_name: techdo-blog
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
