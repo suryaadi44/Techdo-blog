@@ -1,0 +1,5 @@
+CREATE PROCEDURE old_session_removal()
+BEGIN
+	DELETE FROM sessions
+	WHERE CURRENT_TIMESTAMP > expireAt;
+END;

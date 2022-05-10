@@ -1,0 +1,1 @@
+DROP EVENT IF EXISTS session_killer;
