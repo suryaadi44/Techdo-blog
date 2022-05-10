@@ -1,0 +1,16 @@
+SET GLOBAL event_scheduler = 1;
+
+DELIMITER //
+
+CREATE PROCEDURE old_session_removal()
+BEGIN 
+	DELETE FROM sessions
+	WHERE CURRENT_TIMESTAMP > expireAt;
+END //
+DELIMITER ;
+
+CREATE EVENT IF NOT EXISTS session_killer 
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_TIMESTAMP
+DO 
+	CALL old_session_removal;
