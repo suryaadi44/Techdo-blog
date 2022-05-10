@@ -1,6 +1,10 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"github.com/suryaadi44/Techdo-blog/pkg/dto"
+)
 
 type User struct {
 	UserID   int64  `db:"uid"`
@@ -9,15 +13,15 @@ type User struct {
 }
 
 type UserDetail struct {
-	UserID    int64     `db:"uid"`
-	Email     string    `db:"email"`
-	FirstName string    `db:"first_name"`
-	LastName  string    `db:"last_name"`
-	Picture   string    `db:"picture"`
-	Phone     string    `db:"phone"`
-	AboutMe   string    `db:"about_me"`
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
+	UserID    int64          `db:"uid"`
+	Email     string         `db:"email"`
+	FirstName string         `db:"first_name"`
+	LastName  string         `db:"last_name"`
+	Picture   string         `db:"picture"`
+	Phone     string         `db:"phone"`
+	AboutMe   dto.NullString `db:"about_me"`
+	CreatedAt time.Time      `db:"created_at"`
+	UpdatedAt time.Time      `db:"updated_at"`
 }
 
 type Session struct {

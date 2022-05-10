@@ -47,6 +47,7 @@ func (p *PostController) InitializeController() {
 
 	p.router.HandleFunc("/", p.postDashboardHandler).Methods(http.MethodGet)
 	p.router.HandleFunc("/search", p.searchBlogPostHandler).Methods(http.MethodGet)
+	p.router.HandleFunc("/post/{id:[0-9]+}", p.viewPostHandlder).Methods(http.MethodGet)
 }
 
 func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Request) {
@@ -130,6 +131,40 @@ func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Re
 	pageConv, _ := strconv.ParseInt(page, 10, 64)
 
 	postData, err := p.postService.SearchBlogPost(r.Context(), q, pageConv, limitConv, dateStartPtr, dateEndPtr)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	token, isLoggedIn := utils.GetSessionToken(r)
+	data := map[string]interface{}{
+		"LoggedIn": isLoggedIn,
+		"Posts":    postData,
+	}
+
+	if isLoggedIn {
+		session, err := p.sessionService.GetSession(r.Context(), token)
+		user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
+
+		if err == nil {
+			data["User"] = user
+		}
+	}
+
+	if err == nil {
+		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
+	} else {
+		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+	}
+}
+
+func (p *PostController) viewPostHandlder(w http.ResponseWriter, r *http.Request) {
+	var tmpl = template.Must(template.ParseFiles("web/template/blog-view/blog-view.html"))
+
+	vars := mux.Vars(r)
+	id, _ := strconv.ParseInt(vars["id"], 10, 64)
+
+	postData, err := p.postService.GetFullPost(r.Context(), id)
 	if err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return
