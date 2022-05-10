@@ -16,7 +16,7 @@ type Server struct {
 }
 
 func (s *Server) Run() {
-	host := fmt.Sprintf("%s:", s.Port)
+	host := fmt.Sprintf(":%s", s.Port)
 
 	go func() {
 		if err := http.ListenAndServe(host, s.Router); err != nil {
