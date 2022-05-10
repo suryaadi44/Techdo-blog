@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,18 +11,20 @@ import (
 )
 
 type Server struct {
-	Address string
-	Router  *mux.Router
+	Port   string
+	Router *mux.Router
 }
 
 func (s *Server) Run() {
+	host := fmt.Sprintf("%s:", s.Port)
+
 	go func() {
-		if err := http.ListenAndServe(s.Address, s.Router); err != nil {
-			log.Printf("[SERVER] error starting server at %s: %v\n", s.Address, err)
+		if err := http.ListenAndServe(host, s.Router); err != nil {
+			log.Printf("[SERVER] error starting server at %s: %v\n", host, err)
 		}
 	}()
 
-	log.Printf("[SERVER] server started, listening to %s\n", s.Address)
+	log.Printf("[SERVER] server started, listening to %s\n", host)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -30,9 +33,9 @@ func (s *Server) Run() {
 	log.Printf("[SERVER] server stopped")
 }
 
-func NewServer(address string, router *mux.Router) Server {
+func NewServer(port string, router *mux.Router) Server {
 	return Server{
-		Address: address,
-		Router:  router,
+		Port:   port,
+		Router: router,
 	}
 }

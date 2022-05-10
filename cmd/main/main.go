@@ -49,7 +49,7 @@ func main() {
 	controller.InitializeController(router, db)
 
 	server := server.NewServer(
-		os.Getenv("ADDRESS"),
+		os.Getenv("PORT"),
 		router,
 	)
 
