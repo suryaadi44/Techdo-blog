@@ -16,7 +16,7 @@ var (
 	INSERT_USER_DETAIL = "INSERT INTO user_details(uid, email, first_name, last_name, picture, phone, about_me) VALUE (?, ?, ?, ?, ?, ?, ?)"
 
 	SELECT_USER_DETAIL      = "SELECT uid, email, first_name, last_name, picture, phone, about_me, created_at, updated_at FROM user_details WHERE uid = ?"
-	SELECT_USER_MINI_DETAIL = "SELECT uid, email, first_name, last_name, picture, FROM user_details WHERE uid = ?"
+	SELECT_USER_MINI_DETAIL = "SELECT uid, email, first_name, last_name, picture FROM user_details WHERE uid = ?"
 )
 
 func NewUserRepository(DB *sql.DB) UserRepositoryImpl {
@@ -54,13 +54,7 @@ func NewUserRepository(DB *sql.DB) UserRepositoryImpl {
 func (u UserRepositoryImpl) GetUserDetail(ctx context.Context, id int64) (entity.UserDetail, error) {
 	var user entity.UserDetail
 
-	prpd, err := u.DB.PrepareContext(ctx, SELECT_USER_DETAIL)
-	if err != nil {
-		log.Println("[ERROR] GetUserDetail -> error :", err)
-		return user, err
-	}
-
-	rows, err := prpd.QueryContext(ctx, id)
+	rows, err := u.DB.QueryContext(ctx, SELECT_USER_DETAIL, id)
 	if err != nil {
 		log.Println("[ERROR] GetUserDetail -> error on executing query :", err)
 		return user, err
@@ -82,13 +76,7 @@ func (u UserRepositoryImpl) GetUserDetail(ctx context.Context, id int64) (entity
 func (u UserRepositoryImpl) GetUserMiniDetail(ctx context.Context, id int64) (entity.UserDetail, error) {
 	var user entity.UserDetail
 
-	prpd, err := u.DB.PrepareContext(ctx, SELECT_USER_MINI_DETAIL)
-	if err != nil {
-		log.Println("[ERROR] GetUserMiniDetail -> error :", err)
-		return user, err
-	}
-
-	rows, err := prpd.QueryContext(ctx, id)
+	rows, err := u.DB.QueryContext(ctx, SELECT_USER_MINI_DETAIL, id)
 	if err != nil {
 		log.Println("[ERROR] GetUserMiniDetail -> error on executing query :", err)
 		return user, err
