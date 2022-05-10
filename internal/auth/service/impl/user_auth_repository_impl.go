@@ -15,7 +15,7 @@ type UserAuthRepositoryImpl struct {
 
 var (
 	INSERT_USER        = "INSERT INTO users(username, password) VALUE (?, ?)"
-	INSERT_USER_DETAIL = "INSERT INTO user_details(uid, email, first_name, last_name, pciture) VALUE (?, ?, ?, ?, ?)"
+	INSERT_USER_DETAIL = "INSERT INTO user_details(uid, email, first_name, last_name, picture) VALUE (?, ?, ?, ?, ?)"
 	FIND_USER          = "SELECT uid, username, password FROM users WHERE username = ?"
 )
 
