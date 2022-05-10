@@ -17,7 +17,7 @@
     Note:
     - `root:root` is your username:password for database.
     - `localhost:3307` is your database address.
-    - `techdo_db` is your database name.
+    - `techdo_db` is your database name. **Need to be created first!**
 
 3. Change `.env` file value according to your own value.
     Variable description:
@@ -25,7 +25,7 @@
     | Variable       | Description                                                        |
     | -------------- | ------------------------------------------------------------------ |
     | APP_NAME       | Current app name, not affecting front end, only used for logging   |
-    | ADDRESS        | Address which server will listen to, eg: localhost:80 / :80        |
+    | PORT           | Port which server will listen to, eg: 80                           |
     | DB_ADDRESS     | DBMS address, eg: localhost:3307 / :3307                           |
     | DB_USERNAME    | Database username that have acces to CRUD operation in table       |
     | DB_PASSWORD    | Database password for username                                     |
