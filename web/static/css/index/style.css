@@ -1,104 +1,7 @@
 /* Custom Font */
 @import url("../others/custom-font.css");
-
-/* Navbar-CSS */
-.navbar{
-    background-color: #7102DF;
-    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
-}
-
-.navbar a.navbar__logo{
-    color: #fff;
-    font-family: 'arcade-classic', monospace;
-    font-size: 2em;
-    text-decoration: none;
-}
-
-.navbar .navbar__search-box-container {
-    width: 25%;
-    display: flex;
-    justify-content: right;
-}
-
-.navbar .navbar__search-button {
-    color: #fff;
-    width: 13%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 5px;
-    transition: .3s all;
-}
-
-.navbar .right-nav {
-    display: flex;
-    justify-content: space-around;
-    width: 20%;
-}
-
-.navbar .navbar__create-post-btn, .navbar .navbar__create-acc-btn{
-    border: 1px solid #fff;
-    padding: 6px 12px;
-    border-radius: 5px;
-    text-decoration: none;
-    color: #fff;
-}
-
-.navbar .navbar__login-btn{
-    padding: 6px 25px;
-    border-radius: 5px;
-    text-decoration: none;
-    color: #fff;
-}
-
-.navbar .user-profile-container {
-    background-color: gray;
-    padding: 20px;
-    border-radius: 150%;
-    background-size: cover;
-}
-
-.user-nav,.auth-nav {
-    display: none;
-    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
-    z-index: 999;
-}
-
-.user-nav.active, .auth-nav.active {
-    position: absolute;
-    top: 60px;
-    right: 60px;
-    display: block;
-}
-
-.user-nav .card-body, .auth-nav .card-body {
-    padding-left: 0px;
-}
-
-.user-nav li, .auth-nav li {
-    list-style: none;
-    border-radius: 5px;
-    margin-top: 2px;
-    padding: 9px 20px;
-}
-
-.user-nav li a, .auth-nav li a {
-    text-decoration: none;
-    color: #000;
-}
-
-.user-nav a:hover, .auth-nav a:hover {
-    color: #7102DF;
-    text-decoration: underline;
-}
-
-.navbar .navbar__auth-nav-btn {
-    color: #fff;
-    font-size: 1.5em;
-    display: none;
-    border: 0;
-    background-color: transparent;
-}
+/* Navbar CSS */
+@import url("../others/navbar.css");
 
 /* Body CSS */
 .post {
@@ -116,42 +19,7 @@
 /* Responsive Breakpoint */
 /* Ukuran Desktop */
 @media screen and (max-width: 1280px) {
-    .navbar .navbar__search-button:hover {
-        background-color: #4c0097;
-        cursor: pointer;
-    }
-
-    .navbar .navbar__create-post-btn:hover,.navbar .navbar__create-acc-btn:hover {
-        background-color: #fff;
-        color: #000;
-        text-decoration: underline;
-    }
-
-    .navbar .navbar__login-btn:hover{
-        background-color: #4c0097;
-    }
-
-    .navbar .user-profile-container:hover {
-        cursor: pointer;
-        box-shadow: 0 0 0 3px #4c0097;
-    }
-
     .h-custom-2 {
         height: 100%;
-    }
-}
-
-/* Ukuran Tablet */
-@media screen and (max-width: 768px) {
-    .navbar .navbar__search-box {
-        display: none;
-    }
-    
-    .navbar .right-nav {
-        display: none;
-    }
-
-    .navbar .navbar__auth-nav-btn {
-        display: inline;
     }
 }
