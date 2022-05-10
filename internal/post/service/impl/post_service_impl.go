@@ -53,6 +53,12 @@ func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest, 
 		return -1, err
 	}
 
+	err = p.Repository.AddPostCategoryAssoc(ctx, reservedID, post.Category)
+	if err != nil {
+		log.Println("[ERROR] AddPost: Error adding post category data -> error:", err)
+		return -1, err
+	}
+
 	return reservedID, nil
 }
 
@@ -74,19 +80,22 @@ func (p PostServiceImpl) DeletePost(ctx context.Context, id int64) error {
 }
 
 func (p PostServiceImpl) GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error) {
-	post, err := p.Repository.GetFullPost(ctx, id)
+	var postDto dto.BlogPostResponse
+
+	post, author, err := p.Repository.GetFullPost(ctx, id)
 	if err != nil {
 		log.Println("[ERROR] Fetching Full Post with id", id, "-> error:", err)
-		return dto.BlogPostResponse{}, err
+		return postDto, err
 	}
 
 	categories, err := p.Repository.GetCategoriesFromID(ctx, id)
 	if err != nil {
 		log.Println("[ERROR] Fetching categories for post with id", id, "-> error:", err)
-		return dto.BlogPostResponse{}, err
+		return postDto, err
 	}
 
-	return dto.NewBlogPostResponse(post, categories), nil
+	postDto = dto.NewBlogPostResponse(post, categories, author)
+	return postDto, nil
 }
 
 func (p PostServiceImpl) GetBriefsBlogPost(ctx context.Context, page int64, limit int64) (dto.BriefsBlogPostResponse, error) {

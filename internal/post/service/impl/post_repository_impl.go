@@ -16,17 +16,19 @@ type PostRepositoryImpl struct {
 }
 
 var (
-	INSERT_BLANK_POST = "INSERT INTO blog_posts() VALUE ()"
+	INSERT_BLANK_POST     = "INSERT INTO blog_posts() VALUE ()"
+	INSERT_CATEGORY_ASSOC = "INSERT INTO category_associations(post_id, category_id) VALUE (?, ?)"
 
 	UPDATE_POST = "UPDATE blog_posts SET author_id = ?, banner = ?, title = ?, body = ? WHERE post_id = ?"
 
 	DELETE_POST = "DELETE FROM blog_posts WHERE post_id = ?"
 
-	SELECT_POST              = "SELECT b.post_id, b.banner, b.title, b.body, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author, u.picture FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
+	SELECT_POST = "SELECT b.post_id, b.author_id, b.banner, b.title, b.body, b.created_at, b.updated_at, u.uid, u.email, u.first_name, u.last_name, u.picture, u.phone, u.about_me, u.created_at, u.updated_at FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
+
 	SELECT_POST_AUTHOR       = "SELECT author_id FROM blog_posts WHERE post_id = ?"
 	SELECT_ID_OF_LAST_INSERT = "SELECT LAST_INSERT_ID() as uid"
 	SELECT_LIST_OF_POST      = "SELECT b.post_id, b.banner, b.title, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid"
-	SELECT_FULL_TEXT_POST    = "SELECT b.post_id, b.banner, b.title, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
+	SELECT_FULL_TEXT_POST    = "SELECT b.post_id, ,b.banner, b.title, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
 	SELECT_CATEGORY_OF_POST  = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
 	SELECT_CATEGORY          = "SELECT category_id, category_name FROM categories"
 )
@@ -105,32 +107,33 @@ func (p PostRepositoryImpl) DeletePost(ctx context.Context, id int64) error {
 	return nil
 }
 
-func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int64) (entity.BlogPostFull, error) {
-	var post entity.BlogPostFull
+func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int64) (entity.BlogPost, entity.UserDetail, error) {
+	var post entity.BlogPost
+	var author entity.UserDetail
 
 	prpd, err := p.DB.PrepareContext(ctx, SELECT_POST)
 	if err != nil {
 		log.Println("[ERROR] GetFullPost -> error :", err)
-		return post, err
+		return post, author, err
 	}
 
 	rows, err := prpd.QueryContext(ctx, id)
 	if err != nil {
 		log.Println("[ERROR] GetFullPost -> error on executing query :", err)
-		return post, err
+		return post, author, err
 	}
 
 	if rows.Next() {
-		err = rows.Scan(&post.PostID, &post.Banner, &post.Title, &post.Body, &post.CreatedAt, &post.UpdatedAt, &post.Author, &post.Picture)
+		err = rows.Scan(&post.PostID, &post.AuthorID, &post.Banner, &post.Title, &post.Body, &post.CreatedAt, &post.UpdatedAt, &author.UserID, &author.Email, &author.FirstName, &author.LastName, &author.Picture, &author.Phone, &author.AboutMe, &author.CreatedAt, &author.UpdatedAt)
 		if err != nil {
 			log.Println("[ERROR] GetFullPost -> error scanning row :", err)
-			return post, err
+			return post, author, err
 		}
 
-		return post, nil
+		return post, author, nil
 	}
 
-	return post, errors.New(fmt.Sprintf("No post with id %d", id))
+	return post, author, errors.New(fmt.Sprintf("No post with id %d", id))
 }
 
 func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset int64, limit int64) (entity.BriefsBlogPost, error) {
@@ -139,13 +142,13 @@ func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset in
 	query := SELECT_LIST_OF_POST + " ORDER BY b.created_at DESC LIMIT ?, ? "
 	prpd, err := p.DB.PrepareContext(ctx, query)
 	if err != nil {
-		log.Println("[ERROR] GetFullPost -> error :", err)
+		log.Println("[ERROR] GetBriefsBlogPostData -> error :", err)
 		return postList, err
 	}
 
 	rows, err := prpd.QueryContext(ctx, offset, limit)
 	if err != nil {
-		log.Println("[ERROR] GetFullPost -> error on executing query :", err)
+		log.Println("[ERROR] GetBriefsBlogPostData -> error on executing query :", err)
 		return postList, err
 	}
 
@@ -153,7 +156,7 @@ func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset in
 		var post entity.BriefBlogPost
 		err = rows.Scan(&post.PostID, &post.Banner, &post.Title, &post.CreatedAt, &post.UpdatedAt, &post.Author)
 		if err != nil {
-			log.Println("[ERROR] GetFullPost -> error scanning row :", err)
+			log.Println("[ERROR] GetBriefsBlogPostData -> error scanning row :", err)
 			return postList, err
 		}
 
@@ -253,7 +256,9 @@ func (p PostRepositoryImpl) GetCategoriesFromID(ctx context.Context, id int64) (
 		return categories, err
 	}
 
+	found := false
 	for rows.Next() {
+		found = true
 		var postCategory entity.Category
 
 		err = rows.Scan(&postCategory.CategoryID, &postCategory.CategoryName)
@@ -262,21 +267,19 @@ func (p PostRepositoryImpl) GetCategoriesFromID(ctx context.Context, id int64) (
 			return categories, err
 		}
 		categories = append(categories, &postCategory)
-
 	}
+
+	if !found {
+		return categories, errors.New("Categories not found")
+	}
+
 	return categories, nil
 }
 
 func (p PostRepositoryImpl) GetCategoryList(ctx context.Context) (entity.Categories, error) {
 	var categories entity.Categories
 
-	prpd, err := p.DB.PrepareContext(ctx, SELECT_CATEGORY)
-	if err != nil {
-		log.Println("[ERROR] GetCategoryList -> error :", err)
-		return categories, err
-	}
-
-	rows, err := prpd.QueryContext(ctx)
+	rows, err := p.DB.QueryContext(ctx, SELECT_CATEGORY)
 	if err != nil {
 		log.Println("[ERROR] GetCategoryList -> error on executing query :", err)
 		return categories, err
@@ -294,4 +297,24 @@ func (p PostRepositoryImpl) GetCategoryList(ctx context.Context) (entity.Categor
 
 	}
 	return categories, nil
+}
+
+func (p PostRepositoryImpl) AddPostCategoryAssoc(ctx context.Context, posdtId int64, categoryId int64) error {
+	result, err := p.DB.ExecContext(ctx, INSERT_CATEGORY_ASSOC, posdtId, categoryId)
+	if err != nil {
+		log.Println("[ERROR] AddPostCategoryAssoc -> error inserting row :", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] AddPostCategoryAssoc -> error on getting rows affected :", err)
+		return err
+	}
+	if rowsAffected != 1 {
+		log.Println("[ERROR] AddPostCategoryAssoc -> error on updating row :", err)
+		return err
+	}
+
+	return nil
 }
