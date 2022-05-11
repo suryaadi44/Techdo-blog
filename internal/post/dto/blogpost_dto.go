@@ -1,18 +1,20 @@
 package dto
 
 import (
+	"html/template"
 	"time"
 
+	UserDto "github.com/suryaadi44/Techdo-blog/internal/user/dto"
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
 )
 
 type BlogPostResponse struct {
 	PostID     int64
-	Author     string
+	Author     UserDto.UserDetail
 	Categories CategoryList
 	Banner     string
 	Title      string
-	Body       string
+	Body       template.HTML
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
@@ -60,14 +62,14 @@ func NewCategoryList(c entity.Categories) CategoryList {
 	return categoryList
 }
 
-func NewBlogPostResponse(post entity.BlogPostFull, categories entity.Categories) BlogPostResponse {
+func NewBlogPostResponse(post entity.BlogPost, categories entity.Categories, author entity.UserDetail) BlogPostResponse {
 	return BlogPostResponse{
 		PostID:     post.PostID,
-		Author:     post.Author,
+		Author:     UserDto.NewUserDetailDTO(author),
 		Categories: NewCategoryList(categories),
 		Banner:     post.Banner,
 		Title:      post.Title,
-		Body:       post.Body,
+		Body:       template.HTML(post.Body),
 		CreatedAt:  post.CreatedAt,
 		UpdatedAt:  post.UpdatedAt,
 	}
