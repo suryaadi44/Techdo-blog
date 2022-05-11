@@ -61,7 +61,7 @@ func (u *UserAuthController) loginHandler(w http.ResponseWriter, r *http.Request
 	})
 
 	globalDTO.NewBaseResponse(http.StatusSeeOther, false, "/").SendResponse(&w)
-	return
+
 }
 
 func (u *UserAuthController) loginPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -104,7 +104,7 @@ func (u *UserAuthController) signUpHandler(w http.ResponseWriter, r *http.Reques
 
 	log.Println("[Auth] Failed creating account :", payload.Username, "Already exist")
 	globalDTO.NewBaseResponse(http.StatusOK, true, fmt.Sprintf("Accout with username %s already exist", payload.Username)).SendResponse(&w)
-	return
+
 }
 
 func (u *UserAuthController) signUpPageHandler(w http.ResponseWriter, r *http.Request) {
