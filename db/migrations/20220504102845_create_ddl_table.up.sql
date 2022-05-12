@@ -68,3 +68,12 @@ CREATE TABLE IF NOT EXISTS comment(
     FOREIGN KEY (post_id) REFERENCES blog_posts(post_id),
     FOREIGN KEY (uid) REFERENCES users(uid)
 )ENGINE=InnoDB;	
+
+CREATE TABLE IF NOT EXISTS logger(
+	log_id INT AUTO_INCREMENT, 
+	operation VARCHAR(6),
+	statement VARCHAR(1024),
+	tabel VARCHAR(9),
+	waktu TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (log_id)
+)ENGINE=InnoDB;
