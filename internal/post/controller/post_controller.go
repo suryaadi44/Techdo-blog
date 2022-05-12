@@ -96,7 +96,7 @@ func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Req
 
 func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO : Change search page template
-	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
+	var tmpl = template.Must(template.ParseFiles("web/template/search-blog/search-blog.html"))
 	var err error
 	var dateStart, dateEnd time.Time
 
@@ -139,6 +139,7 @@ func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Re
 	token, isLoggedIn := utils.GetSessionToken(r)
 	data := map[string]interface{}{
 		"LoggedIn": isLoggedIn,
+		"Query":    q,
 		"Posts":    postData,
 	}
 
