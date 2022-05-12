@@ -41,16 +41,26 @@ func NewController(router *mux.Router, postService service.PostServiceApi, sessi
 func (p *PostController) InitializeController() {
 	createRouter := p.router.PathPrefix("/").Subrouter()
 	createRouter.Use(p.authMiddleware.AuthMiddleware())
+
+	// With middlerware
+	// Page
 	createRouter.HandleFunc("/post/create", p.createPostPageHandler).Methods(http.MethodGet)
+
+	// API
 	createRouter.HandleFunc("/post/create", p.createPostHandler).Methods(http.MethodPost)
 	createRouter.HandleFunc("/post/delete/{id:[0-9]+}", p.deletePostHandlder).Methods(http.MethodDelete)
 
-	p.router.HandleFunc("/", p.postDashboardHandler).Methods(http.MethodGet)
-	p.router.HandleFunc("/search", p.searchBlogPostHandler).Methods(http.MethodGet)
-	p.router.HandleFunc("/post/{id:[0-9]+}", p.viewPostHandlder).Methods(http.MethodGet)
+	// Without middleware
+	// Page
+	p.router.HandleFunc("/", p.postDashboardPageHandler).Methods(http.MethodGet)
+	p.router.HandleFunc("/search", p.searchPostPageHandler).Methods(http.MethodGet)
+	p.router.HandleFunc("/post/{id:[0-9]+}", p.viewPostPageHandlder).Methods(http.MethodGet)
+
+	// API
+	p.router.HandleFunc("/post/{id:[0-9]+}/comment", p.viewCommentHandler).Methods(http.MethodGet)
 }
 
-func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Request) {
+func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http.Request) {
 	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
 	var err error
 
@@ -94,7 +104,7 @@ func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Req
 	}
 }
 
-func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Request) {
+func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO : Change search page template
 	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
 	var err error
@@ -158,7 +168,7 @@ func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Re
 	}
 }
 
-func (p *PostController) viewPostHandlder(w http.ResponseWriter, r *http.Request) {
+func (p *PostController) viewPostPageHandlder(w http.ResponseWriter, r *http.Request) {
 	var tmpl = template.Must(template.ParseFiles("web/template/blog-view/blog-view.html"))
 
 	vars := mux.Vars(r)
@@ -299,4 +309,31 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	globalDTO.NewBaseResponse(http.StatusCreated, false, fmt.Sprintf("/post/%d", postID)).SendResponse(&w)
+}
+
+func (p *PostController) viewCommentHandler(w http.ResponseWriter, r *http.Request) {
+	queryVar := r.URL.Query()
+	vars := mux.Vars(r)
+
+	limit := queryVar.Get("limit")
+	if limit == "" {
+		limit = "8"
+	}
+	page := queryVar.Get("page")
+	if page == "" {
+		page = "1"
+	}
+
+	// TODO : add error handler
+	id, _ := strconv.ParseInt(vars["id"], 10, 64)
+	limitConv, _ := strconv.ParseInt(limit, 10, 64)
+	pageConv, _ := strconv.ParseInt(page, 10, 64)
+
+	commentsData, err := p.postService.GetComments(r.Context(), id, pageConv, limitConv)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	globalDTO.NewBaseResponse(http.StatusOK, false, commentsData).SendResponse(&w)
 }

@@ -18,6 +18,7 @@ type PostRepositoryImpl struct {
 var (
 	INSERT_BLANK_POST     = "INSERT INTO blog_posts() VALUE ()"
 	INSERT_CATEGORY_ASSOC = "INSERT INTO category_associations(post_id, category_id) VALUE (?, ?)"
+	INSERT_COMMENT        = "INSERT INTO comment(post_id, uid, comment_body) VALUE (?, ?, ?) ORDER BY b.created_at DESC LIMIT ?, ?"
 
 	UPDATE_POST = "UPDATE blog_posts SET author_id = ?, banner = ?, title = ?, body = ? WHERE post_id = ?"
 
@@ -31,6 +32,7 @@ var (
 	SELECT_FULL_TEXT_POST    = "SELECT b.post_id, b.banner, b.title, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
 	SELECT_CATEGORY_OF_POST  = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
 	SELECT_CATEGORY          = "SELECT category_id, category_name FROM categories"
+	SELECT_COMMENTS          = "SELECT comment_id, uid, comment_body, created_at, updated_at WHERE post_id = ?"
 )
 
 func NewPostRepository(db *sql.DB) PostRepositoryImpl {
@@ -275,4 +277,48 @@ func (p PostRepositoryImpl) AddPostCategoryAssoc(ctx context.Context, posdtId in
 	}
 
 	return nil
+}
+
+func (p PostRepositoryImpl) AddComment(ctx context.Context, comment entity.Comment) error {
+	result, err := p.db.ExecContext(ctx, INSERT_COMMENT, comment.PostID, comment.UserID, comment.CommentBody)
+	if err != nil {
+		log.Println("[ERROR] AddComment -> error inserting row :", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] AddComment -> error on getting rows affected :", err)
+		return err
+	}
+	if rowsAffected != 1 {
+		log.Println("[ERROR] AddComment -> error on updating row :", err)
+		return err
+	}
+
+	return nil
+}
+
+func (p PostRepositoryImpl) GetPostComments(ctx context.Context, id int64, offset int64, limit int64) (entity.Comments, entity.MiniUsersDetail, error) {
+	var comments entity.Comments
+	var users entity.MiniUsersDetail
+
+	rows, err := p.db.QueryContext(ctx, SELECT_COMMENTS, id, offset, limit)
+	if err != nil {
+		log.Println("[ERROR] GetPostComments -> error on executing query :", err)
+		return comments, users, err
+	}
+
+	for rows.Next() {
+		var comment entity.Comment
+		err = rows.Scan(&comment.CommentID, &comment.UserID, &comment.CommentBody, &comment.CreatedAt, &comment.UpdatedAt)
+		if err != nil {
+			log.Println("[ERROR] GetPostComments -> error scanning row :", err)
+			return comments, users, err
+		}
+
+		comments = append(comments, &comment)
+	}
+
+	return comments, users, nil
 }

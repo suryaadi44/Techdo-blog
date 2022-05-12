@@ -16,7 +16,7 @@ var (
 	INSERT_USER_DETAIL = "INSERT INTO user_details(uid, email, first_name, last_name, picture, phone, about_me) VALUE (?, ?, ?, ?, ?, ?, ?)"
 
 	SELECT_USER_DETAIL      = "SELECT uid, email, first_name, last_name, picture, phone, about_me, created_at, updated_at FROM user_details WHERE uid = ?"
-	SELECT_USER_MINI_DETAIL = "SELECT uid, email, first_name, last_name, picture FROM user_details WHERE uid = ?"
+	SELECT_USER_MINI_DETAIL = "SELECT uid, first_name, last_name, picture FROM user_details WHERE uid = ?"
 )
 
 func NewUserRepository(db *sql.DB) UserRepositoryImpl {
@@ -73,8 +73,8 @@ func (u UserRepositoryImpl) GetUserDetail(ctx context.Context, id int64) (entity
 	return user, err
 }
 
-func (u UserRepositoryImpl) GetUserMiniDetail(ctx context.Context, id int64) (entity.UserDetail, error) {
-	var user entity.UserDetail
+func (u UserRepositoryImpl) GetUserMiniDetail(ctx context.Context, id int64) (entity.MiniUserDetail, error) {
+	var user entity.MiniUserDetail
 
 	rows, err := u.db.QueryContext(ctx, SELECT_USER_MINI_DETAIL, id)
 	if err != nil {
@@ -83,7 +83,7 @@ func (u UserRepositoryImpl) GetUserMiniDetail(ctx context.Context, id int64) (en
 	}
 
 	if rows.Next() {
-		err = rows.Scan(&user.UserID, &user.Email, &user.FirstName, &user.LastName, &user.Picture)
+		err = rows.Scan(&user.UserID, &user.FirstName, &user.LastName, &user.Picture)
 		if err != nil {
 			log.Println("[ERROR] GetUserMiniDetail -> error scanning row :", err)
 			return user, err
