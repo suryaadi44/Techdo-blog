@@ -1,0 +1,23 @@
+@import url("../others/custom-font.css");
+/* Navbar CSS */
+@import url("../others/navbar.css");
+
+.user-profiles-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.user-profiles__img-container {
+    padding: 0 50px 50px 50px;
+}
+.user-profiles__img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background-size: cover;
+}
+
+.user-profiles__details {
+    flex-grow: 1;
+}
