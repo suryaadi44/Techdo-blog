@@ -35,13 +35,8 @@ CREATE TABLE IF NOT EXISTS blog_posts(
     banner VARCHAR(100) DEFAULT NULL,
     title VARCHAR(100) DEFAULT NULL,
     body TEXT DEFAULT NULL,
-<<<<<<< HEAD
 	view_count INT DEFAULT 0,
 	comment_count INT DEFAULT 0,
-=======
-    view_count INT DEFAULT 0,
-    comment_count INT DEFAULT 0,
->>>>>>> 8ad429016ef56b60dc2df0bba0c97d5c64b8428a
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (post_id),
