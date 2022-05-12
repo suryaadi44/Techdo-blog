@@ -9,7 +9,7 @@ import (
 )
 
 type SessionRepositoryImpl struct {
-	DB *sql.DB
+	db *sql.DB
 }
 
 var (
@@ -18,20 +18,14 @@ var (
 	DELETE_SESSION = "DELETE FROM sessions WHERE token = ?"
 )
 
-func NewSessionRepository(DB *sql.DB) SessionRepositoryImpl {
+func NewSessionRepository(db *sql.DB) SessionRepositoryImpl {
 	return SessionRepositoryImpl{
-		DB: DB,
+		db: db,
 	}
 }
 
 func (u SessionRepositoryImpl) NewSession(ctx context.Context, user entity.Session) error {
-	prpd, err := u.DB.PrepareContext(ctx, INSERT_SESSION)
-	if err != nil {
-		log.Println("[ERROR] NewSession -> error :", err)
-		return err
-	}
-
-	result, err := prpd.ExecContext(ctx, user.Token, user.UID, user.ExpireAt)
+	result, err := u.db.ExecContext(ctx, INSERT_SESSION, user.Token, user.UID, user.ExpireAt)
 	if err != nil {
 		log.Println("[ERROR] NewSession -> error on executing query :", err)
 		return err
@@ -51,13 +45,7 @@ func (u SessionRepositoryImpl) NewSession(ctx context.Context, user entity.Sessi
 }
 
 func (u SessionRepositoryImpl) GetSession(ctx context.Context, token string) (entity.SessionDetail, error) {
-	prpd, err := u.DB.PrepareContext(ctx, FIND_SESSION)
-	if err != nil {
-		log.Println("[ERROR] GetSession -> error :", err)
-		return entity.SessionDetail{}, err
-	}
-
-	rows, err := prpd.Query(token)
+	rows, err := u.db.QueryContext(ctx, FIND_SESSION, token)
 	if err != nil {
 		log.Println("[ERROR] GetSession -> error on executing query :", err)
 		return entity.SessionDetail{}, err
@@ -78,13 +66,7 @@ func (u SessionRepositoryImpl) GetSession(ctx context.Context, token string) (en
 }
 
 func (u SessionRepositoryImpl) DeleteSession(ctx context.Context, token string) error {
-	prpd, err := u.DB.PrepareContext(ctx, DELETE_SESSION)
-	if err != nil {
-		log.Println("[ERROR] DeleteSession -> error :", err)
-		return err
-	}
-
-	result, err := prpd.ExecContext(ctx, token)
+	result, err := u.db.ExecContext(ctx, DELETE_SESSION, token)
 	if err != nil {
 		log.Println("[ERROR] DeleteSession -> error on executing query :", err)
 		return err

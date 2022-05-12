@@ -10,7 +10,7 @@ import (
 )
 
 type UserAuthRepositoryImpl struct {
-	DB *sql.DB
+	db *sql.DB
 }
 
 var (
@@ -19,14 +19,14 @@ var (
 	FIND_USER          = "SELECT uid, username, password FROM users WHERE username = ?"
 )
 
-func NewUserAuthRepository(DB *sql.DB) UserAuthRepositoryImpl {
+func NewUserAuthRepository(db *sql.DB) UserAuthRepositoryImpl {
 	return UserAuthRepositoryImpl{
-		DB: DB,
+		db: db,
 	}
 }
 
 func (u UserAuthRepositoryImpl) NewUser(ctx context.Context, user entity.User, userDetail entity.UserDetail) error {
-	result, err := u.DB.ExecContext(ctx, INSERT_USER, user.Username, user.Password)
+	result, err := u.db.ExecContext(ctx, INSERT_USER, user.Username, user.Password)
 	if err != nil {
 		log.Println("[ERROR] NewUser -> error on executing insert user query :", err)
 		return err
@@ -49,7 +49,7 @@ func (u UserAuthRepositoryImpl) NewUser(ctx context.Context, user entity.User, u
 		return err
 	}
 
-	result, err = u.DB.ExecContext(ctx, INSERT_USER_DETAIL, lid, userDetail.Email, userDetail.FirstName, userDetail.LastName, userDetail.Picture)
+	result, err = u.db.ExecContext(ctx, INSERT_USER_DETAIL, lid, userDetail.Email, userDetail.FirstName, userDetail.LastName, userDetail.Picture)
 	if err != nil {
 		log.Println("[ERROR] NewUser -> error on executing insert user details query :", err)
 		return err
@@ -72,13 +72,7 @@ func (u UserAuthRepositoryImpl) NewUser(ctx context.Context, user entity.User, u
 func (u UserAuthRepositoryImpl) GetUser(ctx context.Context, username string) (entity.User, error) {
 	var user entity.User
 
-	prpd, err := u.DB.PrepareContext(ctx, FIND_USER)
-	if err != nil {
-		log.Println("[ERROR] GetUser -> error :", err)
-		return user, err
-	}
-
-	rows, err := prpd.Query(username)
+	rows, err := u.db.QueryContext(ctx, FIND_USER, username)
 	if err != nil {
 		log.Println("[ERROR] GetUser -> error on executing query :", err)
 		return user, err

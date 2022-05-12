@@ -12,7 +12,7 @@ import (
 )
 
 type PostRepositoryImpl struct {
-	DB *sql.DB
+	db *sql.DB
 }
 
 var (
@@ -33,14 +33,14 @@ var (
 	SELECT_CATEGORY          = "SELECT category_id, category_name FROM categories"
 )
 
-func NewPostRepository(DB *sql.DB) PostRepositoryImpl {
+func NewPostRepository(db *sql.DB) PostRepositoryImpl {
 	return PostRepositoryImpl{
-		DB: DB,
+		db: db,
 	}
 }
 
 func (p PostRepositoryImpl) ReserveID(ctx context.Context) (int64, error) {
-	res, err := p.DB.ExecContext(ctx, INSERT_BLANK_POST)
+	res, err := p.db.ExecContext(ctx, INSERT_BLANK_POST)
 	if err != nil {
 		log.Println("[ERROR] ReserveID -> error inserting blank row :", err)
 		return -1, err
@@ -56,13 +56,7 @@ func (p PostRepositoryImpl) ReserveID(ctx context.Context) (int64, error) {
 }
 
 func (p PostRepositoryImpl) UpdatePost(ctx context.Context, post entity.BlogPost) error {
-	prpd, err := p.DB.PrepareContext(ctx, UPDATE_POST)
-	if err != nil {
-		log.Println("[ERROR] UpdatePost -> error :", err)
-		return err
-	}
-
-	result, err := prpd.ExecContext(ctx, post.AuthorID, post.Banner, post.Title, post.Body, post.PostID)
+	result, err := p.db.ExecContext(ctx, UPDATE_POST, post.AuthorID, post.Banner, post.Title, post.Body, post.PostID)
 	if err != nil {
 		log.Println("[ERROR] UpdatePost -> error on executing query :", err)
 		return err
@@ -82,13 +76,7 @@ func (p PostRepositoryImpl) UpdatePost(ctx context.Context, post entity.BlogPost
 }
 
 func (p PostRepositoryImpl) DeletePost(ctx context.Context, id int64) error {
-	prpd, err := p.DB.PrepareContext(ctx, DELETE_POST)
-	if err != nil {
-		log.Println("[ERROR] DeletePost -> error :", err)
-		return err
-	}
-
-	result, err := prpd.ExecContext(ctx, id)
+	result, err := p.db.ExecContext(ctx, DELETE_POST, id)
 	if err != nil {
 		log.Println("[ERROR] DeletePost -> error on executing query :", err)
 		return err
@@ -111,13 +99,7 @@ func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int64) (entity.B
 	var post entity.BlogPost
 	var author entity.UserDetail
 
-	prpd, err := p.DB.PrepareContext(ctx, SELECT_POST)
-	if err != nil {
-		log.Println("[ERROR] GetFullPost -> error :", err)
-		return post, author, err
-	}
-
-	rows, err := prpd.QueryContext(ctx, id)
+	rows, err := p.db.QueryContext(ctx, SELECT_POST, id)
 	if err != nil {
 		log.Println("[ERROR] GetFullPost -> error on executing query :", err)
 		return post, author, err
@@ -133,20 +115,14 @@ func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int64) (entity.B
 		return post, author, nil
 	}
 
-	return post, author, fmt.Errorf("no post with id %d", id)
+	return post, author, fmt.Errorf("No post with id %d", id)
 }
 
 func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset int64, limit int64) (entity.BriefsBlogPost, error) {
 	var postList entity.BriefsBlogPost
 
 	query := SELECT_LIST_OF_POST + " ORDER BY b.created_at DESC LIMIT ?, ? "
-	prpd, err := p.DB.PrepareContext(ctx, query)
-	if err != nil {
-		log.Println("[ERROR] GetBriefsBlogPostData -> error :", err)
-		return postList, err
-	}
-
-	rows, err := prpd.QueryContext(ctx, offset, limit)
+	rows, err := p.db.QueryContext(ctx, query, offset, limit)
 	if err != nil {
 		log.Println("[ERROR] GetBriefsBlogPostData -> error on executing query :", err)
 		return postList, err
@@ -188,13 +164,7 @@ func (p PostRepositoryImpl) GetBriefsBlogPostFromSearch(ctx context.Context, q s
 	query = query + " ORDER BY b.created_at DESC LIMIT ?, ?"
 	args = append(args, offset, limit)
 
-	prpd, err := p.DB.PrepareContext(ctx, query)
-	if err != nil {
-		log.Println("[ERROR] GetBriefsBlogPostFromSearch -> error :", err)
-		return postList, err
-	}
-
-	rows, err := prpd.QueryContext(ctx, args...)
+	rows, err := p.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		log.Println("[ERROR] GetBriefsBlogPostFromSearch -> error on executing query :", err)
 		return postList, err
@@ -215,13 +185,7 @@ func (p PostRepositoryImpl) GetBriefsBlogPostFromSearch(ctx context.Context, q s
 }
 
 func (p PostRepositoryImpl) GetPostAuthorId(ctx context.Context, postID int64) (int64, error) {
-	prpd, err := p.DB.PrepareContext(ctx, SELECT_POST_AUTHOR)
-	if err != nil {
-		log.Println("[ERROR] GetPostAuthorId -> error :", err)
-		return -1, err
-	}
-
-	rows, err := prpd.QueryContext(ctx, postID)
+	rows, err := p.db.QueryContext(ctx, SELECT_POST_AUTHOR, postID)
 	if err != nil {
 		log.Println("[ERROR] GetPostAuthorId -> error on executing query :", err)
 		return -1, err
@@ -238,19 +202,13 @@ func (p PostRepositoryImpl) GetPostAuthorId(ctx context.Context, postID int64) (
 		return authorID, nil
 	}
 
-	return -1, fmt.Errorf("no post with id %d", postID)
+	return -1, fmt.Errorf("No post with id %d", postID)
 }
 
 func (p PostRepositoryImpl) GetCategoriesFromID(ctx context.Context, id int64) (entity.Categories, error) {
 	var categories entity.Categories
 
-	prpd, err := p.DB.PrepareContext(ctx, SELECT_CATEGORY_OF_POST)
-	if err != nil {
-		log.Println("[ERROR] GetCategoriesFromID -> error :", err)
-		return categories, err
-	}
-
-	rows, err := prpd.QueryContext(ctx, id)
+	rows, err := p.db.QueryContext(ctx, SELECT_CATEGORY_OF_POST, id)
 	if err != nil {
 		log.Println("[ERROR] GetCategoriesFromID -> error on executing query :", err)
 		return categories, err
@@ -279,7 +237,7 @@ func (p PostRepositoryImpl) GetCategoriesFromID(ctx context.Context, id int64) (
 func (p PostRepositoryImpl) GetCategoryList(ctx context.Context) (entity.Categories, error) {
 	var categories entity.Categories
 
-	rows, err := p.DB.QueryContext(ctx, SELECT_CATEGORY)
+	rows, err := p.db.QueryContext(ctx, SELECT_CATEGORY)
 	if err != nil {
 		log.Println("[ERROR] GetCategoryList -> error on executing query :", err)
 		return categories, err
@@ -300,7 +258,7 @@ func (p PostRepositoryImpl) GetCategoryList(ctx context.Context) (entity.Categor
 }
 
 func (p PostRepositoryImpl) AddPostCategoryAssoc(ctx context.Context, posdtId int64, categoryId int64) error {
-	result, err := p.DB.ExecContext(ctx, INSERT_CATEGORY_ASSOC, posdtId, categoryId)
+	result, err := p.db.ExecContext(ctx, INSERT_CATEGORY_ASSOC, posdtId, categoryId)
 	if err != nil {
 		log.Println("[ERROR] AddPostCategoryAssoc -> error inserting row :", err)
 		return err

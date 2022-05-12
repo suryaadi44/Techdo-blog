@@ -9,7 +9,7 @@ import (
 )
 
 type UserRepositoryImpl struct {
-	DB *sql.DB
+	db *sql.DB
 }
 
 var (
@@ -19,9 +19,9 @@ var (
 	SELECT_USER_MINI_DETAIL = "SELECT uid, email, first_name, last_name, picture FROM user_details WHERE uid = ?"
 )
 
-func NewUserRepository(DB *sql.DB) UserRepositoryImpl {
+func NewUserRepository(db *sql.DB) UserRepositoryImpl {
 	return UserRepositoryImpl{
-		DB: DB,
+		db: db,
 	}
 }
 
@@ -54,7 +54,7 @@ func NewUserRepository(DB *sql.DB) UserRepositoryImpl {
 func (u UserRepositoryImpl) GetUserDetail(ctx context.Context, id int64) (entity.UserDetail, error) {
 	var user entity.UserDetail
 
-	rows, err := u.DB.QueryContext(ctx, SELECT_USER_DETAIL, id)
+	rows, err := u.db.QueryContext(ctx, SELECT_USER_DETAIL, id)
 	if err != nil {
 		log.Println("[ERROR] GetUserDetail -> error on executing query :", err)
 		return user, err
@@ -76,7 +76,7 @@ func (u UserRepositoryImpl) GetUserDetail(ctx context.Context, id int64) (entity
 func (u UserRepositoryImpl) GetUserMiniDetail(ctx context.Context, id int64) (entity.UserDetail, error) {
 	var user entity.UserDetail
 
-	rows, err := u.DB.QueryContext(ctx, SELECT_USER_MINI_DETAIL, id)
+	rows, err := u.db.QueryContext(ctx, SELECT_USER_MINI_DETAIL, id)
 	if err != nil {
 		log.Println("[ERROR] GetUserMiniDetail -> error on executing query :", err)
 		return user, err
