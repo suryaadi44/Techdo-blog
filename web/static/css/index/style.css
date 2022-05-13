@@ -16,6 +16,12 @@
     background-size: cover;
 }
 
+.fill-width {
+    inline-size: -webkit-fill-available;
+    inline-size: -moz-available;
+    inline-size: fill-available;
+}
+
 /* Responsive Breakpoint */
 /* Ukuran Desktop */
 @media screen and (max-width: 1280px) {
