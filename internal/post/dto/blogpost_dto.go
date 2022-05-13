@@ -3,7 +3,6 @@ package dto
 import (
 	"html/template"
 	"regexp"
-	"time"
 
 	UserDto "github.com/suryaadi44/Techdo-blog/internal/user/dto"
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
@@ -17,8 +16,8 @@ type BlogPostResponse struct {
 	Banner     string
 	Title      string
 	Body       template.HTML
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	CreatedAt  string
+	UpdatedAt  string
 }
 
 type BriefBlogPostResponse struct {
@@ -27,8 +26,8 @@ type BriefBlogPostResponse struct {
 	Banner    string
 	Title     string
 	Body      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt string
+	UpdatedAt string
 }
 
 type BlogPostRequest struct {
@@ -73,8 +72,8 @@ func NewBlogPostResponse(post entity.BlogPost, categories entity.Categories, aut
 		Banner:     post.Banner,
 		Title:      post.Title,
 		Body:       template.HTML(post.Body),
-		CreatedAt:  post.CreatedAt,
-		UpdatedAt:  post.UpdatedAt,
+		CreatedAt:  post.CreatedAt.Format("02 Jan 2006"),
+		UpdatedAt:  post.UpdatedAt.Format("02 Jan 2006"),
 	}
 }
 
@@ -88,8 +87,8 @@ func NewBriefBlogPostResponse(post entity.BriefBlogPost) BriefBlogPostResponse {
 		Banner:    post.Banner,
 		Title:     post.Title,
 		Body:      body,
-		CreatedAt: post.CreatedAt,
-		UpdatedAt: post.UpdatedAt,
+		CreatedAt: post.CreatedAt.Format("02 Jan 2006"),
+		UpdatedAt: post.UpdatedAt.Format("02 Jan 2006"),
 	}
 
 }

@@ -27,8 +27,8 @@ var (
 
 	SELECT_POST_AUTHOR       = "SELECT author_id FROM blog_posts WHERE post_id = ?"
 	SELECT_ID_OF_LAST_INSERT = "SELECT LAST_INSERT_ID() as uid"
-	SELECT_LIST_OF_POST      = "SELECT b.post_id, b.banner, b.title, b.body, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid"
-	SELECT_FULL_TEXT_POST    = "SELECT b.post_id, b.banner, b.title, b.body, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
+	SELECT_LIST_OF_POST      = "SELECT b.post_id, b.banner, b.title, b.body, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid"
+	SELECT_FULL_TEXT_POST    = "SELECT b.post_id, b.banner, b.title, b.body, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
 	SELECT_CATEGORY_OF_POST  = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
 	SELECT_CATEGORY          = "SELECT category_id, category_name FROM categories"
 )
