@@ -2,10 +2,12 @@ package dto
 
 import (
 	"html/template"
+	"regexp"
 	"time"
 
 	UserDto "github.com/suryaadi44/Techdo-blog/internal/user/dto"
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
+	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 
 type BlogPostResponse struct {
@@ -24,6 +26,7 @@ type BriefBlogPostResponse struct {
 	Author    string
 	Banner    string
 	Title     string
+	Body      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -76,11 +79,15 @@ func NewBlogPostResponse(post entity.BlogPost, categories entity.Categories, aut
 }
 
 func NewBriefBlogPostResponse(post entity.BriefBlogPost) BriefBlogPostResponse {
+	r := regexp.MustCompile(`<[^>]*>`)
+	body := utils.Truncate(r.ReplaceAllString(post.Body, ""), 230)
+
 	return BriefBlogPostResponse{
 		PostID:    post.PostID,
 		Author:    post.Author,
 		Banner:    post.Banner,
 		Title:     post.Title,
+		Body:      body,
 		CreatedAt: post.CreatedAt,
 		UpdatedAt: post.UpdatedAt,
 	}
