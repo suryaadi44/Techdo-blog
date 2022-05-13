@@ -2,10 +2,11 @@ package dto
 
 import (
 	"html/template"
-	"time"
+	"regexp"
 
 	UserDto "github.com/suryaadi44/Techdo-blog/internal/user/dto"
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
+	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 
 type BlogPostResponse struct {
@@ -15,8 +16,8 @@ type BlogPostResponse struct {
 	Banner     string
 	Title      string
 	Body       template.HTML
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	CreatedAt  string
+	UpdatedAt  string
 }
 
 type BriefBlogPostResponse struct {
@@ -24,8 +25,9 @@ type BriefBlogPostResponse struct {
 	Author    string
 	Banner    string
 	Title     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Body      string
+	CreatedAt string
+	UpdatedAt string
 }
 
 type BlogPostRequest struct {
@@ -70,19 +72,23 @@ func NewBlogPostResponse(post entity.BlogPost, categories entity.Categories, aut
 		Banner:     post.Banner,
 		Title:      post.Title,
 		Body:       template.HTML(post.Body),
-		CreatedAt:  post.CreatedAt,
-		UpdatedAt:  post.UpdatedAt,
+		CreatedAt:  post.CreatedAt.Format("02 Jan 2006"),
+		UpdatedAt:  post.UpdatedAt.Format("02 Jan 2006"),
 	}
 }
 
 func NewBriefBlogPostResponse(post entity.BriefBlogPost) BriefBlogPostResponse {
+	r := regexp.MustCompile(`<[^>]*>`)
+	body := utils.Truncate(r.ReplaceAllString(post.Body, ""), 230)
+
 	return BriefBlogPostResponse{
 		PostID:    post.PostID,
 		Author:    post.Author,
 		Banner:    post.Banner,
 		Title:     post.Title,
-		CreatedAt: post.CreatedAt,
-		UpdatedAt: post.UpdatedAt,
+		Body:      body,
+		CreatedAt: post.CreatedAt.Format("02 Jan 2006"),
+		UpdatedAt: post.UpdatedAt.Format("02 Jan 2006"),
 	}
 
 }

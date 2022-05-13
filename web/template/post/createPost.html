@@ -27,7 +27,7 @@
     <div class="container-fluid">
       <a href="/" class="navbar__logo">Techdo-Blog</a>
 
-      <div class="right-nav">
+      <div class="right-nav justify-content-end">
         <div class="user-profile-container" style="background-image: url('{{.Data.User.Picture}}');"></div>
       </div>
       <button href="" class="navbar__auth-nav-btn"><i class="fa-solid fa-user"></i></button>
@@ -41,6 +41,21 @@
         <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
         <hr>
         <li><a href="/">Dashboard</a></li>
+        <li><a href="/post/create">Create Post</a></li>
+        <li><a href="">Settings</a></li>
+        <hr>
+        <li><a href="/logout">Sign Out</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card auth-nav" style="width: 18rem;">
+    <div class="card-body">
+      <ul>
+        <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+        <hr>
+        <li><a href="/">Dashboard</a></li>
+        <li><a href="/post/create">Create Post</a></li>
         <li><a href="">Settings</a></li>
         <hr>
         <li><a href="/logout">Sign Out</a></li>

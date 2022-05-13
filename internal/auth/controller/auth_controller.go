@@ -30,9 +30,12 @@ func NewController(router *mux.Router, userAuthService service.UserAuthServiceAp
 }
 
 func (u *UserAuthController) InitializeController() {
+	//API
 	u.router.HandleFunc("/login", u.loginHandler).Methods(http.MethodPost)
-	u.router.HandleFunc("/login", u.loginPageHandler).Methods(http.MethodGet)
 	u.router.HandleFunc("/signup", u.signUpHandler).Methods(http.MethodPost)
+
+	// Page
+	u.router.HandleFunc("/login", u.loginPageHandler).Methods(http.MethodGet)
 	u.router.HandleFunc("/signup", u.signUpPageHandler).Methods(http.MethodGet)
 	u.router.HandleFunc("/logout", u.logOutHandler).Methods(http.MethodGet)
 }

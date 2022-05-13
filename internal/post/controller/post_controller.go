@@ -78,8 +78,7 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 
 	postData, err := p.postService.GetBriefsBlogPost(r.Context(), pageConv, limitConv)
 	if err != nil {
-		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
-		return
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
 	token, isLoggedIn := utils.GetSessionToken(r)
@@ -97,16 +96,21 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 		}
 	}
 
-	if err == nil {
-		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
-	} else {
-		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
+
+	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
 }
 
+<<<<<<< HEAD
 func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO : Change search page template
 	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
+=======
+func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Request) {
+	var tmpl = template.Must(template.ParseFiles("web/template/search-blog/search-blog.html"))
+>>>>>>> main
 	var err error
 	var dateStart, dateEnd time.Time
 
@@ -142,13 +146,13 @@ func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Re
 
 	postData, err := p.postService.SearchBlogPost(r.Context(), q, pageConv, limitConv, dateStartPtr, dateEndPtr)
 	if err != nil {
-		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
-		return
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
 	token, isLoggedIn := utils.GetSessionToken(r)
 	data := map[string]interface{}{
 		"LoggedIn": isLoggedIn,
+		"Query":    q,
 		"Posts":    postData,
 	}
 
@@ -161,11 +165,11 @@ func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Re
 		}
 	}
 
-	if err == nil {
-		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
-	} else {
-		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
+
+	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
 }
 
 func (p *PostController) viewPostPageHandlder(w http.ResponseWriter, r *http.Request) {
@@ -176,8 +180,10 @@ func (p *PostController) viewPostPageHandlder(w http.ResponseWriter, r *http.Req
 
 	postData, err := p.postService.GetFullPost(r.Context(), id)
 	if err != nil {
-		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
-		return
+		if strings.Contains(err.Error(), "No post") {
+			panic(globalDTO.NewBaseResponse(http.StatusNotFound, true, err.Error()))
+		}
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
 	token, isLoggedIn := utils.GetSessionToken(r)
@@ -195,11 +201,11 @@ func (p *PostController) viewPostPageHandlder(w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	if err == nil {
-		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
-	} else {
-		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
+
+	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
 }
 
 func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -215,16 +221,11 @@ func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Re
 		"User":       user,
 	}
 
-	if err == nil {
-		err = tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
-	} else {
-		err = tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
 	}
 
-	if err != nil {
-		tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
-		return
-	}
+	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
 }
 
 func (p *PostController) deletePostHandlder(w http.ResponseWriter, r *http.Request) {

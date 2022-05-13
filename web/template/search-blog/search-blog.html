@@ -11,18 +11,15 @@
   <link rel="stylesheet" href="/static/css/index/style.css">
   <!-- Icon -->
   <script src="https://kit.fontawesome.com/ede9e54d69.js" crossorigin="anonymous"></script>
-  <!-- Summer Note -->
   <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
     integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
     crossorigin="anonymous"></script>
-  <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
   <title>Techdo</title>
 </head>
 
 <body>
   <!-- Navbar -->
-  <nav class="navbar ps-2 pe-2">
+  <nav class="navbar ps-5 pe-5">
     <div class="container-fluid">
       <div class="left-nav justify-content-start col-6">
         <a href="/" class="navbar__logo col">Techdo-Blog</a>
@@ -34,7 +31,7 @@
         </form>
       </div>
 
-      <div class="right-nav justify-content-end col">
+      <div class="right-nav justify-content-end">
         {{if .Data.LoggedIn}}
         <a class="navbar__create-post-btn" href="/post/create">Create Post</a>
         <div class="user-profile-container" style="background-image: url('{{.Data.User.Picture}}');"></div>
@@ -77,7 +74,6 @@
       </div>
     </div>
   {{else}}
-  
   <!-- Auth Nav Menu -->
     <div class="card auth-nav" style="width: 18rem;">
       <div class="card-body">
@@ -89,37 +85,39 @@
     </div>
   {{end}}
   
-  <!-- Index Body -->
-  <div class="container-fluid pt-4 ps-5 pe-5 body-container">
-    <div class="row">
-      <div class="col">
-        Column
-      </div>
-      <div class="col-6">
-        <div class="row">
-          <nav class="nav">
-            <a class="nav-link" href="#">All</a>
-            <a class="nav-link" href="#">Latest</a>
-            <a class="nav-link" href="#">Trend</a>
-          </nav>
-        </div>
 
-        {{range $elem := .Data.Posts}}
-        <div class="row posts-container">
-          <div class="card mb-3 post" style="width: 100%;">
-            <div class="blog-cover" style="background-image: url('{{$elem.Banner}}');"></div>
-            <div class="card-body fill-width">
-              <h5 class="card-title">{{$elem.Title}}</h5>
-              <h6 class="card-subtitle mb-2 text-muted">By {{$elem.Author}} on {{$elem.CreatedAt}}</h6>
-              <p class="card-text">{{$elem.Body}}<a href="/post/{{$elem.PostID}}">...</a></p>
-              <a href="/post/{{$elem.PostID}}" class="btn btn-primary">Read More</a>
+  <!-- Search Body -->
+  <div class="container-fluid pt-4 ps-5 pe-5 body-container">
+    <h2 class="mb-5">Search Result for <span class="keywords">"{{.Data.Query}}"</span></h2>
+
+    <div class="row">
+      
+      <div class="col">
+        <!-- If Found -->
+
+        {{$post := len .Data.Posts}}
+        {{if ne $post 0 }}
+          {{range $elem := .Data.Posts}}
+          <div class="row posts-container">
+            <div class="card mb-3 post" style="width: 100%;">
+              <div class="blog-cover" style="background-image: url('{{$elem.Banner}}');"></div>
+              <div class="card-body fill-width">
+                <h5 class="card-title">{{$elem.Title}}</h5> 
+                <h6 class="card-subtitle mb-2 text-muted">By {{$elem.Author}} on {{$elem.CreatedAt}}</h6>
+                <p class="card-text">{{$elem.Body}}<a href="/post/{{$elem.PostID}}">...</a></p>
+                <a href="/post/{{$elem.PostID}}" class="btn btn-primary">Read More</a>
+              </div>
             </div>
           </div>
-        </div>
+          {{end}}
+        {{else}}
+          <div class="card container d-flex not-found-container p-5">
+              <img class="m-auto" src="/static/css/css-images/not-found-ilustration.png" style="width: 200px;" alt="cute cat">
+              <h3 class="mt-3 fw-bold" style="text-align:center;">Tidak ada hasil untuk <span class="keywords">"{{.Data.Query}}"</span></h3>
+          </div>
         {{end}}
-
       </div>
-      <div class="col">
+      <div class="card col-3 me-3">
         Column
       </div>
     </div>
@@ -130,7 +128,7 @@
     integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
     crossorigin="anonymous"></script>
 
-  <script src="/static/js/index.js"></script>
+  <script src="/web/static/js/index.js"></script>
 </body>
 
 </html>
