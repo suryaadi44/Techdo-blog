@@ -11,12 +11,9 @@
   <link rel="stylesheet" href="/static/css/index/style.css">
   <!-- Icon -->
   <script src="https://kit.fontawesome.com/ede9e54d69.js" crossorigin="anonymous"></script>
-  <!-- Summer Note -->
   <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
     integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
     crossorigin="anonymous"></script>
-  <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
   <title>Techdo</title>
 </head>
 
@@ -26,55 +23,16 @@
     <div class="container-fluid">
       <a href="/" class="navbar__logo">Techdo-Blog</a>
 
-      <form class="navbar__search-box-container" method="get" action="/search">
-        <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
-        <button class="navbar__search-button" type="submit" >
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-      </form>
-
-      <div class="right-nav">
-        {{if .Data.LoggedIn}}
-        <a class="navbar__create-post-btn" href="/post/create">Create Post</a>
-        <div class="user-profile-container" style="background-image: url('{{.Data.User.Picture}}');"></div>
-        {{else}}
-        <a class="navbar__login-btn" href="/login">Login</a>
-        <a class="navbar__create-acc-btn" href="/signup">Create Account</a>
-        {{end}}
       </div>
       <button href="" class="navbar__auth-nav-btn"><i class="fa-solid fa-user"></i></button>
     </div>
   </nav>
 
-  <!-- User-Profile Nav -->
-  <div class="card user-nav" style="width: 18rem;">
-    <div class="card-body">
-      <ul>
-        <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
-        <hr>
-        <li><a href="/">Dashboard</a></li>
-        <li><a href="/post/create">Create Post</a></li>
-        <li><a href="">Settings</a></li>
-        <hr>
-        <li><a href="/logout">Sign Out</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Auth Nav Menu -->
-  <div class="card auth-nav" style="width: 18rem;">
-    <div class="card-body">
-      <ul>
-        <li><a href="/login">Login</a></li>
-        <li><a href="/signup">Create Account</a></li>
-      </ul>
-    </div>
-  </div>
-
   <!-- Route Error Body -->
   <div class="container-fluid d-flex flex-column align-items-center flex-direction-column pt-5 body-container">
     <img class="m-auto" src="/static/css/css-images/routing-error.png" style="width: 350px;" alt="cute astrounot">
-    <h1 class="mt-5 error-message fw-bold" style="font-size: 3em;">PAGE NOT FOUND</h1>
+    <h1 class="mt-5 error-message fw-bold" style="font-size: 3em;">Error {{.Code}}</h1>
+    <h3 class="mt-1 error-message" style="font-size: 1em;">{{.Data}}</h3>
   </div>
 
   <!-- Bootstrap Bundle with Popper -->
