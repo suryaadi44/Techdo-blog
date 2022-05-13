@@ -87,7 +87,7 @@ func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	if err != nil {
-		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
 	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
@@ -150,7 +150,7 @@ func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	if err != nil {
-		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
 	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
@@ -164,6 +164,9 @@ func (p *PostController) viewPostHandlder(w http.ResponseWriter, r *http.Request
 
 	postData, err := p.postService.GetFullPost(r.Context(), id)
 	if err != nil {
+		if strings.Contains(err.Error(), "No post") {
+			panic(globalDTO.NewBaseResponse(http.StatusNotFound, true, err.Error()))
+		}
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
@@ -183,7 +186,7 @@ func (p *PostController) viewPostHandlder(w http.ResponseWriter, r *http.Request
 	}
 
 	if err != nil {
-		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
 	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
