@@ -104,7 +104,7 @@
             </div>
             
             <div class="card-body px-5">
-                <h1 class="card-title mb-4">{{.Data.Posts.Title}}</h1>
+                <h1 class="card-title mb-1">{{.Data.Posts.Title}}</h1>
                 {{range $elem := .Data.Posts.Categories}}
                   <h5 class="col blog-category mb-4">{{$elem.CategoryName}}</h5>
                 {{end}}
@@ -114,14 +114,16 @@
             </div>
 
             <div class="comment-body container">
-                <h2 class="comment-title">Comment(<span class="comment-count">14</span>)</h2>
+                <h2 class="comment-title">Comment(<span class="comment-count">{{.Data.Posts.CommentCount}}</span>)</h2>
 
                 <div class="comment-form-body container row mt-4">
                     <div class="col-2 user-pict" style="background-image: url('/static/img/default-user-profile-img.png');"></div>
-                    <form class="col">
+                    
+                    <form class="col" action="/post/{{.Data.Posts.PostID}}/comment" method="post">
                         <textarea class="px-3" name="comment" id="comment-form" cols="30" rows="10" placeholder="Add comment"></textarea>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
+                    
                 </div>
 
                 <div class="comment-wrapper mt-3 px-4">
@@ -134,7 +136,7 @@
                               <p class="comment-body">Some quick example text to build on the card title and make up the bulk of the card's content.</p>  
                         </div>
                     </div>
-                    <!-- Comment list End -->
+                  <!-- Comment list End -->
                 </div>
             </div>
         </div>

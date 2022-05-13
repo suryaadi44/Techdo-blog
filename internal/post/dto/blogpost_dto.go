@@ -10,24 +10,28 @@ import (
 )
 
 type BlogPostResponse struct {
-	PostID     int64
-	Author     UserDto.UserDetail
-	Categories CategoryList
-	Banner     string
-	Title      string
-	Body       template.HTML
-	CreatedAt  string
-	UpdatedAt  string
+	PostID       int64
+	Author       UserDto.UserDetail
+	Categories   CategoryList
+	Banner       string
+	Title        string
+	Body         template.HTML
+	ViewCount    int64
+	CommentCount int64
+	CreatedAt    string
+	UpdatedAt    string
 }
 
 type BriefBlogPostResponse struct {
-	PostID    int64
-	Author    string
-	Banner    string
-	Title     string
-	Body      string
-	CreatedAt string
-	UpdatedAt string
+	PostID       int64
+	Author       string
+	Banner       string
+	Title        string
+	Body         string
+	ViewCount    int64
+	CommentCount int64
+	CreatedAt    string
+	UpdatedAt    string
 }
 
 type BlogPostRequest struct {
@@ -66,14 +70,16 @@ func NewCategoryList(c entity.Categories) CategoryList {
 
 func NewBlogPostResponse(post entity.BlogPost, categories entity.Categories, author entity.UserDetail) BlogPostResponse {
 	return BlogPostResponse{
-		PostID:     post.PostID,
-		Author:     UserDto.NewUserDetailDTO(author),
-		Categories: NewCategoryList(categories),
-		Banner:     post.Banner,
-		Title:      post.Title,
-		Body:       template.HTML(post.Body),
-		CreatedAt:  post.CreatedAt.Format("02 Jan 2006"),
-		UpdatedAt:  post.UpdatedAt.Format("02 Jan 2006"),
+		PostID:       post.PostID,
+		Author:       UserDto.NewUserDetailDTO(author),
+		Categories:   NewCategoryList(categories),
+		Banner:       post.Banner,
+		Title:        post.Title,
+		Body:         template.HTML(post.Body),
+		ViewCount:    post.ViewCount,
+		CommentCount: post.CommentCount,
+		CreatedAt:    post.CreatedAt.Format("02 Jan 2006"),
+		UpdatedAt:    post.UpdatedAt.Format("02 Jan 2006"),
 	}
 }
 
@@ -82,13 +88,15 @@ func NewBriefBlogPostResponse(post entity.BriefBlogPost) BriefBlogPostResponse {
 	body := utils.Truncate(r.ReplaceAllString(post.Body, ""), 230)
 
 	return BriefBlogPostResponse{
-		PostID:    post.PostID,
-		Author:    post.Author,
-		Banner:    post.Banner,
-		Title:     post.Title,
-		Body:      body,
-		CreatedAt: post.CreatedAt.Format("02 Jan 2006"),
-		UpdatedAt: post.UpdatedAt.Format("02 Jan 2006"),
+		PostID:       post.PostID,
+		Author:       post.Author,
+		Banner:       post.Banner,
+		Title:        post.Title,
+		Body:         body,
+		ViewCount:    post.ViewCount,
+		CommentCount: post.CommentCount,
+		CreatedAt:    post.CreatedAt.Format("02 Jan 2006"),
+		UpdatedAt:    post.UpdatedAt.Format("02 Jan 2006"),
 	}
 
 }

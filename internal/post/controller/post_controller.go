@@ -73,8 +73,15 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 	if page == "" {
 		page = "1"
 	}
-	limitConv, _ := strconv.ParseInt(limit, 10, 64)
-	pageConv, _ := strconv.ParseInt(page, 10, 64)
+
+	limitConv, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+	pageConv, err := strconv.ParseInt(page, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
 
 	postData, err := p.postService.GetBriefsBlogPost(r.Context(), pageConv, limitConv)
 	if err != nil {
@@ -104,7 +111,6 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 }
 
 func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO : Change search page template
 	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
 	var err error
 	var dateStart, dateEnd time.Time
@@ -136,8 +142,14 @@ func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Re
 
 	q := queryVar.Get("q")
 
-	limitConv, _ := strconv.ParseInt(limit, 10, 64)
-	pageConv, _ := strconv.ParseInt(page, 10, 64)
+	limitConv, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+	pageConv, err := strconv.ParseInt(page, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
 
 	postData, err := p.postService.SearchBlogPost(r.Context(), q, pageConv, limitConv, dateStartPtr, dateEndPtr)
 	if err != nil {
@@ -320,10 +332,23 @@ func (p *PostController) viewCommentHandler(w http.ResponseWriter, r *http.Reque
 		page = "1"
 	}
 
-	// TODO : add error handler
-	id, _ := strconv.ParseInt(vars["id"], 10, 64)
-	limitConv, _ := strconv.ParseInt(limit, 10, 64)
-	pageConv, _ := strconv.ParseInt(page, 10, 64)
+	id, err := strconv.ParseInt(vars["id"], 10, 64)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	limitConv, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	pageConv, err := strconv.ParseInt(page, 10, 64)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+		return
+	}
 
 	commentsData, err := p.postService.GetComments(r.Context(), id, pageConv, limitConv)
 	if err != nil {

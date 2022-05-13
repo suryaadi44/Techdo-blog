@@ -1,8 +1,6 @@
 package dto
 
 import (
-	"time"
-
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
 )
 
@@ -13,13 +11,13 @@ type CommentRequest struct {
 }
 
 type CommentResponse struct {
-	UserID      int64     `json:"uid"`
-	FirstName   string    `json:"firstName"`
-	LastName    string    `json:"lastName"`
-	UserPicture string    `json:"userPic"`
-	CommentBody string    `json:"commentBody"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	UserID      int64  `json:"uid"`
+	FirstName   string `json:"firstName"`
+	LastName    string `json:"lastName"`
+	UserPicture string `json:"userPic"`
+	CommentBody string `json:"commentBody"`
+	CreatedAt   string `json:"createdAt"`
+	UpdatedAt   string `json:"updatedAt"`
 }
 
 type CommentsResponse []*CommentResponse
@@ -39,8 +37,8 @@ func NewCommentResponse(comment entity.Comment, user entity.MiniUserDetail) Comm
 		LastName:    user.LastName,
 		UserPicture: user.Picture,
 		CommentBody: comment.CommentBody,
-		CreatedAt:   comment.CreatedAt,
-		UpdatedAt:   comment.UpdatedAt,
+		CreatedAt:   comment.CreatedAt.Format("02 Jan 2006"),
+		UpdatedAt:   comment.UpdatedAt.Format("02 Jan 2006"),
 	}
 }
 
