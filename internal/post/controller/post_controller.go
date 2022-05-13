@@ -103,14 +103,9 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
 }
 
-<<<<<<< HEAD
 func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO : Change search page template
 	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
-=======
-func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Request) {
-	var tmpl = template.Must(template.ParseFiles("web/template/search-blog/search-blog.html"))
->>>>>>> main
 	var err error
 	var dateStart, dateEnd time.Time
 
