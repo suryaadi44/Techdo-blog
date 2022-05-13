@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -25,13 +26,14 @@
       <div class="left-nav justify-content-start col-6">
         <a href="/" class="navbar__logo col">Techdo-Blog</a>
         <form class="navbar__search-box-container justify-content-start" method="get" action="/search">
-          <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
-          <button class="navbar__search-button" type="submit" >
+          <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search"
+            name="q">
+          <button class="navbar__search-button" type="submit">
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>
         </form>
       </div>
-      
+
       <div class="right-nav justify-content-end col">
         {{if .Data.LoggedIn}}
         <a class="navbar__create-post-btn" href="/post/create">Create Post</a>
@@ -47,107 +49,116 @@
 
   {{if .Data.LoggedIn}}
   <!-- User-Profile Nav -->
-    <div class="card user-nav" style="width: 18rem;">
-      <div class="card-body">
-        <ul>
-          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
-          <hr>
-          <li><a href="/">Dashboard</a></li>
-          <li><a href="/post/create">Create Post</a></li>
-          <li><a href="">Settings</a></li>
-          <hr>
-          <li><a href="/logout">Sign Out</a></li>
-        </ul>
-      </div>
+  <div class="card user-nav" style="width: 18rem;">
+    <div class="card-body">
+      <ul>
+        <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+        <hr>
+        <li><a href="/">Dashboard</a></li>
+        <li><a href="/post/create">Create Post</a></li>
+        <li><a href="">Settings</a></li>
+        <hr>
+        <li><a href="/logout">Sign Out</a></li>
+      </ul>
     </div>
+  </div>
 
-    <div class="card auth-nav" style="width: 18rem;">
-      <div class="card-body">
-        <ul>
-          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
-          <hr>
-          <li><a href="/">Dashboard</a></li>
-          <li><a href="/post/create">Create Post</a></li>
-          <li><a href="">Settings</a></li>
-          <hr>
-          <li><a href="/logout">Sign Out</a></li>
-        </ul>
-      </div>
+  <div class="card auth-nav" style="width: 18rem;">
+    <div class="card-body">
+      <ul>
+        <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+        <hr>
+        <li><a href="/">Dashboard</a></li>
+        <li><a href="/post/create">Create Post</a></li>
+        <li><a href="">Settings</a></li>
+        <hr>
+        <li><a href="/logout">Sign Out</a></li>
+      </ul>
     </div>
+  </div>
   {{else}}
   <!-- Auth Nav Menu -->
-    <div class="card auth-nav" style="width: 18rem;">
-      <div class="card-body">
-        <ul>
-          <li><a href="/login">Login</a></li>
-          <li><a href="/signup">Create Account</a></li>
-        </ul>
-      </div>
+  <div class="card auth-nav" style="width: 18rem;">
+    <div class="card-body">
+      <ul>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/signup">Create Account</a></li>
+      </ul>
     </div>
+  </div>
   {{end}}
-  
+
 
   <!-- Index Body -->
   <div class="container-fluid pt-4 ps-5 pe-5 body-container">
     <div class="row">
-      <div class="posts-container col-8">
+      <div class="post-container col-lg-8">
         <div class="card mb-3 post" style="width: 100%;">
-            <div class="blog-cover" style="background-image: url('{{.Data.Posts.Banner}}');"></div>
-            <div class="blog-author row mt-4 px-5 py-3">
-                <div class="col-1">
-                    <div class="author-pict" style="background-image: url('{{.Data.Posts.Author.Picture}}')"></div>
-                </div>
-                <div class="col ms-lg-4">
-                    <p class="row mb-1 author-name">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</p>
-                    <p class="row text-muted date-post">Posted on {{.Data.Posts.CreatedAt}}</p>
-                </div>
-            </div>
-            
-            <div class="card-body px-5">
-                <h1 class="card-title mb-4">{{.Data.Posts.Title}}</h1>
-                {{range $elem := .Data.Posts.Categories}}
-                  <h5 class="col blog-category mb-4">{{$elem.CategoryName}}</h5>
-                {{end}}
-                <div class="card-text">
-                    {{.Data.Posts.Body}}
-                </div>
+          <div class="blog-cover" style="background-image: url('{{.Data.Posts.Banner}}');"></div>
+          <div class="card-body px-5">
+            {{range $elem := .Data.Posts.Categories}}
+              <h5 class="col blog-category">{{$elem.CategoryName}}</h5>
+            {{end}}
+            <h1 class="card-title mb-3">{{.Data.Posts.Title}}</h1>
+
+            <!-- Author -->
+            <div class="post-meta d-flex mb-5">
+              <div class="bio-pic mr-3">
+                <img src="{{.Data.Posts.Author.Picture}}" alt="Image" class="img-fluidid">
+              </div>
+              <div class="vcard">
+                <span class="d-block">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</span>
+                <span class="d-block text-muted date-post">Posted on {{.Data.Posts.CreatedAt}}</span>
+              </div>
             </div>
 
-            <div class="comment-body container">
-                <h2 class="comment-title">Comment(<span class="comment-count">14</span>)</h2>
-
-                <div class="comment-form-body container row mt-4">
-                    <div class="col-2 user-pict" style="background-image: url('/static/img/default-user-profile-img.png');"></div>
-                    <form class="col">
-                        <textarea class="px-3" name="comment" id="comment-form" cols="30" rows="10" placeholder="Add comment"></textarea>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
-
-                <div class="comment-wrapper mt-3 px-4">
-                  <!-- Comment list -->
-                    <div class="comment-list row my-2">
-                        <div class="col-2 user-pict" style="background-image: url('/static/img/default-user-profile-img.png');"></div>
-
-                        <div class="col card mx-2 px-4 py-3 comment-card">
-                              <h5 class="comment-header"><span class="user-comment-name">User Comment</span> • <span class="user-comment-date text-muted">12 April 2022</span></h5>
-                              <p class="comment-body">Some quick example text to build on the card title and make up the bulk of the card's content.</p>  
-                        </div>
-                    </div>
-                    <!-- Comment list End -->
-                </div>
+            <div class="card-text">
+              {{.Data.Posts.Body}}
             </div>
+          </div>
+
+          <div class="comment-body container">
+            <h2 class="comment-title">Comment(<span class="comment-count">14</span>)</h2>
+
+            <div class="comment-form-body container row mt-4">
+              <div class="col-2 user-pict" style="background-image: url('/static/img/default-user-profile-img.png');">
+              </div>
+              <form class="col">
+                <textarea class="px-3" name="comment" id="comment-form" cols="30" rows="10"
+                  placeholder="Add comment"></textarea>
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+            </div>
+
+            <div class="comment-wrapper mt-3 px-4">
+
+              <!-- Comment list -->
+              <div class="comment-list row my-2">
+                <div class="col-2 user-pict" style="background-image: url('/static/img/default-user-profile-img.png');">
+                </div>
+
+                <div class="col card mx-2 px-4 py-3 comment-card">
+                  <h5 class="comment-header"><span class="user-comment-name">User Comment</span> • <span
+                      class="user-comment-date text-muted">12 April 2022</span></h5>
+                  <p class="comment-body">Some quick example text to build on the card title and make up the bulk of the
+                    card's content.</p>
+                </div>
+              </div>
+              <!-- Comment list End -->
+
+            </div>
+          </div>
         </div>
       </div>
-      <div class="col aside">
+      <div class="col-sm">
         <div class="container author-detail-container card">
           <div class="cover"></div>
-          <div class="blog-author row py-3">
-            <div class="col-1">
-                <div class="author-pict" style="background-image: url('{{.Data.Posts.Author.Picture}}')"></div>
+          <div class="post-meta d-flex mt-3">
+            <div class="bio-pic mr-3">
+              <img src="{{.Data.Posts.Author.Picture}}" alt="Image" class="img-fluidid">
             </div>
-            <div class="col ms-lg-5 mt-4">
-                <h5 class="row mb-1 author-name">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</h5>
+            <div class="vcard">
+              <span class="d-block">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</span>
             </div>
           </div>
           <hr>
