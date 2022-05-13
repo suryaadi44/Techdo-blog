@@ -2,6 +2,7 @@ package controller
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -39,16 +40,17 @@ func NewController(router *mux.Router, postService service.PostServiceApi, sessi
 }
 
 func (p *PostController) InitializeController() {
-	createRouter := p.router.PathPrefix("/").Subrouter()
-	createRouter.Use(p.authMiddleware.AuthMiddleware())
+	authRouter := p.router.PathPrefix("/").Subrouter()
+	authRouter.Use(p.authMiddleware.AuthMiddleware())
 
 	// With middlerware
 	// Page
-	createRouter.HandleFunc("/post/create", p.createPostPageHandler).Methods(http.MethodGet)
+	authRouter.HandleFunc("/post/create", p.createPostPageHandler).Methods(http.MethodGet)
 
 	// API
-	createRouter.HandleFunc("/post/create", p.createPostHandler).Methods(http.MethodPost)
-	createRouter.HandleFunc("/post/delete/{id:[0-9]+}", p.deletePostHandlder).Methods(http.MethodDelete)
+	authRouter.HandleFunc("/post/create", p.createPostHandler).Methods(http.MethodPost)
+	authRouter.HandleFunc("/post/delete/{id:[0-9]+}", p.deletePostHandlder).Methods(http.MethodDelete)
+	authRouter.HandleFunc("/post/{id:[0-9]+}/comment/add", p.addCommentHandler).Methods(http.MethodPost)
 
 	// Without middleware
 	// Page
@@ -263,7 +265,7 @@ func (p *PostController) deletePostHandlder(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	globalDTO.NewBaseResponse(http.StatusOK, true, "Post deleted").SendResponse(&w)
+	globalDTO.NewBaseResponse(http.StatusOK, false, "Post deleted").SendResponse(&w)
 }
 
 func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Request) {
@@ -357,4 +359,35 @@ func (p *PostController) viewCommentHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	globalDTO.NewBaseResponse(http.StatusOK, false, commentsData).SendResponse(&w)
+}
+
+func (p *PostController) addCommentHandler(w http.ResponseWriter, r *http.Request) {
+	token, _ := utils.GetSessionToken(r)
+	session, _ := p.sessionService.GetSession(r.Context(), token)
+
+	vars := mux.Vars(r)
+	id, err := strconv.ParseInt(vars["id"], 10, 64)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	payload := dto.CommentRequest{}
+
+	if err := decoder.Decode(&payload); err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	payload.UserID = session.UID
+	payload.PostID = id
+
+	err = p.postService.AddComment(r.Context(), payload)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	globalDTO.NewBaseResponse(http.StatusCreated, false, nil).SendResponse(&w)
 }

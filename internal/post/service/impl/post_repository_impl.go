@@ -18,7 +18,7 @@ type PostRepositoryImpl struct {
 var (
 	INSERT_BLANK_POST     = "INSERT INTO blog_posts() VALUE ()"
 	INSERT_CATEGORY_ASSOC = "INSERT INTO category_associations(post_id, category_id) VALUE (?, ?)"
-	INSERT_COMMENT        = "INSERT INTO comment(post_id, uid, comment_body) VALUE (?, ?, ?) ORDER BY b.created_at DESC LIMIT ?, ?"
+	INSERT_COMMENT        = "INSERT INTO comment(post_id, uid, comment_body) VALUE (?, ?, ?)"
 
 	UPDATE_POST = "UPDATE blog_posts SET author_id = ?, banner = ?, title = ?, body = ? WHERE post_id = ?"
 
@@ -31,7 +31,7 @@ var (
 	SELECT_FULL_TEXT_POST    = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
 	SELECT_CATEGORY_OF_POST  = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
 	SELECT_CATEGORY          = "SELECT category_id, category_name FROM categories"
-	SELECT_COMMENTS          = "SELECT comment_id, uid, comment_body, created_at, updated_at WHERE post_id = ?"
+	SELECT_COMMENTS          = "SELECT c.comment_id, c.uid, c.comment_body, c.created_at, c.updated_at, u.uid, u.first_name, u.last_name, u.picture FROM comment c JOIN user_details u ON c.uid= u.uid WHERE c.post_id = ? ORDER BY c.created_at DESC LIMIT ?, ?; "
 )
 
 func NewPostRepository(db *sql.DB) PostRepositoryImpl {
@@ -310,13 +310,15 @@ func (p PostRepositoryImpl) GetPostComments(ctx context.Context, id int64, offse
 
 	for rows.Next() {
 		var comment entity.Comment
-		err = rows.Scan(&comment.CommentID, &comment.UserID, &comment.CommentBody, &comment.CreatedAt, &comment.UpdatedAt)
+		var user entity.MiniUserDetail
+		err = rows.Scan(&comment.CommentID, &comment.UserID, &comment.CommentBody, &comment.CreatedAt, &comment.UpdatedAt, &user.UserID, &user.FirstName, &user.LastName, &user.Picture)
 		if err != nil {
 			log.Println("[ERROR] GetPostComments -> error scanning row :", err)
 			return comments, users, err
 		}
 
 		comments = append(comments, &comment)
+		users = append(users, &user)
 	}
 
 	return comments, users, nil
