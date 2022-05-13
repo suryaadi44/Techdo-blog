@@ -103,7 +103,7 @@
               <div class="blog-cover" style="background-image: url('{{$elem.Banner}}');"></div>
               <div class="card-body fill-width">
                 <h5 class="card-title">{{$elem.Title}}</h5> 
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <p class="card-text">{{$elem.Body}}<a href="/post/{{$elem.PostID}}">...</a></p>
                 <a href="/post/{{$elem.PostID}}" class="btn btn-primary">Read More</a>
               </div>
             </div>
