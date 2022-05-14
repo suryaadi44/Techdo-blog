@@ -143,6 +143,7 @@ func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Re
 	}
 	maxPage := int64(math.Ceil(float64(contentCount) / float64(limitConv)))
 	pageNavigation := utils.Paginate(pageConv, maxPage)
+	startIndex := (pageConv-1)*limitConv + 1
 
 	postData, err := p.postService.SearchBlogPost(r.Context(), q, pageConv, limitConv, dateStartPtr, dateEndPtr)
 	if err != nil {
@@ -154,6 +155,8 @@ func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Re
 		"LoggedIn":   isLoggedIn,
 		"Query":      q,
 		"PostsCount": contentCount,
+		"StartIndex": startIndex,
+		"EndIndex":   startIndex + int64(len(postData)) - 1,
 		"Posts":      postData,
 		"PageNav":    pageNavigation,
 	}
