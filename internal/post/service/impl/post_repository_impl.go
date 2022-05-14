@@ -16,7 +16,8 @@ type PostRepositoryImpl struct {
 }
 
 var (
-	COUNT_LIST_OF_POST = "SELECT COUNT(*) FROM blog_posts"
+	COUNT_LIST_OF_POST  = "SELECT COUNT(*) FROM blog_posts"
+	COUNT_SEARCH_RESULT = "SELECT COUNT(*) FROM blog_posts WHERE MATCH(title) AGAINST(? IN NATURAL LANGUAGE MODE)"
 
 	INSERT_BLANK_POST     = "INSERT INTO blog_posts() VALUE ()"
 	INSERT_CATEGORY_ASSOC = "INSERT INTO category_associations(post_id, category_id) VALUE (?, ?)"
@@ -184,25 +185,42 @@ func (p PostRepositoryImpl) GetBriefsBlogPostFromSearch(ctx context.Context, q s
 	return postList, nil
 }
 
-func (p PostRepositoryImpl) GetPostAuthorId(ctx context.Context, postID int64) (int64, error) {
-	rows, err := p.db.QueryContext(ctx, SELECT_POST_AUTHOR, postID)
-	if err != nil {
-		log.Println("[ERROR] GetPostAuthorId -> error on executing query :", err)
-		return -1, err
+func (p PostRepositoryImpl) CountSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time) (int64, error) {
+	var count int64
+	var query string
+	var args []interface{}
+
+	args = append(args, q)
+	query = COUNT_SEARCH_RESULT
+
+	if dateStart != nil && dateEnd != nil {
+		query = query + " AND b.created_at BETWEEN ? AND ?"
+		args = append(args, dateStart.Format("2006-01-02"), dateEnd.Format("2006-01-02"))
+	} else if dateStart != nil {
+		query = query + " AND b.created_at > ?"
+		args = append(args, dateStart.Format("2006-01-02"))
+	} else if dateEnd != nil {
+		query = query + " AND b.created_at < ?"
+		args = append(args, dateEnd.Format("2006-01-02"))
 	}
 
-	var authorID int64
+	rows, err := p.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		log.Println("[ERROR] CountSearchResult -> error on executing query :", err)
+		return 0, err
+	}
+
 	if rows.Next() {
-		err = rows.Scan(&authorID)
+		err = rows.Scan(&count)
 		if err != nil {
-			log.Println("[ERROR] GetPostAuthorId -> error scanning row :", err)
-			return -1, err
+			log.Println("[ERROR] CountSearchResult -> error scanning row :", err)
+			return 0, err
 		}
 
-		return authorID, nil
+		return count, nil
 	}
 
-	return -1, fmt.Errorf("No post with id %d", postID)
+	return 0, errors.New("can't get count of post ")
 }
 
 func (p PostRepositoryImpl) CountListOfPost(ctx context.Context) (int64, error) {
@@ -225,6 +243,27 @@ func (p PostRepositoryImpl) CountListOfPost(ctx context.Context) (int64, error) 
 	}
 
 	return 0, errors.New("can't get count of post ")
+}
+
+func (p PostRepositoryImpl) GetPostAuthorId(ctx context.Context, postID int64) (int64, error) {
+	rows, err := p.db.QueryContext(ctx, SELECT_POST_AUTHOR, postID)
+	if err != nil {
+		log.Println("[ERROR] GetPostAuthorId -> error on executing query :", err)
+		return -1, err
+	}
+
+	var authorID int64
+	if rows.Next() {
+		err = rows.Scan(&authorID)
+		if err != nil {
+			log.Println("[ERROR] GetPostAuthorId -> error scanning row :", err)
+			return -1, err
+		}
+
+		return authorID, nil
+	}
+
+	return -1, fmt.Errorf("No post with id %d", postID)
 }
 
 func (p PostRepositoryImpl) GetCategoriesFromID(ctx context.Context, id int64) (entity.Categories, error) {

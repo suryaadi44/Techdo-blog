@@ -130,6 +130,10 @@ func (p PostServiceImpl) SearchBlogPost(ctx context.Context, q string, page int6
 	return postList, nil
 }
 
+func (p PostServiceImpl) GetCountOfSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time) (int64, error) {
+	return p.Repository.CountSearchResult(ctx, q, dateStart, dateEnd)
+}
+
 func (p PostServiceImpl) GetPostAuthorIdFromId(ctx context.Context, postId int64) (int64, error) {
 	return p.Repository.GetPostAuthorId(ctx, postId)
 }
