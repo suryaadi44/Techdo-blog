@@ -20,7 +20,10 @@ type PostServiceApi interface {
 
 	GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error)
 	GetBriefsBlogPost(ctx context.Context, page int64, limit int64) (dto.BriefsBlogPostResponse, error)
+	GetCountListOfPost(ctx context.Context) (int64, error)
 	GetPostAuthorIdFromId(ctx context.Context, postId int64) (int64, error)
+	GetCountOfSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time) (int64, error)
+
 	GetCategoriesFromID(ctx context.Context, id int64) (dto.CategoryList, error)
 	GetCategoryList(ctx context.Context) (dto.CategoryList, error)
 	GetComments(ctx context.Context, postID int64, page int64, limit int64) (dto.CommentsResponse, error)

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -85,6 +86,13 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
 	}
 
+	contentCount, err := p.postService.GetCountListOfPost(r.Context())
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+	maxPage := int64(math.Ceil(float64(contentCount) / float64(limitConv)))
+	pageNavigation := utils.Paginate(pageConv, maxPage)
+
 	postData, err := p.postService.GetBriefsBlogPost(r.Context(), pageConv, limitConv)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
@@ -94,6 +102,7 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 	data := map[string]interface{}{
 		"LoggedIn": isLoggedIn,
 		"Posts":    postData,
+		"PageNav":  pageNavigation,
 	}
 
 	if isLoggedIn {
@@ -153,6 +162,14 @@ func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Re
 		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
 	}
 
+	contentCount, err := p.postService.GetCountOfSearchResult(r.Context(), q, dateStartPtr, dateEndPtr)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+	maxPage := int64(math.Ceil(float64(contentCount) / float64(limitConv)))
+	pageNavigation := utils.Paginate(pageConv, maxPage)
+	startIndex := (pageConv-1)*limitConv + 1
+
 	postData, err := p.postService.SearchBlogPost(r.Context(), q, pageConv, limitConv, dateStartPtr, dateEndPtr)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
@@ -160,9 +177,13 @@ func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Re
 
 	token, isLoggedIn := utils.GetSessionToken(r)
 	data := map[string]interface{}{
-		"LoggedIn": isLoggedIn,
-		"Query":    q,
-		"Posts":    postData,
+		"LoggedIn":   isLoggedIn,
+		"Query":      q,
+		"PostsCount": contentCount,
+		"StartIndex": startIndex,
+		"EndIndex":   startIndex + int64(len(postData)) - 1,
+		"Posts":      postData,
+		"PageNav":    pageNavigation,
 	}
 
 	if isLoggedIn {

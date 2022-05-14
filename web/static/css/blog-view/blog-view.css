@@ -7,9 +7,22 @@ body {
     background-color: #F5F5F5;
 }
 
+img {
+    vertical-align: middle;
+    border-style: none;
+}
+
+.mr-3 {
+    margin-right: 1rem!important;
+}
+
 /* Body CSS */
 .post {
     overflow: hidden;
+}
+
+.d-block {
+    display: block!important;
 }
 
 .card .blog-cover {
@@ -19,28 +32,26 @@ body {
     background-size: cover;
 }
 
-.author-pict {
-    padding: 25px;
-    background-size: cover;
+.bio-pic {
+    flex: 0 0 40px;
+}
+
+.bio-pic img {
+    max-width: 100%;
     border-radius: 50%;
 }
 
-.author-name {
-    font-weight: bold;
-}
-
 .date-post {
-    font-size: .8em;
+    font-size: .8rem;
+    line-height: .8rem;
 }
 
-h5.blog-category {
-    background-color: #7102DF;
-    width: 20%;
-    color: #fff;
-    padding: 4px;
-    text-align: center;
+.blog-category {
+    color: rgb(82, 82, 82);
+    text-align: left;
     border-radius: 6px;
     font-family: "Poppins", sans-serif;
+    margin: 0;
 }
 
 .card-title {
@@ -72,12 +83,6 @@ h5.blog-category {
 }
 
 /* Author Detail CSS */
-.aside {
-    position: fixed;
-    width: 30%;
-    left: 65%;
-}
-
 .author-detail-container {
     overflow: hidden;
     border-radius: 4px;
@@ -96,4 +101,10 @@ h5.blog-category {
 
 .author-about-header {
     font-weight: bold;
+}
+
+.card-text img{
+    max-width: 100% !important; 
+    max-height: 100% !important;
+    height: auto !important; 
 }

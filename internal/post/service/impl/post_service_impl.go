@@ -112,6 +112,10 @@ func (p PostServiceImpl) GetBriefsBlogPost(ctx context.Context, page int64, limi
 	return postList, nil
 }
 
+func (p PostServiceImpl) GetCountListOfPost(ctx context.Context) (int64, error) {
+	return p.Repository.CountListOfPost(ctx)
+}
+
 func (p PostServiceImpl) SearchBlogPost(ctx context.Context, q string, page int64, limit int64, dateStart *time.Time, dateEnd *time.Time) (dto.BriefsBlogPostResponse, error) {
 	var postList dto.BriefsBlogPostResponse
 	offset := (page - 1) * limit
@@ -124,6 +128,10 @@ func (p PostServiceImpl) SearchBlogPost(ctx context.Context, q string, page int6
 
 	postList = dto.NewBriefsBlogPostResponse(postListEntity)
 	return postList, nil
+}
+
+func (p PostServiceImpl) GetCountOfSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time) (int64, error) {
+	return p.Repository.CountSearchResult(ctx, q, dateStart, dateEnd)
 }
 
 func (p PostServiceImpl) GetPostAuthorIdFromId(ctx context.Context, postId int64) (int64, error) {

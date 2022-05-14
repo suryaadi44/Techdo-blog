@@ -22,6 +22,38 @@
     inline-size: fill-available;
 }
 
+a {
+    color: #007bff;
+    text-decoration: none;
+    background-color: transparent;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #7102DF;
+    border-color: #7102DF;
+}
+
+/* Page Nav */
+
+.page-nav ul li.active a, .page-nav ul li.active span {
+    background: #7102DF;
+    color: #fff;
+    border: 1px solid transparent;
+}
+
+.page-nav ul li a, .page-nav ul li span {
+    color: rgb(53, 53, 53);
+    text-align: center;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    line-height: 40px;
+    border-radius: 50% !important;
+    border: 1px solid #e6e6e6;
+}
+
 /* Responsive Breakpoint */
 /* Ukuran Desktop */
 @media screen and (max-width: 1280px) {
