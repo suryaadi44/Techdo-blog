@@ -1,4 +1,4 @@
-CREATE TRIGGER IF NOT EXISTS log_update_post
+CREATE TRIGGER log_update_post
 AFTER UPDATE ON blog_posts
 FOR EACH ROW 
 BEGIN

@@ -1,4 +1,4 @@
-CREATE TRIGGER IF NOT EXISTS log_delete_post
+CREATE TRIGGER log_delete_post
 AFTER DELETE ON blog_posts
 FOR EACH ROW 
 BEGIN

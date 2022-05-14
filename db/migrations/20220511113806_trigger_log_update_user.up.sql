@@ -1,4 +1,4 @@
-CREATE TRIGGER IF NOT EXISTS log_update_users
+CREATE TRIGGER log_update_users
 AFTER UPDATE ON users
 FOR EACH ROW 
 BEGIN

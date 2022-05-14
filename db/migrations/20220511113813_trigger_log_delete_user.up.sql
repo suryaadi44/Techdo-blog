@@ -1,4 +1,4 @@
-CREATE TRIGGER IF NOT EXISTS log_delete_users
+CREATE TRIGGER log_delete_users
 AFTER DELETE ON users
 FOR EACH ROW 
 BEGIN
