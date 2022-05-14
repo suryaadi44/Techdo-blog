@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -66,6 +67,13 @@ func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Req
 	limitConv, _ := strconv.ParseInt(limit, 10, 64)
 	pageConv, _ := strconv.ParseInt(page, 10, 64)
 
+	contentCount, err := p.postService.GetCountListOfPost(r.Context())
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+	maxPage := int64(math.Ceil(float64(contentCount) / float64(limitConv)))
+	pageNavigation := utils.Paginate(pageConv, maxPage)
+
 	postData, err := p.postService.GetBriefsBlogPost(r.Context(), pageConv, limitConv)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
@@ -75,6 +83,7 @@ func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Req
 	data := map[string]interface{}{
 		"LoggedIn": isLoggedIn,
 		"Posts":    postData,
+		"PageNav":  pageNavigation,
 	}
 
 	if isLoggedIn {
@@ -128,6 +137,13 @@ func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Re
 	limitConv, _ := strconv.ParseInt(limit, 10, 64)
 	pageConv, _ := strconv.ParseInt(page, 10, 64)
 
+	contentCount, err := p.postService.GetCountOfSearchResult(r.Context(), q, dateStartPtr, dateEndPtr)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+	maxPage := int64(math.Ceil(float64(contentCount) / float64(limitConv)))
+	pageNavigation := utils.Paginate(pageConv, maxPage)
+
 	postData, err := p.postService.SearchBlogPost(r.Context(), q, pageConv, limitConv, dateStartPtr, dateEndPtr)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
@@ -135,9 +151,11 @@ func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Re
 
 	token, isLoggedIn := utils.GetSessionToken(r)
 	data := map[string]interface{}{
-		"LoggedIn": isLoggedIn,
-		"Query":    q,
-		"Posts":    postData,
+		"LoggedIn":   isLoggedIn,
+		"Query":      q,
+		"PostsCount": contentCount,
+		"Posts":      postData,
+		"PageNav":    pageNavigation,
 	}
 
 	if isLoggedIn {
