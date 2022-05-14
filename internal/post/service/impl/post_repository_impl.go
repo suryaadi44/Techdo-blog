@@ -16,6 +16,8 @@ type PostRepositoryImpl struct {
 }
 
 var (
+	COUNT_LIST_OF_POST = "SELECT COUNT(*) FROM blog_posts"
+
 	INSERT_BLANK_POST     = "INSERT INTO blog_posts() VALUE ()"
 	INSERT_CATEGORY_ASSOC = "INSERT INTO category_associations(post_id, category_id) VALUE (?, ?)"
 
@@ -23,11 +25,10 @@ var (
 
 	DELETE_POST = "DELETE FROM blog_posts WHERE post_id = ?"
 
-	SELECT_POST = "SELECT b.post_id, b.author_id, b.banner, b.title, b.body, b.created_at, b.updated_at, u.uid, u.email, u.first_name, u.last_name, u.picture, u.phone, u.about_me, u.created_at, u.updated_at FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
-
+	SELECT_POST              = "SELECT b.post_id, b.author_id, b.banner, b.title, b.body, b.created_at, b.updated_at, u.uid, u.email, u.first_name, u.last_name, u.picture, u.phone, u.about_me, u.created_at, u.updated_at FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
 	SELECT_POST_AUTHOR       = "SELECT author_id FROM blog_posts WHERE post_id = ?"
 	SELECT_ID_OF_LAST_INSERT = "SELECT LAST_INSERT_ID() as uid"
-	SELECT_LIST_OF_POST      = "SELECT b.post_id, b.banner, b.title, b.body, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid"
+	SELECT_LIST_OF_POST      = "SELECT b.post_id, b.banner, b.title, b.body, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid ORDER BY b.created_at DESC LIMIT ?, ? "
 	SELECT_FULL_TEXT_POST    = "SELECT b.post_id, b.banner, b.title, b.body, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
 	SELECT_CATEGORY_OF_POST  = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
 	SELECT_CATEGORY          = "SELECT category_id, category_name FROM categories"
@@ -121,8 +122,7 @@ func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int64) (entity.B
 func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset int64, limit int64) (entity.BriefsBlogPost, error) {
 	var postList entity.BriefsBlogPost
 
-	query := SELECT_LIST_OF_POST + " ORDER BY b.created_at DESC LIMIT ?, ? "
-	rows, err := p.db.QueryContext(ctx, query, offset, limit)
+	rows, err := p.db.QueryContext(ctx, SELECT_LIST_OF_POST, offset, limit)
 	if err != nil {
 		log.Println("[ERROR] GetBriefsBlogPostData -> error on executing query :", err)
 		return postList, err
@@ -203,6 +203,28 @@ func (p PostRepositoryImpl) GetPostAuthorId(ctx context.Context, postID int64) (
 	}
 
 	return -1, fmt.Errorf("No post with id %d", postID)
+}
+
+func (p PostRepositoryImpl) CountListOfPost(ctx context.Context) (int64, error) {
+	var count int64
+
+	rows, err := p.db.QueryContext(ctx, COUNT_LIST_OF_POST)
+	if err != nil {
+		log.Println("[ERROR] CountListOfPost -> error on executing query :", err)
+		return 0, err
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&count)
+		if err != nil {
+			log.Println("[ERROR] CountListOfPost -> error scanning row :", err)
+			return 0, err
+		}
+
+		return count, nil
+	}
+
+	return 0, errors.New("can't get count of post ")
 }
 
 func (p PostRepositoryImpl) GetCategoriesFromID(ctx context.Context, id int64) (entity.Categories, error) {

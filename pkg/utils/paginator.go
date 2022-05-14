@@ -2,7 +2,13 @@ package utils
 
 import "fmt"
 
-func Paginate(current int64, total int64) []string {
+type PageNavigation struct {
+	Max      int64
+	Active   string
+	PageList []string
+}
+
+func Paginate(current int64, total int64) PageNavigation {
 	var stringRange []string
 	var intRange []int64
 	var delta int64 = 2
@@ -31,5 +37,9 @@ func Paginate(current int64, total int64) []string {
 		l = i
 	}
 
-	return stringRange
+	return PageNavigation{
+		Max:      total,
+		Active:   fmt.Sprint(current),
+		PageList: stringRange,
+	}
 }

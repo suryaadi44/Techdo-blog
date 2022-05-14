@@ -97,6 +97,7 @@
       <div class="col-sm">
         Column
       </div>
+
       <div class="col-md-6">
         <div class="row">
           <nav class="nav">
@@ -123,35 +124,36 @@
         <div class="col text-center">
           <div class="page-nav">
             <ul class="pagination justify-content-center">
-              <li class="page-item disabled">
-                <a class="page-link" href="#">&lt;</a>
-              </li>
-              <li class="page-item active">
-                <span>1</span>
-              </li>
               <li class="page-item">
-                <a class="page-link" href="#">2</a>
+                <a class="page-link prev-button">&lt;</a>
               </li>
+
+              {{$active := .Data.PageNav.Active}}
+              {{$max := .Data.PageNav.Max}}
+              {{range $elem := .Data.PageNav.PageList}}
+                {{if eq $elem $active}}
+                  <li class="page-item active">
+                    <span>{{$elem}}</span>
+                  </li>
+                {{else}}
+                  <li class="page-item">
+                    <a class="page-link">{{$elem}}</a>
+                  </li>
+                {{end}}
+              {{end}}
+
               <li class="page-item">
-                <a class="page-link" href="#">3</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">4</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">5</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">&gt;</a>
+                <a class="page-link next-button">&gt;</a>
               </li>
             </ul>
           </div>
         </div>
-
       </div>
+
       <div class="col-sm">
         Column
       </div>
+
     </div>
   </div>
 
@@ -161,6 +163,33 @@
     crossorigin="anonymous"></script>
 
   <script src="/static/js/index.js"></script>
+  <script>
+    let url = new URL(window.location.href);
+    const pageParam = url.searchParams.get('page');
+    let page = 1;
+
+    if (pageParam) {
+      page = parseInt(pageParam);
+    }
+
+    document.querySelector(".next-button").addEventListener("click", (e) => {
+      if (page < {{$max}}){
+        page++;
+        go();
+      }
+    })
+    document.querySelector(".prev-button").addEventListener("click", (e) => {
+      if (page > 1) {
+        page--;
+        go();
+      }
+    })
+
+    function go() {
+      url.searchParams.set('page', page);
+      window.location.href = url;
+    }
+  </script>
 </body>
 
 </html>
