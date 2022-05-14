@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -27,8 +28,9 @@
       <div class="left-nav justify-content-start col-6">
         <a href="/" class="navbar__logo col">Techdo-Blog</a>
         <form class="navbar__search-box-container justify-content-start" method="get" action="/search">
-          <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
-          <button class="navbar__search-button" type="submit" >
+          <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search"
+            name="q">
+          <button class="navbar__search-button" type="submit">
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>
         </form>
@@ -49,46 +51,46 @@
 
   {{if .Data.LoggedIn}}
   <!-- User-Profile Nav -->
-    <div class="card user-nav" style="width: 18rem;">
-      <div class="card-body">
-        <ul>
-          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
-          <hr>
-          <li><a href="/">Dashboard</a></li>
-          <li><a href="/post/create">Create Post</a></li>
-          <li><a href="">Settings</a></li>
-          <hr>
-          <li><a href="/logout">Sign Out</a></li>
-        </ul>
-      </div>
+  <div class="card user-nav" style="width: 18rem;">
+    <div class="card-body">
+      <ul>
+        <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+        <hr>
+        <li><a href="/">Dashboard</a></li>
+        <li><a href="/post/create">Create Post</a></li>
+        <li><a href="">Settings</a></li>
+        <hr>
+        <li><a href="/logout">Sign Out</a></li>
+      </ul>
     </div>
+  </div>
 
-    <div class="card auth-nav" style="width: 18rem;">
-      <div class="card-body">
-        <ul>
-          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
-          <hr>
-          <li><a href="/">Dashboard</a></li>
-          <li><a href="/post/create">Create Post</a></li>
-          <li><a href="">Settings</a></li>
-          <hr>
-          <li><a href="/logout">Sign Out</a></li>
-        </ul>
-      </div>
+  <div class="card auth-nav" style="width: 18rem;">
+    <div class="card-body">
+      <ul>
+        <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+        <hr>
+        <li><a href="/">Dashboard</a></li>
+        <li><a href="/post/create">Create Post</a></li>
+        <li><a href="">Settings</a></li>
+        <hr>
+        <li><a href="/logout">Sign Out</a></li>
+      </ul>
     </div>
+  </div>
   {{else}}
-  
+
   <!-- Auth Nav Menu -->
-    <div class="card auth-nav" style="width: 18rem;">
-      <div class="card-body">
-        <ul>
-          <li><a href="/login">Login</a></li>
-          <li><a href="/signup">Create Account</a></li>
-        </ul>
-      </div>
+  <div class="card auth-nav" style="width: 18rem;">
+    <div class="card-body">
+      <ul>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/signup">Create Account</a></li>
+      </ul>
     </div>
+  </div>
   {{end}}
-  
+
   <!-- Index Body -->
   <div class="container-fluid pt-4 ps-5 pe-5 body-container">
     <div class="row">
@@ -117,6 +119,34 @@
           </div>
         </div>
         {{end}}
+
+        <div class="col text-center">
+          <div class="page-nav">
+            <ul class="pagination justify-content-center">
+              <li class="page-item disabled">
+                <a class="page-link" href="#">&lt;</a>
+              </li>
+              <li class="page-item active">
+                <span>1</span>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">2</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">3</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">4</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">5</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">&gt;</a>
+              </li>
+            </ul>
+          </div>
+        </div>
 
       </div>
       <div class="col-sm">
