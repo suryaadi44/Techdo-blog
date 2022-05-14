@@ -122,7 +122,7 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 }
 
 func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Request) {
-	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
+	var tmpl = template.Must(template.ParseFiles("web/template/search-blog/search-blog.html"))
 	var err error
 	var dateStart, dateEnd time.Time
 
