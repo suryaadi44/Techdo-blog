@@ -34,7 +34,7 @@ var (
 	SELECT_FULL_TEXT_POST    = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
 	SELECT_CATEGORY_OF_POST  = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
 	SELECT_CATEGORY          = "SELECT category_id, category_name FROM categories"
-	SELECT_COMMENTS          = "SELECT c.comment_id, c.uid, c.comment_body, c.created_at, c.updated_at, u.uid, u.first_name, u.last_name, u.picture FROM comment c JOIN user_details u ON c.uid= u.uid WHERE c.post_id = ? ORDER BY c.created_at DESC LIMIT ?, ?; "
+	SELECT_COMMENTS          = "SELECT c.comment_id, c.uid, c.comment_body, c.created_at, c.updated_at, u.uid, u.first_name, u.last_name, u.picture FROM comment c JOIN user_details u ON c.uid= u.uid WHERE c.post_id = ? ORDER BY c.created_at DESC"
 )
 
 func NewPostRepository(db *sql.DB) PostRepositoryImpl {
@@ -360,11 +360,11 @@ func (p PostRepositoryImpl) AddComment(ctx context.Context, comment entity.Comme
 	return nil
 }
 
-func (p PostRepositoryImpl) GetPostComments(ctx context.Context, id int64, offset int64, limit int64) (entity.Comments, entity.MiniUsersDetail, error) {
+func (p PostRepositoryImpl) GetPostComments(ctx context.Context, id int64) (entity.Comments, entity.MiniUsersDetail, error) {
 	var comments entity.Comments
 	var users entity.MiniUsersDetail
 
-	rows, err := p.db.QueryContext(ctx, SELECT_COMMENTS, id, offset, limit)
+	rows, err := p.db.QueryContext(ctx, SELECT_COMMENTS, id)
 	if err != nil {
 		log.Println("[ERROR] GetPostComments -> error on executing query :", err)
 		return comments, users, err

@@ -343,17 +343,7 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (p *PostController) viewCommentHandler(w http.ResponseWriter, r *http.Request) {
-	queryVar := r.URL.Query()
 	vars := mux.Vars(r)
-
-	limit := queryVar.Get("limit")
-	if limit == "" {
-		limit = "8"
-	}
-	page := queryVar.Get("page")
-	if page == "" {
-		page = "1"
-	}
 
 	id, err := strconv.ParseInt(vars["id"], 10, 64)
 	if err != nil {
@@ -361,19 +351,7 @@ func (p *PostController) viewCommentHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	limitConv, err := strconv.ParseInt(limit, 10, 64)
-	if err != nil {
-		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
-		return
-	}
-
-	pageConv, err := strconv.ParseInt(page, 10, 64)
-	if err != nil {
-		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
-		return
-	}
-
-	commentsData, err := p.postService.GetComments(r.Context(), id, pageConv, limitConv)
+	commentsData, err := p.postService.GetComments(r.Context(), id)
 	if err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return

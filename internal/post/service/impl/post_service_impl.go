@@ -166,11 +166,10 @@ func (p PostServiceImpl) AddComment(ctx context.Context, comment dto.CommentRequ
 	return p.Repository.AddComment(ctx, comment.ToDAO())
 }
 
-func (p PostServiceImpl) GetComments(ctx context.Context, postID int64, page int64, limit int64) (dto.CommentsResponse, error) {
+func (p PostServiceImpl) GetComments(ctx context.Context, postID int64) (dto.CommentsResponse, error) {
 	var commentResponse dto.CommentsResponse
-	offset := (page - 1) * limit
 
-	comment, user, err := p.Repository.GetPostComments(ctx, postID, offset, limit)
+	comment, user, err := p.Repository.GetPostComments(ctx, postID)
 	if err != nil {
 		log.Println("[ERROR] Fetching list of comment -> error:", err)
 		return commentResponse, err
