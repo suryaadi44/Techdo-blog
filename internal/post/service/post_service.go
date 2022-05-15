@@ -26,7 +26,7 @@ type PostServiceApi interface {
 
 	GetCategoriesFromID(ctx context.Context, id int64) (dto.CategoryList, error)
 	GetCategoryList(ctx context.Context) (dto.CategoryList, error)
-	GetComments(ctx context.Context, postID int64, page int64, limit int64) (dto.CommentsResponse, error)
+	GetComments(ctx context.Context, postID int64) (dto.CommentsResponse, error)
 
 	UploadImage(ctx context.Context, filename string, image interface{}, folderID string) (*imagekit.UploadResponse, error)
 }
