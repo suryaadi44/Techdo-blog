@@ -25,7 +25,7 @@ type UserDetail struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 }
 
-func NewMiniUserDetailDTO(user entity.UserDetail) MiniUserDetail {
+func NewMiniUserDetailDTO(user entity.MiniUserDetail) MiniUserDetail {
 	return MiniUserDetail{
 		UserID:    user.UserID,
 		FirstName: user.FirstName,

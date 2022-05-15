@@ -2,6 +2,7 @@ package controller
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -40,18 +41,29 @@ func NewController(router *mux.Router, postService service.PostServiceApi, sessi
 }
 
 func (p *PostController) InitializeController() {
-	createRouter := p.router.PathPrefix("/").Subrouter()
-	createRouter.Use(p.authMiddleware.AuthMiddleware())
-	createRouter.HandleFunc("/post/create", p.createPostPageHandler).Methods(http.MethodGet)
-	createRouter.HandleFunc("/post/create", p.createPostHandler).Methods(http.MethodPost)
-	createRouter.HandleFunc("/post/delete/{id:[0-9]+}", p.deletePostHandlder).Methods(http.MethodDelete)
+	authRouter := p.router.PathPrefix("/").Subrouter()
+	authRouter.Use(p.authMiddleware.AuthMiddleware())
 
-	p.router.HandleFunc("/", p.postDashboardHandler).Methods(http.MethodGet)
-	p.router.HandleFunc("/search", p.searchBlogPostHandler).Methods(http.MethodGet)
-	p.router.HandleFunc("/post/{id:[0-9]+}", p.viewPostHandlder).Methods(http.MethodGet)
+	// With middlerware
+	// Page
+	authRouter.HandleFunc("/post/create", p.createPostPageHandler).Methods(http.MethodGet)
+
+	// API
+	authRouter.HandleFunc("/post/create", p.createPostHandler).Methods(http.MethodPost)
+	authRouter.HandleFunc("/post/delete/{id:[0-9]+}", p.deletePostHandlder).Methods(http.MethodDelete)
+	authRouter.HandleFunc("/post/{id:[0-9]+}/comment/add", p.addCommentHandler).Methods(http.MethodPost)
+
+	// Without middleware
+	// Page
+	p.router.HandleFunc("/", p.postDashboardPageHandler).Methods(http.MethodGet)
+	p.router.HandleFunc("/search", p.searchPostPageHandler).Methods(http.MethodGet)
+	p.router.HandleFunc("/post/{id:[0-9]+}", p.viewPostPageHandlder).Methods(http.MethodGet)
+
+	// API
+	p.router.HandleFunc("/post/{id:[0-9]+}/comment", p.viewCommentHandler).Methods(http.MethodGet)
 }
 
-func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Request) {
+func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http.Request) {
 	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
 	var err error
 
@@ -64,8 +76,15 @@ func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Req
 	if page == "" {
 		page = "1"
 	}
-	limitConv, _ := strconv.ParseInt(limit, 10, 64)
-	pageConv, _ := strconv.ParseInt(page, 10, 64)
+
+	limitConv, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+	pageConv, err := strconv.ParseInt(page, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
 
 	contentCount, err := p.postService.GetCountListOfPost(r.Context())
 	if err != nil {
@@ -102,7 +121,7 @@ func (p *PostController) postDashboardHandler(w http.ResponseWriter, r *http.Req
 	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
 }
 
-func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Request) {
+func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Request) {
 	var tmpl = template.Must(template.ParseFiles("web/template/search-blog/search-blog.html"))
 	var err error
 	var dateStart, dateEnd time.Time
@@ -134,8 +153,14 @@ func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Re
 
 	q := queryVar.Get("q")
 
-	limitConv, _ := strconv.ParseInt(limit, 10, 64)
-	pageConv, _ := strconv.ParseInt(page, 10, 64)
+	limitConv, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+	pageConv, err := strconv.ParseInt(page, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
 
 	contentCount, err := p.postService.GetCountOfSearchResult(r.Context(), q, dateStartPtr, dateEndPtr)
 	if err != nil {
@@ -177,7 +202,7 @@ func (p *PostController) searchBlogPostHandler(w http.ResponseWriter, r *http.Re
 	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
 }
 
-func (p *PostController) viewPostHandlder(w http.ResponseWriter, r *http.Request) {
+func (p *PostController) viewPostPageHandlder(w http.ResponseWriter, r *http.Request) {
 	var tmpl = template.Must(template.ParseFiles("web/template/blog-view/blog-view.html"))
 
 	vars := mux.Vars(r)
@@ -261,7 +286,7 @@ func (p *PostController) deletePostHandlder(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	globalDTO.NewBaseResponse(http.StatusOK, true, "Post deleted").SendResponse(&w)
+	globalDTO.NewBaseResponse(http.StatusOK, false, "Post deleted").SendResponse(&w)
 }
 
 func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Request) {
@@ -315,4 +340,75 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	globalDTO.NewBaseResponse(http.StatusCreated, false, fmt.Sprintf("/post/%d", postID)).SendResponse(&w)
+}
+
+func (p *PostController) viewCommentHandler(w http.ResponseWriter, r *http.Request) {
+	queryVar := r.URL.Query()
+	vars := mux.Vars(r)
+
+	limit := queryVar.Get("limit")
+	if limit == "" {
+		limit = "8"
+	}
+	page := queryVar.Get("page")
+	if page == "" {
+		page = "1"
+	}
+
+	id, err := strconv.ParseInt(vars["id"], 10, 64)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	limitConv, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	pageConv, err := strconv.ParseInt(page, 10, 64)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	commentsData, err := p.postService.GetComments(r.Context(), id, pageConv, limitConv)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	globalDTO.NewBaseResponse(http.StatusOK, false, commentsData).SendResponse(&w)
+}
+
+func (p *PostController) addCommentHandler(w http.ResponseWriter, r *http.Request) {
+	token, _ := utils.GetSessionToken(r)
+	session, _ := p.sessionService.GetSession(r.Context(), token)
+
+	vars := mux.Vars(r)
+	id, err := strconv.ParseInt(vars["id"], 10, 64)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	payload := dto.CommentRequest{}
+
+	if err := decoder.Decode(&payload); err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	payload.UserID = session.UID
+	payload.PostID = id
+
+	err = p.postService.AddComment(r.Context(), payload)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	globalDTO.NewBaseResponse(http.StatusCreated, false, nil).SendResponse(&w)
 }

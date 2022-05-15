@@ -14,6 +14,8 @@ type PostServiceApi interface {
 	SearchBlogPost(ctx context.Context, q string, page int64, limit int64, dateStart *time.Time, dateEnd *time.Time) (dto.BriefsBlogPostResponse, error)
 
 	AddPost(ctx context.Context, post dto.BlogPostRequest, authorID int64) (int64, error)
+	AddComment(ctx context.Context, comment dto.CommentRequest) error
+
 	DeletePost(ctx context.Context, id int64) error
 
 	GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error)
@@ -24,6 +26,7 @@ type PostServiceApi interface {
 
 	GetCategoriesFromID(ctx context.Context, id int64) (dto.CategoryList, error)
 	GetCategoryList(ctx context.Context) (dto.CategoryList, error)
+	GetComments(ctx context.Context, postID int64, page int64, limit int64) (dto.CommentsResponse, error)
 
 	UploadImage(ctx context.Context, filename string, image interface{}, folderID string) (*imagekit.UploadResponse, error)
 }
