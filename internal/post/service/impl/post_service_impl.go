@@ -79,6 +79,10 @@ func (p PostServiceImpl) DeletePost(ctx context.Context, id int64) error {
 	return nil
 }
 
+func (p PostServiceImpl) IncreaseView(ctx context.Context, id int64) error {
+	return p.Repository.IncreaseView(ctx, id)
+}
+
 func (p PostServiceImpl) GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error) {
 	var postDto dto.BlogPostResponse
 

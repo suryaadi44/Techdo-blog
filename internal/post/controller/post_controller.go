@@ -235,6 +235,11 @@ func (p *PostController) viewPostPageHandlder(w http.ResponseWriter, r *http.Req
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
+	err = p.postService.IncreaseView(r.Context(), id)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
 	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
 }
 

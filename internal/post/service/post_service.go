@@ -11,6 +11,7 @@ import (
 )
 
 type PostServiceApi interface {
+	IncreaseView(ctx context.Context, id int64) error
 	SearchBlogPost(ctx context.Context, q string, page int64, limit int64, dateStart *time.Time, dateEnd *time.Time) (dto.BriefsBlogPostResponse, error)
 
 	AddPost(ctx context.Context, post dto.BlogPostRequest, authorID int64) (int64, error)
