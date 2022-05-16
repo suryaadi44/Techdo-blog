@@ -107,7 +107,13 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 
 	if isLoggedIn {
 		session, err := p.sessionService.GetSession(r.Context(), token)
+		if err != nil {
+			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+		}
 		user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
+		if err != nil {
+			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+		}
 
 		if err == nil {
 			data["User"] = user
@@ -188,7 +194,14 @@ func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Re
 
 	if isLoggedIn {
 		session, err := p.sessionService.GetSession(r.Context(), token)
+		if err != nil {
+			panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+		}
+
 		user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
+		if err != nil {
+			panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+		}
 
 		if err == nil {
 			data["User"] = user
@@ -224,7 +237,13 @@ func (p *PostController) viewPostPageHandlder(w http.ResponseWriter, r *http.Req
 
 	if isLoggedIn {
 		session, err := p.sessionService.GetSession(r.Context(), token)
+		if err != nil {
+			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+		}
 		user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
+		if err != nil {
+			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+		}
 
 		if err == nil {
 			data["User"] = user
@@ -248,7 +267,13 @@ func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Re
 
 	token, _ := utils.GetSessionToken(r)
 	session, err := p.sessionService.GetSession(r.Context(), token)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
 	user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
 
 	categoryList, err := p.postService.GetCategoryList(r.Context())
 	data := map[string]interface{}{
@@ -296,7 +321,10 @@ func (p *PostController) deletePostHandlder(w http.ResponseWriter, r *http.Reque
 
 func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Request) {
 	token, _ := utils.GetSessionToken(r)
-	session, _ := p.sessionService.GetSession(r.Context(), token)
+	session, err := p.sessionService.GetSession(r.Context(), token)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+	}
 
 	if err := r.ParseMultipartForm(32 << 20); err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
@@ -367,7 +395,10 @@ func (p *PostController) viewCommentHandler(w http.ResponseWriter, r *http.Reque
 
 func (p *PostController) addCommentHandler(w http.ResponseWriter, r *http.Request) {
 	token, _ := utils.GetSessionToken(r)
-	session, _ := p.sessionService.GetSession(r.Context(), token)
+	session, err := p.sessionService.GetSession(r.Context(), token)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+	}
 
 	vars := mux.Vars(r)
 	id, err := strconv.ParseInt(vars["id"], 10, 64)
