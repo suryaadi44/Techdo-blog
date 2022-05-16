@@ -16,6 +16,8 @@ type PostRepositoryImpl struct {
 }
 
 var (
+	ADD_VIEW = "UPDATE blog_posts SET view_count = view_count + 1 WHERE post_id = ?"
+
 	COUNT_LIST_OF_POST  = "SELECT COUNT(*) FROM blog_posts"
 	COUNT_SEARCH_RESULT = "SELECT COUNT(*) FROM blog_posts WHERE MATCH(title) AGAINST(? IN NATURAL LANGUAGE MODE)"
 
@@ -93,6 +95,26 @@ func (p PostRepositoryImpl) DeletePost(ctx context.Context, id int64) error {
 	}
 	if rowsAffected != 1 {
 		log.Println("[ERROR] DeletePost -> error on deleting row :", err)
+		return err
+	}
+
+	return nil
+}
+
+func (p PostRepositoryImpl) IncreaseView(ctx context.Context, id int64) error {
+	result, err := p.db.ExecContext(ctx, ADD_VIEW, id)
+	if err != nil {
+		log.Println("[ERROR] IncreaseView -> error on executing query :", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] UpdatePost -> error on getting rows affected :", err)
+		return err
+	}
+	if rowsAffected != 1 {
+		log.Println("[ERROR] UpdatePost -> error on updating row :", err)
 		return err
 	}
 
