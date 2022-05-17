@@ -49,6 +49,7 @@ type Category struct {
 
 type CategoryList []Category
 type BriefsBlogPostResponse []BriefBlogPostResponse
+type TopCategoriesWithPost map[string]BriefsBlogPostResponse
 
 func NewCategory(c entity.Category) Category {
 	return Category{
@@ -85,7 +86,7 @@ func NewBlogPostResponse(post entity.BlogPost, categories entity.Categories, aut
 
 func NewBriefBlogPostResponse(post entity.BriefBlogPost) BriefBlogPostResponse {
 	r := regexp.MustCompile(`<[^>]*>`)
-	body := utils.Truncate(r.ReplaceAllString(post.Body, ""), 70)
+	body := utils.Truncate(r.ReplaceAllString(post.Body, ""), 150)
 
 	return BriefBlogPostResponse{
 		PostID:       post.PostID,
@@ -110,6 +111,17 @@ func NewBriefsBlogPostResponse(posts entity.BriefsBlogPost) BriefsBlogPostRespon
 	}
 
 	return postList
+}
+
+func NewTopCategoriesAndPost(posts entity.BriefsBlogPost, categories entity.Categories) TopCategoriesWithPost {
+	var topCategoriesAndPost = make(TopCategoriesWithPost)
+
+	for idx, each := range categories {
+		postData := NewBriefBlogPostResponse(*posts[idx])
+		topCategoriesAndPost[each.CategoryName] = append(topCategoriesAndPost[each.CategoryName], postData)
+	}
+
+	return topCategoriesAndPost
 }
 
 func (b *BlogPostRequest) ToDAO(PostID int64, AuthorID int64, BannerURL string) entity.BlogPost {

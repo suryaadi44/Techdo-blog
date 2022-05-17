@@ -3,25 +3,26 @@
 /* Navbar CSS */
 @import url("../others/home-navbar.css");
 
-.rounded{
-    border-radius: .75rem!important;
+.rounded {
+	border-radius: 0.75rem !important;
 }
 
 /* Hero content */
-.hero-section{
-    margin-bottom: 10rem;
+.hero-section {
+	margin-bottom: 10rem;
 }
 
 .hero .h1,
 .hero .h3,
-.hero span {
+.hero span,
+.contents h2 {
 	font-family: "Poppins";
 	font-style: normal;
 }
 
-.hero .title-text{
-    margin-top: 6rem;
-    margin-bottom: 3rem;
+.hero .title-text {
+	margin-top: 6rem;
+	margin-bottom: 3rem;
 }
 
 .hero .h1 {
@@ -33,6 +34,19 @@
 .hero .h3 {
 	font-weight: 500;
 	font-size: 50px;
+}
+
+.contents h2 {
+	font-size: 50px;
+	line-height: 45px;
+}
+
+.border-badge{
+	border: 1px solid #7102DF;
+    padding: 2px 8px;
+    border-radius: 5px;
+    text-decoration: none;
+	color: #7102DF;
 }
 
 .hero .gradient {
@@ -51,7 +65,7 @@
 
 .post-entry .img-bg {
 	width: 65%;
-	height: auto;
+	height: 430px;
 }
 
 .post-entry .contents {
@@ -83,7 +97,7 @@
 	width: 100%;
 	height: 10rem;
 	background-size: cover;
-    background-position: center center;
+	background-position: center center;
 }
 
 .card-subtitle {

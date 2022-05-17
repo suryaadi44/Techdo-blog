@@ -12,7 +12,10 @@
   <link rel="stylesheet" href="/static/css/homepage/style.css" />
   <!-- Icon -->
   <script src="https://kit.fontawesome.com/ede9e54d69.js" crossorigin="anonymous"></script>
-  <!-- Summer Note -->
+
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+  integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+  crossorigin="anonymous"></script>
   <script>
     function goTo(destination) {
       let url = new URL(window.location.href);
@@ -25,11 +28,15 @@
 
 <body>
   <!-- Navbar -->
-  <nav class="navbar ps-2 pe-2">
+  <nav class="navbar sticky-top ps-2 pe-2">
     <div class="container-fluid">
       <div class="left-nav justify-content-start col-6">
         <a href="/" class="navbar__logo col">
-          <img src="/static/img/logo 2.svg" alt="" srcset="">
+          <img src="/static/img/logo 2.svg" class="dark-logo">
+          <img src="/static/img/logo 1.svg" class="white-logo hide">
+          <spam class="align-middle text-logo">
+            <span class="half-logo gradient">Tech</span><span>Do</span>
+          </spam>
         </a>
         <form class="navbar__search-box-container justify-content-start" method="get" action="/search">
           <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search"
@@ -108,26 +115,21 @@
         <span class="h1 gradient">Tech</span><span class="h1">Do</span><span class="h3">Blog</span>
       </div>
       <div class="post-entry d-block d-lg-flex">
-        <div class="img-bg rounded" style="background-image: url('https://ik.imagekit.io/fortyfour/1/1_p_bPfmsKI.png');">
+        <div class="img-bg rounded" style="background-image: url('{{.Data.EditorsPick.Banner}}');">
         </div>
-        <div class="contents mx-3 my-3">
-          <h2>
-            <a href="blog-single.html">News Needs to Meet Its Audiences Where They Are</a>
-          </h2>
-          <span class="caption">Editor's Pick</span>
-          <p class="mb-3">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            Voluptate vero obcaecati natus adipisci necessitatibus eius,
-            enim vel sit ad reiciendis. Enim praesentium magni delectus
-            cum, tempore deserunt aliquid quaerat culpa nemo veritatis,
-            iste adipisci excepturi consectetur doloribus aliquam
-            accusantium beatae?
+        <div class="contents mx-3 my-auto ">
+          <span class="date-read mb-5">{{.Data.EditorsPick.CreatedAt}}</span>
+          <a href="/post/{{.Data.EditorsPick.PostID}}">
+            <h2 class="card-title">
+              {{.Data.EditorsPick.Title}}
+            </h2>
+          </a>
+          <span class="caption border-badge my-3">Editor's Pick</span>
+          <p class="mb-5">
+            {{.Data.EditorsPick.Body}}
           </p>
           <div class="post-meta">
-            <span class="d-block"><a href="#">Dave Rogers</a> in
-              <a href="#">Food</a></span>
-            <span class="date-read">Jun 14 <span class="mx-1">•</span> 3 min read
-              <span class="icon-star2"></span></span>
+            <span class="date-read">By {{.Data.EditorsPick.Author}}</span>
           </div>
         </div>
       </div>
@@ -135,8 +137,13 @@
   </div>
 
   <div class="body-container">
-    <div class="container">
-      <h3>Latest</h3>
+    <div class="container mb-5">
+      <div class="d-flex align-items-center mb-2">
+        <span class="h3 m-0">Latest</span>
+        <a href="/latest">
+          <span class="border-badge mx-2">More</span>
+        </a>
+      </div>
       <div class="row row-cols-1 row-cols-md-3 g-4">
         {{range $elem := .Data.LatestPosts}}
         <div class="col">
@@ -158,6 +165,36 @@
         {{end}}
       </div>
     </div>
+    <div class="container">
+      {{range $key, $postsData := .Data.LatestCategories}}
+      <div class="d-flex align-items-center mb-2">
+        <span class="h3 m-0">Latest in <span class="text-capitalize">{{$key}}</span></span>
+        <a href="/latest/{{$key}}">
+          <span class="border-badge mx-2">More</span>
+        </a>
+      </div>
+      <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+        {{range $elem := $postsData}}
+        <div class="col">
+          <div class="card border-0">
+            <div class="blog-cover rounded" style="background-image: url('{{$elem.Banner}}');"></div>
+            <div class="card-body">
+              <a href="/post/{{$elem.PostID}}">
+                <h5 class="card-title">{{$elem.Title}}</h5>
+              </a>
+              <p class="card-subtitle mb-2 text-muted">
+                By {{$elem.Author}} on {{$elem.CreatedAt}}
+              </p>
+              <p class="card-text">
+                {{$elem.Body}}<a href="/post/{{$elem.PostID}}">...</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        {{end}}
+      </div>
+      {{end}}
+    </div>
   </div>
 
   <!-- Bootstrap Bundle with Popper -->
@@ -166,6 +203,7 @@
     crossorigin="anonymous"></script>
 
   <script src="/static/js/index.js"></script>
+  <script src="/static/js/navbar.js"></script>
 </body>
 
 </html>

@@ -80,7 +80,7 @@
         <select class="form-select" id="category" name="category"  required>
           <option value="" disabled selected>Please select</option>
           {{range $elem := .Data.Categories}}
-            <option value="{{$elem.CategoryID}}">{{$elem.CategoryName}}</option>
+            <option value="{{$elem.CategoryID}}" class="text-capitalize">{{$elem.CategoryName}}</option>
           {{end}}
         </select>
       </div>

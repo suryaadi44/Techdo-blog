@@ -72,10 +72,21 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
+	latestCategories, err := p.postService.GetTopCategoryPost(r.Context())
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
+	editorsPick, err := p.postService.GetEditorsPick(r.Context())
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
 	token, isLoggedIn := utils.GetSessionToken(r)
 	data := map[string]interface{}{
-		"LoggedIn":    isLoggedIn,
-		"LatestPosts": latestPosts,
+		"LoggedIn":         isLoggedIn,
+		"EditorsPick":      editorsPick,
+		"LatestPosts":      latestPosts,
+		"LatestCategories": latestCategories,
 	}
 
 	if isLoggedIn {

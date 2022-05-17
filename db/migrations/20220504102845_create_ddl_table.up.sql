@@ -43,6 +43,13 @@ CREATE TABLE IF NOT EXISTS blog_posts(
     FOREIGN KEY (author_id) REFERENCES users(uid)
 )ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS editor_pick(
+	id INT NOT NULL AUTO_INCREMENT,
+    post_id INT NOT NULL,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (post_id) REFERENCES blog_posts(post_id)
+)ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS categories(
 	category_id INT NOT NULL AUTO_INCREMENT,

@@ -1,162 +1,215 @@
 /* Navbar-CSS */
-.navbar{
-    background-color: #7102DF;
-    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+.navbar {
+	background-color: #fbfbfb;
+	box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+    transition: background-color 200ms linear;
 }
 
-.navbar__logo img{
-    width: 40px;
-    height: 40px;
+.navbar.scrolled {
+	background-color: #7102df;
+	transition: background-color 200ms linear;
+}
+
+.hide{
+    display: none !important;
+}
+
+.navbar__logo img {
+	width: 40px;
+	height: 40px;
+}
+
+.navbar a .text-logo {
+    font-weight: 500;
+	font-size: 1.25em;
+    line-height: 1.25em;
+    color: black;
+	text-decoration: none;
+	background-color: transparent;
+    transition: color 200ms linear;
+}
+
+.navbar a .scrolled{
+    color: white !important;
+    transition: color 200ms linear;
+}
+
+.gradient {
+	background: linear-gradient(90deg, #7102df 7.84%, #b5179e 50%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	text-fill-color: transparent;
 }
 
 .navbar .left-nav {
-    display: flex;
-    width: 75%;
+	display: flex;
+	width: 75%;
 }
 
 .navbar .navbar__search-box-container {
-    display: flex;
-    justify-content: left;
-    width: 66%;
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+	display: flex;
+	justify-content: left;
+	width: 66%;
+	padding-left: 0.75rem;
+	padding-right: 0.75rem;
 }
-
 
 .navbar .navbar__search-button {
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    background-color: #7102DF;
-    border: 1px solid #fff;
-    align-items: center;
-    border-radius: 5px;
-    transition: .3s all;
+	color: #fff;
+	display: flex;
+	justify-content: center;
+	background-color: #7102df;
+	border: 1px solid #fff;
+	align-items: center;
+	border-radius: 5px;
+	transition: 0.3s all;
 }
-
 
 .navbar .right-nav {
-    display: flex;
-    justify-content: space-around;
-    width: 25%;
+	display: flex;
+	justify-content: space-around;
+	width: 25%;
+}
+
+.navbar .navbar__create-post-btn,
+.navbar .navbar__create-acc-btn{
+	border: 1px solid #7102df;
+	padding: 6px 12px;
+	border-radius: 5px;
+	text-decoration: none;
+	color: #7102df;
+	margin-right: 1vw;
+	margin-left: 1vw;
+    transition:border 200ms linear, color 200ms linear;
+}
+
+.navbar .navbar__create-post-btn.scrolled,
+.navbar .navbar__create-acc-btn.scrolled{
+	border: 1px solid #fff;
+	color: #fff;
+	transition:border 200ms linear, color 200ms linear;
+}
+
+.navbar .navbar__login-btn {
+	padding: 6px 20px;
+	border-radius: 5px;
+	text-decoration: none;
+	color: #7102df;
+    transition: color 200ms linear;
 }
 
 
-.navbar .navbar__create-post-btn, .navbar .navbar__create-acc-btn{
-    border: 1px solid #fff;
-    padding: 6px 12px;
-    border-radius: 5px;
-    text-decoration: none;
-    color: #fff;
-    margin-right: 1vw;
-    margin-left: 1vw;
-}
-
-.navbar .navbar__login-btn{
-    padding: 6px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    color: #fff;
+.navbar .navbar__login-btn.scrolled {
+	color: #fff;
+    transition: color 200ms linear;
 }
 
 .navbar .user-profile-container {
-    background-color: gray;
-    padding: 20px;
-    border-radius: 150%;
-    background-size: cover;
+	background-color: gray;
+	padding: 20px;
+	border-radius: 150%;
+	background-size: cover;
 }
 
-.user-nav,.auth-nav {
-    display: none;
-    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
-    z-index: 999;
+.user-nav,
+.auth-nav {
+	display: none;
+	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
+	z-index: 999;
 }
 
-.user-nav.active, .auth-nav.active {
-    position: absolute;
-    top: 60px;
-    right: 60px;
-    display: block;
+.user-nav.active,
+.auth-nav.active {
+	position: absolute;
+	top: 60px;
+	right: 60px;
+	display: block;
 }
 
-.user-nav .card-body, .auth-nav .card-body {
-    padding-left: 0px;
+.user-nav .card-body,
+.auth-nav .card-body {
+	padding-left: 0px;
 }
 
-.user-nav li, .auth-nav li {
-    list-style: none;
-    border-radius: 5px;
-    margin-top: 2px;
-    padding: 9px 20px;
+.user-nav li,
+.auth-nav li {
+	list-style: none;
+	border-radius: 5px;
+	margin-top: 2px;
+	padding: 9px 20px;
 }
 
-.user-nav li a, .auth-nav li a {
-    text-decoration: none;
-    color: #000;
+.user-nav li a,
+.auth-nav li a {
+	text-decoration: none;
+	color: #000;
 }
 
-.user-nav a:hover, .auth-nav a:hover {
-    color: #7102DF;
-    text-decoration: underline;
+.user-nav a:hover,
+.auth-nav a:hover {
+	color: #7102df;
+	text-decoration: underline;
 }
 
 .navbar .navbar__auth-nav-btn {
-    color: #fff;
-    font-size: 1.5em;
-    display: none;
-    border: 0;
-    background-color: transparent;
+	color: #fff;
+	font-size: 1.5em;
+	display: none;
+	border: 0;
+	background-color: transparent;
 }
 
 /* Responsive Breakpoint */
 /* Ukuran Desktop */
 @media screen and (max-width: 1280px) {
-    .navbar .navbar__search-button:hover {
-        background-color: #fff;
-        color: #000;
-        cursor: pointer;
-    }
+	.navbar .navbar__search-button:hover {
+		background-color: #fff;
+		color: #000;
+		cursor: pointer;
+	}
 
-    .navbar .navbar__create-post-btn:hover,.navbar .navbar__create-acc-btn:hover {
-        background-color: #fff;
-        color: #000;
-        text-decoration: underline;
-    }
+	.navbar .navbar__create-post-btn:hover,
+	.navbar .navbar__create-acc-btn:hover {
+		background-color: #fff;
+		color: #000;
+		text-decoration: underline;
+	}
 
-    .navbar .navbar__login-btn:hover{
-        background-color: #4c0097;
-    }
+	.navbar .navbar__login-btn:hover {
+		background-color: #4c0097;
+	}
 
-    .navbar .user-profile-container:hover {
-        cursor: pointer;
-        box-shadow: 0 0 0 3px #4c0097;
-    }
+	.navbar .user-profile-container:hover {
+		cursor: pointer;
+		box-shadow: 0 0 0 3px #4c0097;
+	}
 }
 
 @media screen and (max-width: 973px) {
-    .navbar .right-nav {
-        display: none;
-    }
+	.navbar .right-nav {
+		display: none;
+	}
 
-    .navbar .navbar__auth-nav-btn {
-        display: inline;
-    }
+	.navbar .navbar__auth-nav-btn {
+		display: inline;
+	}
 }
 
 /* Ukuran Tablet */
 @media screen and (max-width: 768px) {
-    .navbar .navbar__search-box {
-        display: none;
-    }
-    .navbar .navbar__search-button {
-        display: none;
-    }
-    
-    .navbar .right-nav {
-        display: none;
-    }
+	.navbar .navbar__search-box {
+		display: none;
+	}
+	.navbar .navbar__search-button {
+		display: none;
+	}
 
-    .navbar .navbar__auth-nav-btn {
-        display: inline;
-    }
+	.navbar .right-nav {
+		display: none;
+	}
+
+	.navbar .navbar__auth-nav-btn {
+		display: inline;
+	}
 }
