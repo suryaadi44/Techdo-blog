@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS blog_posts(
 CREATE TABLE IF NOT EXISTS categories(
 	category_id INT NOT NULL AUTO_INCREMENT,
     category_name VARCHAR(25) NOT NULL,
+    latest_post TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (category_id)
 )ENGINE=InnoDB;
 
