@@ -1,7 +1,9 @@
 CREATE TRIGGER log_delete_users
-AFTER DELETE ON users
+BEFORE DELETE ON users
 FOR EACH ROW 
 BEGIN
+	DELETE FROM blog_posts 
+	WHERE blog_posts.author_id = OLD.uid;
 	IF (SELECT COUNT(logger.log_id) > 200 FROM logger)
 	THEN 
 		DELETE FROM logger

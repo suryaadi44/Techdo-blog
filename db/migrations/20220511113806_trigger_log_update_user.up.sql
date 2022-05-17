@@ -1,5 +1,5 @@
 CREATE TRIGGER log_update_users
-AFTER UPDATE ON users
+BEFORE UPDATE ON users
 FOR EACH ROW 
 BEGIN
 	IF (SELECT COUNT(logger.log_id) > 200 FROM logger)
