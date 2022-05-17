@@ -15,7 +15,8 @@ func ErrorHandler(next http.Handler) http.Handler {
 				case *globalDTO.BaseResponse:
 					ErrorPage(&w, globalDTO.NewBaseResponse(response.Code, true, response.Data))
 				case error:
-					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+					// http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+					ErrorPage(&w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, response.Error()))
 				default:
 					ErrorPage(&w, globalDTO.NewBaseResponse(http.StatusInternalServerError, true, "runtime error"))
 				}

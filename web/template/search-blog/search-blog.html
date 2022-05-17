@@ -22,6 +22,7 @@
       window.location.href = url;
     }
   </script>
+  <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
   <title>Search {{.Data.Query}} - Techdo</title>
 </head>
 
@@ -101,8 +102,13 @@
   {{$active := .Data.PageNav.Active}}
   {{$max := .Data.PageNav.Max}}
   <div class="container pt-4 ps-5 pe-5 body-container ">
+<<<<<<< HEAD
     <div class="row justify-content-center ">
       <div class="col-lg px-0">
+=======
+    <div class="row justify-content-start ">
+      <div class="col-lg-8 px-0">
+>>>>>>> main
         <h2 class="mb-1">Search Result for <span class="keywords">"{{.Data.Query}}"</span></h2>
 
         <div class="col-sm px-0 row justify-content-end align-items-center">

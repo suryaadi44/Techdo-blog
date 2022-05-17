@@ -16,6 +16,7 @@
   <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
     integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
     crossorigin="anonymous"></script>
+  <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
   <title>{{.Data.Posts.Title}} - Techdo</title>
 </head>
 
@@ -97,7 +98,7 @@
           <div class="blog-cover" style="background-image: url('{{.Data.Posts.Banner}}');"></div>
           <div class="card-body px-5">
             {{range $elem := .Data.Posts.Categories}}
-              <h5 class="col blog-category">{{$elem.CategoryName}}</h5>
+              <h5 class="col blog-category text-capitalize">{{$elem.CategoryName}}</h5>
             {{end}}
             <h1 class="card-title mb-3">{{.Data.Posts.Title}}</h1>
 
