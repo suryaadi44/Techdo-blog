@@ -78,14 +78,14 @@ func NewBlogPostResponse(post entity.BlogPost, categories entity.Categories, aut
 		Body:         template.HTML(post.Body),
 		ViewCount:    post.ViewCount,
 		CommentCount: post.CommentCount,
-		CreatedAt:    post.CreatedAt.Format("02 Jan 2006"),
-		UpdatedAt:    post.UpdatedAt.Format("02 Jan 2006"),
+		CreatedAt:    post.CreatedAt.Format("Jan 02, 2006"),
+		UpdatedAt:    post.UpdatedAt.Format("Jan 02, 2006"),
 	}
 }
 
 func NewBriefBlogPostResponse(post entity.BriefBlogPost) BriefBlogPostResponse {
 	r := regexp.MustCompile(`<[^>]*>`)
-	body := utils.Truncate(r.ReplaceAllString(post.Body, ""), 230)
+	body := utils.Truncate(r.ReplaceAllString(post.Body, ""), 70)
 
 	return BriefBlogPostResponse{
 		PostID:       post.PostID,
@@ -95,8 +95,8 @@ func NewBriefBlogPostResponse(post entity.BriefBlogPost) BriefBlogPostResponse {
 		Body:         body,
 		ViewCount:    post.ViewCount,
 		CommentCount: post.CommentCount,
-		CreatedAt:    post.CreatedAt.Format("02 Jan 2006"),
-		UpdatedAt:    post.UpdatedAt.Format("02 Jan 2006"),
+		CreatedAt:    post.CreatedAt.Format("Jan 02, 2006"),
+		UpdatedAt:    post.UpdatedAt.Format("Jan 02, 2006"),
 	}
 
 }

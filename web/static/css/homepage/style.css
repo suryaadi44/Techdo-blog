@@ -1,0 +1,193 @@
+/* Custom Font */
+@import url("../others/custom-font.css");
+/* Navbar CSS */
+@import url("../others/home-navbar.css");
+
+.rounded{
+    border-radius: .75rem!important;
+}
+
+/* Hero content */
+.hero-section{
+    margin-bottom: 10rem;
+}
+
+.hero .h1,
+.hero .h3,
+.hero span {
+	font-family: "Poppins";
+	font-style: normal;
+}
+
+.hero .title-text{
+    margin-top: 6rem;
+    margin-bottom: 3rem;
+}
+
+.hero .h1 {
+	font-weight: 500;
+	font-size: 150px;
+	line-height: 150px;
+}
+
+.hero .h3 {
+	font-weight: 500;
+	font-size: 50px;
+}
+
+.hero .gradient {
+	background: linear-gradient(90deg, #7102df 7.84%, #b5179e 50%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	text-fill-color: transparent;
+}
+
+.post-entry .img-bg {
+	background-size: cover;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.post-entry .img-bg {
+	width: 65%;
+	height: auto;
+}
+
+.post-entry .contents {
+	width: 35%;
+	height: auto;
+}
+
+@media (max-width: 992px) {
+	.post-entry .img-bg,
+	.post-entry .contents {
+		width: 100%;
+		height: 300px;
+	}
+}
+
+/* Body CSS */
+.body-container {
+	width: 100%;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.post {
+	overflow: hidden;
+	align-items: center;
+}
+
+.card .blog-cover {
+	width: 100%;
+	height: 10rem;
+	background-size: cover;
+    background-position: center center;
+}
+
+.card-subtitle {
+	font-size: 0.75em;
+}
+
+.fill-width {
+	inline-size: -webkit-fill-available;
+	inline-size: -moz-available;
+	inline-size: fill-available;
+}
+
+a {
+	color: #007bff;
+	text-decoration: none;
+	background-color: transparent;
+}
+
+a .card-title {
+	color: black;
+	text-decoration: none;
+	background-color: transparent;
+}
+
+a .card-title:hover {
+	color: rgb(68, 68, 68);
+	text-decoration: none;
+	background-color: transparent;
+}
+
+.btn-primary {
+	color: #fff;
+	background-color: #7102df;
+	border-color: #7102df;
+}
+
+/* Page Nav */
+
+.page-nav ul li.active a,
+.page-nav ul li.active span {
+	background: #7102df;
+	color: #fff;
+	border: 1px solid transparent;
+}
+
+.page-nav ul li a,
+.page-nav ul li span {
+	color: rgb(53, 53, 53);
+	text-align: center;
+	display: inline-block;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	line-height: 40px;
+	border-radius: 50% !important;
+	border: 1px solid #e6e6e6;
+}
+
+/* Responsive Breakpoint */
+/* Ukuran Desktop */
+@media (min-width: 428px) {
+	.container {
+		max-width: 400px;
+	}
+	.card {
+		width: 18rem;
+	}
+}
+
+@media (min-width: 576px) {
+	.container {
+		max-width: 540px;
+	}
+	.card {
+		width: 18rem;
+	}
+}
+
+@media (min-width: 767px) {
+	.container {
+		max-width: 720px;
+	}
+	.card {
+		width: 16rem;
+	}
+}
+
+@media (min-width: 992px) {
+	.container {
+		max-width: 960px;
+	}
+	.card {
+		width: 17rem;
+	}
+}
+
+@media (min-width: 1200px) {
+	.container {
+		max-width: 1140px;
+	}
+	.card {
+		width: 20rem;
+	}
+	.h-custom-2 {
+		height: 100%;
+	}
+}
