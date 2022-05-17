@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -15,30 +16,33 @@
     integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
     crossorigin="anonymous"></script>
   <script>
-      function goTo(destination) {
-        let url = new URL(window.location.href);
-        url.searchParams.set('page', destination);
-        window.location.href = url;
-      }
+    function goTo(destination) {
+      let url = new URL(window.location.href);
+      url.searchParams.set('page', destination);
+      window.location.href = url;
+    }
   </script>
   <title>Search {{.Data.Query}} - Techdo</title>
 </head>
 
 <body>
   <!-- Navbar -->
-  <nav class="navbar ps-5 pe-5">
+  <nav class="navbar ps-2 pe-2">
     <div class="container-fluid">
       <div class="left-nav justify-content-start col-6">
-        <a href="/" class="navbar__logo col">Techdo-Blog</a>
+        <a href="/" class="navbar__logo">Techdo-Blog</a>
+
         <form class="navbar__search-box-container justify-content-start" method="get" action="/search">
-          <input class="navbar__search-box form-control me-2" type="search" value="{{.Data.Query}}" placeholder="Search" aria-label="Search" name="q">
-          <button class="navbar__search-button" type="submit" >
+          <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search"
+            name="q">
+          <button class="navbar__search-button" type="submit">
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>
         </form>
+
       </div>
 
-      <div class="right-nav justify-content-end">
+      <div class="right-nav justify-content-end col">
         {{if .Data.LoggedIn}}
         <a class="navbar__create-post-btn" href="/post/create">Create Post</a>
         <div class="user-profile-container" style="background-image: url('{{.Data.User.Picture}}');"></div>
@@ -53,61 +57,63 @@
 
   {{if .Data.LoggedIn}}
   <!-- User-Profile Nav -->
-    <div class="card user-nav" style="width: 18rem;">
-      <div class="card-body">
-        <ul>
-          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
-          <hr>
-          <li><a href="/">Dashboard</a></li>
-          <li><a href="/post/create">Create Post</a></li>
-          <li><a href="">Settings</a></li>
-          <hr>
-          <li><a href="/logout">Sign Out</a></li>
-        </ul>
-      </div>
+  <div class="card user-nav" style="width: 18rem;">
+    <div class="card-body">
+      <ul>
+        <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+        <hr>
+        <li><a href="/">Dashboard</a></li>
+        <li><a href="/post/create">Create Post</a></li>
+        <li><a href="">Settings</a></li>
+        <hr>
+        <li><a href="/logout">Sign Out</a></li>
+      </ul>
     </div>
+  </div>
 
-    <div class="card auth-nav" style="width: 18rem;">
-      <div class="card-body">
-        <ul>
-          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
-          <hr>
-          <li><a href="/">Dashboard</a></li>
-          <li><a href="/post/create">Create Post</a></li>
-          <li><a href="">Settings</a></li>
-          <hr>
-          <li><a href="/logout">Sign Out</a></li>
-        </ul>
-      </div>
+  <div class="card auth-nav" style="width: 18rem;">
+    <div class="card-body">
+      <ul>
+        <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+        <hr>
+        <li><a href="/">Dashboard</a></li>
+        <li><a href="/post/create">Create Post</a></li>
+        <li><a href="">Settings</a></li>
+        <hr>
+        <li><a href="/logout">Sign Out</a></li>
+      </ul>
     </div>
+  </div>
   {{else}}
   <!-- Auth Nav Menu -->
-    <div class="card auth-nav" style="width: 18rem;">
-      <div class="card-body">
-        <ul>
-          <li><a href="/login">Login</a></li>
-          <li><a href="/signup">Create Account</a></li>
-        </ul>
-      </div>
+  <div class="card auth-nav" style="width: 18rem;">
+    <div class="card-body">
+      <ul>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/signup">Create Account</a></li>
+      </ul>
     </div>
-    {{end}}
-    
-    
-    <!-- Search Body -->
+  </div>
+  {{end}}
+
+  <!-- Search Body -->
   {{$post := len .Data.Posts}}
   {{$active := .Data.PageNav.Active}}
   {{$max := .Data.PageNav.Max}}
   <div class="container pt-4 ps-5 pe-5 body-container ">
     <div class="row justify-content-center ">
-      <div class="col-lg-8 px-0">
+      <div class="col-lg px-0">
         <h2 class="mb-1">Search Result for <span class="keywords">"{{.Data.Query}}"</span></h2>
+
         <div class="col-sm px-0 row justify-content-end align-items-center">
           {{if ne $post 0 }}
-            <span class="col">Showing {{.Data.StartIndex}} - {{$.Data.EndIndex}} posts from {{.Data.PostsCount}} result</span>
+          <span class="col">Showing {{.Data.StartIndex}} - {{$.Data.EndIndex}} posts from {{.Data.PostsCount}}
+            result</span>
           {{else}}
-            <span class="col">Not showing any result</span>
+          <span class="col">Not showing any result</span>
           {{end}}
           <label for="form-select" class="col-sm-2 col-form-label text-end">Limit</label>
+
           <div class="col-sm-2">
             <select class="form-select limit-select">
               <option value="8">8</option>
@@ -118,29 +124,52 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-2 px-0"></div>
     </div>
-    <div class="row justify-content-center px-0">
-      <div class="col-lg-8 ">
+
+    <div class="row mt-3 justify-content-center justify-content-center px-0">
+      <div class="col-lg-4 me-3 p-4 card mt-2" style="height: 70vh;">
+        <h2>Filter</h2>
+
+        <!-- Category Input -->
+        <label for="blog-category-form">Category</label>
+        <select class="form-select mt-2" id="blog-category-filter" aria-label="Default select example">
+          <option selected>Select Category</option>
+          <option value="1">One</option>
+          <option value="2">Two</option>
+          <option value="3">Three</option>
+        </select>
+
+        <!-- Start Date Input -->
+        <label class="mt-3" for="blog-start-date-filter">Start Date</label>
+        <input class="mt-2" type="date" id="blog-start-date-filter">
+
+        <!-- End Date Input -->
+        <label class="mt-3" for="blog-end-date-filter">End Date</label>
+        <input class="mt-2" type="date" id="blog-end-date-filter">
+      </div>
+
+      <div class="col-lg mt-2">
         {{if ne $post 0 }}
-          {{range $elem := .Data.Posts}}
-          <div class="row posts-container">
-            <div class="card mb-3 post" style="width: 100%;">
-              <div class="blog-cover" style="background-image: url('{{$elem.Banner}}');"></div>
-              <div class="card-body fill-width">
-                <h5 class="card-title">{{$elem.Title}}</h5> 
-                <h6 class="card-subtitle mb-2 text-muted">By {{$elem.Author}} on {{$elem.CreatedAt}}</h6>
-                <p class="card-text">{{$elem.Body}}<a href="/post/{{$elem.PostID}}">...</a></p>
-                <a href="/post/{{$elem.PostID}}" class="btn btn-primary">Read More</a>
-              </div>
+        {{range $elem := .Data.Posts}}
+        <div class="row posts-container">
+          <div class="card mb-3 post" style="width: 100%;">
+            <div class="blog-cover" style="background-image: url('{{$elem.Banner}}');"></div>
+            <div class="card-body fill-width">
+              <h5 class="card-title">{{$elem.Title}}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">By {{$elem.Author}} on {{$elem.CreatedAt}}</h6>
+              <p class="card-text">{{$elem.Body}}<a href="/post/{{$elem.PostID}}">...</a></p>
+              <a href="/post/{{$elem.PostID}}" class="btn btn-primary">Read More</a>
             </div>
           </div>
-          {{end}}
+        </div>
+        {{end}}
         {{else}}
-          <div class="card container d-flex not-found-container p-5">
-              <img class="m-auto" src="/static/css/css-images/not-found-ilustration.png" style="width: 200px;" alt="cute cat">
-              <h3 class="mt-3 fw-bold" style="text-align:center;">No result for <span class="keywords">"{{.Data.Query}}"</span></h3>
-          </div>
+        <div class="card container d-flex not-found-container p-5">
+          <img class="m-auto" src="/static/css/css-images/not-found-ilustration.png" style="width: 200px;"
+            alt="cute cat">
+          <h3 class="mt-3 fw-bold" style="text-align:center;">No result for <span
+              class="keywords">"{{.Data.Query}}"</span></h3>
+        </div>
         {{end}}
 
         <div class="col text-center">
@@ -151,19 +180,19 @@
               </li>
 
               {{range $elem := .Data.PageNav.PageList}}
-                {{if eq $elem $active}}
-                  <li class="page-item active">
-                    <span>{{$elem}}</span>
-                  </li>
-                {{else if eq $elem -1}}
-                    <li class="page-item disabled">
-                      <a class="page-link">...</a>
-                    </li>
-                {{else}}
-                  <li class="page-item">
-                    <a class="page-link" onclick="goTo({{$elem}})">{{$elem}}</a>
-                  </li>
-                {{end}}
+              {{if eq $elem $active}}
+              <li class="page-item active">
+                <span>{{$elem}}</span>
+              </li>
+              {{else if eq $elem -1}}
+              <li class="page-item disabled">
+                <a class="page-link">...</a>
+              </li>
+              {{else}}
+              <li class="page-item">
+                <a class="page-link" onclick="goTo({{$elem}})">{{$elem}}</a>
+              </li>
+              {{end}}
               {{end}}
 
               <li class="page-item">
@@ -172,10 +201,6 @@
             </ul>
           </div>
         </div>
-
-      </div>
-      <div class="card col-sm-2">
-        Column
       </div>
     </div>
   </div>
@@ -194,20 +219,21 @@
 
     if (pageParam) {
       page = parseInt(pageParam);
-    } 
+    }
 
     if (limitParam) {
       limit = parseInt(limitParam);
-      document.querySelector('.limit-select').value=limit;
+      document.querySelector('.limit-select').value = limit;
     }
 
     document.querySelector(".next-button").addEventListener("click", (e) => {
-      if (page < {{$max}}){
-        page++;
-        goPage();
-      }
+      if (page < {{ $max }
+    }){
+      page++;
+      goPage();
+    }
     });
-    
+
     document.querySelector(".prev-button").addEventListener("click", (e) => {
       if (page > 1) {
         page--;
