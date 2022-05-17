@@ -37,8 +37,8 @@ func NewCommentResponse(comment entity.Comment, user entity.MiniUserDetail) Comm
 		LastName:    user.LastName,
 		UserPicture: user.Picture,
 		CommentBody: comment.CommentBody,
-		CreatedAt:   comment.CreatedAt.Format("15:04, 02 Jan 2006"),
-		UpdatedAt:   comment.UpdatedAt.Format("15:04, 02 Jan 2006"),
+		CreatedAt:   comment.CreatedAt.Format("15:04, Jan 02, 2006"),
+		UpdatedAt:   comment.UpdatedAt.Format("15:04, Jan 02, 2006"),
 	}
 }
 

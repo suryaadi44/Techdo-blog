@@ -64,45 +64,29 @@ func (p *PostController) InitializeController() {
 }
 
 func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http.Request) {
-	var tmpl = template.Must(template.ParseFiles("web/template/index/index.html"))
+	var tmpl = template.Must(template.ParseFiles("web/template/homepage/index.html"))
 	var err error
 
-	queryVar := r.URL.Query()
-	limit := queryVar.Get("limit")
-	if limit == "" {
-		limit = "8"
-	}
-	page := queryVar.Get("page")
-	if page == "" {
-		page = "1"
-	}
-
-	limitConv, err := strconv.ParseInt(limit, 10, 64)
-	if err != nil {
-		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
-	}
-	pageConv, err := strconv.ParseInt(page, 10, 64)
-	if err != nil {
-		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
-	}
-
-	contentCount, err := p.postService.GetCountListOfPost(r.Context())
-	if err != nil {
-		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
-	}
-	maxPage := int64(math.Ceil(float64(contentCount) / float64(limitConv)))
-	pageNavigation := utils.Paginate(pageConv, maxPage)
-
-	postData, err := p.postService.GetBriefsBlogPost(r.Context(), pageConv, limitConv)
+	latestPosts, err := p.postService.GetBriefsBlogPost(r.Context(), 1, 6)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
+	latestCategories, err := p.postService.GetTopCategoryPost(r.Context())
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
+	editorsPick, err := p.postService.GetEditorsPick(r.Context())
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
 	token, isLoggedIn := utils.GetSessionToken(r)
 	data := map[string]interface{}{
-		"LoggedIn": isLoggedIn,
-		"Posts":    postData,
-		"PageNav":  pageNavigation,
+		"LoggedIn":         isLoggedIn,
+		"EditorsPick":      editorsPick,
+		"LatestPosts":      latestPosts,
+		"LatestCategories": latestCategories,
 	}
 
 	if isLoggedIn {

@@ -116,6 +116,32 @@ func (p PostServiceImpl) GetBriefsBlogPost(ctx context.Context, page int64, limi
 	return postList, nil
 }
 
+func (p PostServiceImpl) GetTopCategoryPost(ctx context.Context) (dto.TopCategoriesWithPost, error) {
+	var postData dto.TopCategoriesWithPost
+
+	postRaw, categoryRaw, err := p.Repository.GetTopCategoryPost(ctx)
+	if err != nil {
+		log.Println("[ERROR] Fetching list of post -> error:", err)
+		return postData, err
+	}
+
+	postData = dto.NewTopCategoriesAndPost(postRaw, categoryRaw)
+	return postData, nil
+}
+
+func (p PostServiceImpl) GetEditorsPick(ctx context.Context) (dto.BriefBlogPostResponse, error) {
+	var postData dto.BriefBlogPostResponse
+
+	postRaw, err := p.Repository.GetEditorsPick(ctx)
+	if err != nil {
+		log.Println("[ERROR] Fetching list of post -> error:", err)
+		return postData, err
+	}
+
+	postData = dto.NewBriefBlogPostResponse(postRaw)
+	return postData, nil
+}
+
 func (p PostServiceImpl) GetCountListOfPost(ctx context.Context) (int64, error) {
 	return p.Repository.CountListOfPost(ctx)
 }

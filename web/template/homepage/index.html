@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
+  <!-- CSS -->
+  <link rel="stylesheet" href="/static/css/homepage/style.css" />
+  <!-- Icon -->
+  <script src="https://kit.fontawesome.com/ede9e54d69.js" crossorigin="anonymous"></script>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+  integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+  crossorigin="anonymous"></script>
+  <script>
+    function goTo(destination) {
+      let url = new URL(window.location.href);
+      url.searchParams.set("page", destination);
+      window.location.href = url;
+    }
+  </script>
+  <title>Techdo</title>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar sticky-top ps-2 pe-2">
+    <div class="container-fluid">
+      <div class="left-nav justify-content-start col-6">
+        <a href="/" class="navbar__logo col">
+          <img src="/static/img/logo 2.svg" class="dark-logo">
+          <img src="/static/img/logo 1.svg" class="white-logo hide">
+          <spam class="align-middle text-logo">
+            <span class="half-logo gradient">Tech</span><span>Do</span>
+          </spam>
+        </a>
+        <form class="navbar__search-box-container justify-content-start" method="get" action="/search">
+          <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search"
+            name="q" />
+          <button class="navbar__search-button" type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
+      </div>
+
+      <div class="right-nav justify-content-end col">
+        {{if .Data.LoggedIn}}
+        <a class="navbar__create-post-btn" href="/post/create">Create Post</a>
+        <div class="user-profile-container" style="background-image: url('{{.Data.User.Picture}}');"></div>
+        {{else}}
+        <a class="navbar__login-btn" href="/login">Login</a>
+        <a class="navbar__create-acc-btn" href="/signup">Create Account</a>
+        {{end}}
+      </div>
+      <button href="" class="navbar__auth-nav-btn">
+        <i class="fa-solid fa-user"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- User-Profile Nav -->
+  {{if .Data.LoggedIn}}
+  <div class="card user-nav" style="width: 18rem">
+    <div class="card-body">
+      <ul>
+        <li>
+          <a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a>
+        </li>
+        <hr />
+        <li><a href="/">Dashboard</a></li>
+        <li><a href="/post/create">Create Post</a></li>
+        <li><a href="">Settings</a></li>
+        <hr />
+        <li><a href="/logout">Sign Out</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card auth-nav" style="width: 18rem">
+    <div class="card-body">
+      <ul>
+        <li>
+          <a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a>
+        </li>
+        <hr />
+        <li><a href="/">Dashboard</a></li>
+        <li><a href="/post/create">Create Post</a></li>
+        <li><a href="">Settings</a></li>
+        <hr />
+        <li><a href="/logout">Sign Out</a></li>
+      </ul>
+    </div>
+  </div>
+  {{else}}
+
+  <!-- Auth Nav Menu -->
+  <div class="card auth-nav" style="width: 18rem">
+    <div class="card-body">
+      <ul>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/signup">Create Account</a></li>
+      </ul>
+    </div>
+  </div>
+  {{end}}
+
+  <!-- Index Body -->
+  <div class="py-0 hero-section">
+    <div class="container hero">
+      <div class="title-text">
+        <span class="h1 gradient">Tech</span><span class="h1">Do</span><span class="h3">Blog</span>
+      </div>
+      <div class="post-entry d-block d-lg-flex">
+        <div class="img-bg rounded" style="background-image: url('{{.Data.EditorsPick.Banner}}');">
+        </div>
+        <div class="contents mx-3 my-auto ">
+          <span class="date-read mb-5">{{.Data.EditorsPick.CreatedAt}}</span>
+          <a href="/post/{{.Data.EditorsPick.PostID}}">
+            <h2 class="card-title">
+              {{.Data.EditorsPick.Title}}
+            </h2>
+          </a>
+          <span class="caption border-badge my-3">Editor's Pick</span>
+          <p class="mb-5">
+            {{.Data.EditorsPick.Body}}
+          </p>
+          <div class="post-meta">
+            <span class="date-read">By {{.Data.EditorsPick.Author}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="body-container">
+    <div class="container mb-5">
+      <div class="d-flex align-items-center mb-2">
+        <span class="h3 m-0">Latest</span>
+        <a href="/latest">
+          <span class="border-badge mx-2">More</span>
+        </a>
+      </div>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        {{range $elem := .Data.LatestPosts}}
+        <div class="col">
+          <div class="card border-0">
+            <div class="blog-cover rounded" style="background-image: url('{{$elem.Banner}}');"></div>
+            <div class="card-body">
+              <a href="/post/{{$elem.PostID}}">
+                <h5 class="card-title">{{$elem.Title}}</h5>
+              </a>
+              <p class="card-subtitle mb-2 text-muted">
+                By {{$elem.Author}} on {{$elem.CreatedAt}}
+              </p>
+              <p class="card-text">
+                {{$elem.Body}}<a href="/post/{{$elem.PostID}}">...</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        {{end}}
+      </div>
+    </div>
+    <div class="container">
+      {{range $key, $postsData := .Data.LatestCategories}}
+      <div class="d-flex align-items-center mb-2">
+        <span class="h3 m-0">Latest in <span class="text-capitalize">{{$key}}</span></span>
+        <a href="/latest/{{$key}}">
+          <span class="border-badge mx-2">More</span>
+        </a>
+      </div>
+      <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+        {{range $elem := $postsData}}
+        <div class="col">
+          <div class="card border-0">
+            <div class="blog-cover rounded" style="background-image: url('{{$elem.Banner}}');"></div>
+            <div class="card-body">
+              <a href="/post/{{$elem.PostID}}">
+                <h5 class="card-title">{{$elem.Title}}</h5>
+              </a>
+              <p class="card-subtitle mb-2 text-muted">
+                By {{$elem.Author}} on {{$elem.CreatedAt}}
+              </p>
+              <p class="card-text">
+                {{$elem.Body}}<a href="/post/{{$elem.PostID}}">...</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        {{end}}
+      </div>
+      {{end}}
+    </div>
+  </div>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
+
+  <script src="/static/js/index.js"></script>
+  <script src="/static/js/navbar.js"></script>
+</body>
+
+</html>
