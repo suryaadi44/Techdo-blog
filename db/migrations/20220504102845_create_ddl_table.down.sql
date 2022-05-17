@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS editor_pick;
+
 DROP TABLE IF EXISTS comment;
 
 DROP TABLE IF EXISTS category_associations;

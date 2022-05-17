@@ -1,0 +1,1 @@
+DROP TRIGGER IF EXISTS delete_old_editor_pick;

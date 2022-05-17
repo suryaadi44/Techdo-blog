@@ -2,30 +2,36 @@ package dto
 
 import (
 	"html/template"
-	"time"
+	"regexp"
 
 	UserDto "github.com/suryaadi44/Techdo-blog/internal/user/dto"
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
+	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 
 type BlogPostResponse struct {
-	PostID     int64
-	Author     UserDto.UserDetail
-	Categories CategoryList
-	Banner     string
-	Title      string
-	Body       template.HTML
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	PostID       int64
+	Author       UserDto.UserDetail
+	Categories   CategoryList
+	Banner       string
+	Title        string
+	Body         template.HTML
+	ViewCount    int64
+	CommentCount int64
+	CreatedAt    string
+	UpdatedAt    string
 }
 
 type BriefBlogPostResponse struct {
-	PostID    int64
-	Author    string
-	Banner    string
-	Title     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	PostID       int64
+	Author       string
+	Banner       string
+	Title        string
+	Body         string
+	ViewCount    int64
+	CommentCount int64
+	CreatedAt    string
+	UpdatedAt    string
 }
 
 type BlogPostRequest struct {
@@ -43,6 +49,7 @@ type Category struct {
 
 type CategoryList []Category
 type BriefsBlogPostResponse []BriefBlogPostResponse
+type TopCategoriesWithPost map[string]BriefsBlogPostResponse
 
 func NewCategory(c entity.Category) Category {
 	return Category{
@@ -64,25 +71,33 @@ func NewCategoryList(c entity.Categories) CategoryList {
 
 func NewBlogPostResponse(post entity.BlogPost, categories entity.Categories, author entity.UserDetail) BlogPostResponse {
 	return BlogPostResponse{
-		PostID:     post.PostID,
-		Author:     UserDto.NewUserDetailDTO(author),
-		Categories: NewCategoryList(categories),
-		Banner:     post.Banner,
-		Title:      post.Title,
-		Body:       template.HTML(post.Body),
-		CreatedAt:  post.CreatedAt,
-		UpdatedAt:  post.UpdatedAt,
+		PostID:       post.PostID,
+		Author:       UserDto.NewUserDetailDTO(author),
+		Categories:   NewCategoryList(categories),
+		Banner:       post.Banner,
+		Title:        post.Title,
+		Body:         template.HTML(post.Body),
+		ViewCount:    post.ViewCount,
+		CommentCount: post.CommentCount,
+		CreatedAt:    post.CreatedAt.Format("Jan 02, 2006"),
+		UpdatedAt:    post.UpdatedAt.Format("Jan 02, 2006"),
 	}
 }
 
 func NewBriefBlogPostResponse(post entity.BriefBlogPost) BriefBlogPostResponse {
+	r := regexp.MustCompile(`<[^>]*>`)
+	body := utils.Truncate(r.ReplaceAllString(post.Body, ""), 150)
+
 	return BriefBlogPostResponse{
-		PostID:    post.PostID,
-		Author:    post.Author,
-		Banner:    post.Banner,
-		Title:     post.Title,
-		CreatedAt: post.CreatedAt,
-		UpdatedAt: post.UpdatedAt,
+		PostID:       post.PostID,
+		Author:       post.Author,
+		Banner:       post.Banner,
+		Title:        post.Title,
+		Body:         body,
+		ViewCount:    post.ViewCount,
+		CommentCount: post.CommentCount,
+		CreatedAt:    post.CreatedAt.Format("Jan 02, 2006"),
+		UpdatedAt:    post.UpdatedAt.Format("Jan 02, 2006"),
 	}
 
 }
@@ -96,6 +111,17 @@ func NewBriefsBlogPostResponse(posts entity.BriefsBlogPost) BriefsBlogPostRespon
 	}
 
 	return postList
+}
+
+func NewTopCategoriesAndPost(posts entity.BriefsBlogPost, categories entity.Categories) TopCategoriesWithPost {
+	var topCategoriesAndPost = make(TopCategoriesWithPost)
+
+	for idx, each := range categories {
+		postData := NewBriefBlogPostResponse(*posts[idx])
+		topCategoriesAndPost[each.CategoryName] = append(topCategoriesAndPost[each.CategoryName], postData)
+	}
+
+	return topCategoriesAndPost
 }
 
 func (b *BlogPostRequest) ToDAO(PostID int64, AuthorID int64, BannerURL string) entity.BlogPost {
