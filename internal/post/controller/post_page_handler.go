@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"html/template"
 	"math"
 	"net/http"
@@ -217,6 +218,147 @@ func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Re
 
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+	}
+
+	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
+}
+
+func (p *PostController) latestPostPageHandler(w http.ResponseWriter, r *http.Request) {
+	var tmpl = template.Must(template.ParseFiles("web/template/see-more/see-more.html"))
+	var err error
+
+	queryVar := r.URL.Query()
+	limit := queryVar.Get("limit")
+	if limit == "" {
+		limit = "12"
+	}
+	page := queryVar.Get("page")
+	if page == "" {
+		page = "1"
+	}
+
+	limitConv, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+	pageConv, err := strconv.ParseInt(page, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+
+	contentCount, err := p.postService.GetCountListOfPost(r.Context())
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+	maxPage := int64(math.Ceil(float64(contentCount) / float64(limitConv)))
+	pageNavigation := utils.Paginate(pageConv, maxPage)
+	startIndex := (pageConv-1)*limitConv + 1
+
+	postData, err := p.postService.GetBriefsBlogPost(r.Context(), pageConv, limitConv)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
+	token, isLoggedIn := utils.GetSessionToken(r)
+	data := map[string]interface{}{
+		"LoggedIn":   isLoggedIn,
+		"PostsCount": contentCount,
+		"StartIndex": startIndex,
+		"EndIndex":   startIndex + int64(len(postData)) - 1,
+		"Posts":      postData,
+		"PageNav":    pageNavigation,
+		"In":         "Latest",
+	}
+
+	if isLoggedIn {
+		session, err := p.sessionService.GetSession(r.Context(), token)
+		if err != nil {
+			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+		}
+		user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
+		if err != nil {
+			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+		}
+
+		if err == nil {
+			data["User"] = user
+		}
+	}
+
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
+	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
+}
+
+func (p *PostController) postInCategoryPageHandler(w http.ResponseWriter, r *http.Request) {
+	var tmpl = template.Must(template.ParseFiles("web/template/see-more/see-more.html"))
+	var err error
+
+	queryVar := r.URL.Query()
+	vars := mux.Vars(r)
+	category := vars["category"]
+
+	limit := queryVar.Get("limit")
+	if limit == "" {
+		limit = "12"
+	}
+	page := queryVar.Get("page")
+	if page == "" {
+		page = "1"
+	}
+
+	limitConv, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+	pageConv, err := strconv.ParseInt(page, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+
+	contentCount, err := p.postService.GetCountListOfPostInCategories(r.Context(), category)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+	maxPage := int64(math.Ceil(float64(contentCount) / float64(limitConv)))
+	pageNavigation := utils.Paginate(pageConv, maxPage)
+	startIndex := (pageConv-1)*limitConv + 1
+
+	postData, err := p.postService.GetBriefsBlogPostOfCategories(r.Context(), category, pageConv, limitConv)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
+	token, isLoggedIn := utils.GetSessionToken(r)
+	data := map[string]interface{}{
+		"LoggedIn":   isLoggedIn,
+		"PostsCount": contentCount,
+		"StartIndex": startIndex,
+		"EndIndex":   startIndex + int64(len(postData)) - 1,
+		"Posts":      postData,
+		"PageNav":    pageNavigation,
+		"In":         fmt.Sprint("Latest in ", strings.Title(category)),
+	}
+
+	if isLoggedIn {
+		session, err := p.sessionService.GetSession(r.Context(), token)
+		if err != nil {
+			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+		}
+		user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
+		if err != nil {
+			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+		}
+
+		if err == nil {
+			data["User"] = user
+		}
+	}
+
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
 	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))

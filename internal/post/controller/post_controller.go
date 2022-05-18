@@ -45,7 +45,9 @@ func (p *PostController) InitializeController() {
 	// Page
 	p.router.HandleFunc("/", p.postDashboardPageHandler).Methods(http.MethodGet)
 	p.router.HandleFunc("/search", p.searchPostPageHandler).Methods(http.MethodGet)
+	p.router.HandleFunc("/post/latest", p.latestPostPageHandler).Methods(http.MethodGet)
 	p.router.HandleFunc("/post/{id:[0-9]+}", p.viewPostPageHandlder).Methods(http.MethodGet)
+	p.router.HandleFunc("/post/category/{category}", p.postInCategoryPageHandler).Methods(http.MethodGet)
 
 	// API
 	p.router.HandleFunc("/post/{id:[0-9]+}/comment", p.viewCommentHandler).Methods(http.MethodGet)
