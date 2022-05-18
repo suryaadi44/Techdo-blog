@@ -20,7 +20,7 @@ var (
 
 	COUNT_LIST_OF_POST              = "SELECT COUNT(*) FROM blog_posts"
 	COUNT_LIST_OF_POST_IN_CATEGOIES = "SELECT COUNT(*) FROM blog_posts b JOIN category_associations a ON  a.post_id =  b.post_id JOIN categories c ON c.category_id = a.category_id WHERE c.category_name = ?"
-	COUNT_SEARCH_RESULT             = "SELECT COUNT(*) FROM blog_posts WHERE MATCH(title) AGAINST(? IN NATURAL LANGUAGE MODE)"
+	COUNT_SEARCH_RESULT             = "SELECT COUNT(*) FROM blog_posts b"
 
 	INSERT_BLANK_POST     = "INSERT INTO blog_posts() VALUE ()"
 	INSERT_CATEGORY_ASSOC = "INSERT INTO category_associations(post_id, category_id) VALUE (?, ?)"
@@ -35,7 +35,7 @@ var (
 	SELECT_ID_OF_LAST_INSERT               = "SELECT LAST_INSERT_ID() as uid"
 	SELECT_LIST_OF_POST                    = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid ORDER BY b.created_at DESC LIMIT ?, ? "
 	SELECT_LISF_OF_POST_IN_CATEGORY        = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid JOIN category_associations a ON  a.post_id =  b.post_id JOIN categories c ON c.category_id = a.category_id WHERE c.category_name = ? ORDER BY b.created_at DESC LIMIT ?, ?"
-	SELECT_FULL_TEXT_POST                  = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
+	SELECT_FULL_TEXT_POST                  = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid"
 	SELECT_CATEGORY_OF_POST                = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
 	SELECT_CATEGORY                        = "SELECT category_id, category_name FROM categories"
 	SELECT_COMMENTS                        = "SELECT c.comment_id, c.uid, c.comment_body, c.created_at, c.updated_at, u.uid, u.first_name, u.last_name, u.picture FROM comment c JOIN user_details u ON c.uid= u.uid WHERE c.post_id = ? ORDER BY c.created_at DESC"
@@ -242,13 +242,26 @@ func (p PostRepositoryImpl) GetTopCategoryPost(ctx context.Context) (entity.Brie
 	return postList, categoryList, nil
 }
 
-func (p PostRepositoryImpl) GetBriefsBlogPostFromSearch(ctx context.Context, q string, offset int64, limit int64, dateStart *time.Time, dateEnd *time.Time) (entity.BriefsBlogPost, error) {
+func (p PostRepositoryImpl) GetBriefsBlogPostFromSearch(ctx context.Context, q string, offset int64, limit int64, dateStart *time.Time, dateEnd *time.Time, category string) (entity.BriefsBlogPost, error) {
 	var postList entity.BriefsBlogPost
 	var query string
 	var args []interface{}
 
 	args = append(args, q)
 	query = SELECT_FULL_TEXT_POST
+
+	if category != "" {
+		query = query + " JOIN category_associations a ON  a.post_id = b.post_id JOIN categories c ON c.category_id = a.category_id"
+	}
+
+	// Add where clause
+	query = query + " WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
+
+	// Add argument
+	if category != "" {
+		query = query + " AND c.category_name = ?"
+		args = append(args, category)
+	}
 
 	if dateStart != nil && dateEnd != nil {
 		query = query + " AND b.created_at BETWEEN ? AND ?"
@@ -284,13 +297,25 @@ func (p PostRepositoryImpl) GetBriefsBlogPostFromSearch(ctx context.Context, q s
 	return postList, nil
 }
 
-func (p PostRepositoryImpl) CountSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time) (int64, error) {
+func (p PostRepositoryImpl) CountSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time, category string) (int64, error) {
 	var count int64
 	var query string
 	var args []interface{}
 
 	args = append(args, q)
 	query = COUNT_SEARCH_RESULT
+	if category != "" {
+		query = query + " JOIN category_associations a ON  a.post_id = b.post_id JOIN categories c ON c.category_id = a.category_id"
+	}
+
+	// Add where clause
+	query = query + " WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
+
+	// Add argument
+	if category != "" {
+		query = query + " AND c.category_name = ?"
+		args = append(args, category)
+	}
 
 	if dateStart != nil && dateEnd != nil {
 		query = query + " AND b.created_at BETWEEN ? AND ?"

@@ -164,11 +164,11 @@ func (p PostServiceImpl) GetCountListOfPostInCategories(ctx context.Context, cat
 	return p.Repository.CountListOfPostInCategories(ctx, categories)
 }
 
-func (p PostServiceImpl) SearchBlogPost(ctx context.Context, q string, page int64, limit int64, dateStart *time.Time, dateEnd *time.Time) (dto.BriefsBlogPostResponse, error) {
+func (p PostServiceImpl) SearchBlogPost(ctx context.Context, q string, page int64, limit int64, dateStart *time.Time, dateEnd *time.Time, category string) (dto.BriefsBlogPostResponse, error) {
 	var postList dto.BriefsBlogPostResponse
 	offset := (page - 1) * limit
 
-	postListEntity, err := p.Repository.GetBriefsBlogPostFromSearch(ctx, q, offset, limit, dateStart, dateEnd)
+	postListEntity, err := p.Repository.GetBriefsBlogPostFromSearch(ctx, q, offset, limit, dateStart, dateEnd, category)
 	if err != nil {
 		log.Println("[ERROR] Fetching list of post -> error:", err)
 		return postList, err
@@ -178,8 +178,8 @@ func (p PostServiceImpl) SearchBlogPost(ctx context.Context, q string, page int6
 	return postList, nil
 }
 
-func (p PostServiceImpl) GetCountOfSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time) (int64, error) {
-	return p.Repository.CountSearchResult(ctx, q, dateStart, dateEnd)
+func (p PostServiceImpl) GetCountOfSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time, category string) (int64, error) {
+	return p.Repository.CountSearchResult(ctx, q, dateStart, dateEnd, category)
 }
 
 func (p PostServiceImpl) GetPostAuthorIdFromId(ctx context.Context, postId int64) (int64, error) {
