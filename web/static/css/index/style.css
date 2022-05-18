@@ -11,7 +11,8 @@
 
 .card .blog-cover {
     width: 100%;
-    height: 10rem;
+    max-width: 22rem;
+    height: 12rem;
     background-size: cover;
 }
 

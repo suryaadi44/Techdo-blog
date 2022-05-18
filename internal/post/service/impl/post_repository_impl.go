@@ -18,8 +18,9 @@ type PostRepositoryImpl struct {
 var (
 	ADD_VIEW = "UPDATE blog_posts SET view_count = view_count + 1 WHERE post_id = ?"
 
-	COUNT_LIST_OF_POST  = "SELECT COUNT(*) FROM blog_posts"
-	COUNT_SEARCH_RESULT = "SELECT COUNT(*) FROM blog_posts WHERE MATCH(title) AGAINST(? IN NATURAL LANGUAGE MODE)"
+	COUNT_LIST_OF_POST              = "SELECT COUNT(*) FROM blog_posts"
+	COUNT_LIST_OF_POST_IN_CATEGOIES = "SELECT COUNT(*) FROM blog_posts b JOIN category_associations a ON  a.post_id =  b.post_id JOIN categories c ON c.category_id = a.category_id WHERE c.category_name = ?"
+	COUNT_SEARCH_RESULT             = "SELECT COUNT(*) FROM blog_posts WHERE MATCH(title) AGAINST(? IN NATURAL LANGUAGE MODE)"
 
 	INSERT_BLANK_POST     = "INSERT INTO blog_posts() VALUE ()"
 	INSERT_CATEGORY_ASSOC = "INSERT INTO category_associations(post_id, category_id) VALUE (?, ?)"
@@ -33,6 +34,7 @@ var (
 	SELECT_POST_AUTHOR                     = "SELECT author_id FROM blog_posts WHERE post_id = ?"
 	SELECT_ID_OF_LAST_INSERT               = "SELECT LAST_INSERT_ID() as uid"
 	SELECT_LIST_OF_POST                    = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid ORDER BY b.created_at DESC LIMIT ?, ? "
+	SELECT_LISF_OF_POST_IN_CATEGORY        = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid JOIN category_associations a ON  a.post_id =  b.post_id JOIN categories c ON c.category_id = a.category_id WHERE c.category_name = ? ORDER BY b.created_at DESC LIMIT ?, ?"
 	SELECT_FULL_TEXT_POST                  = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
 	SELECT_CATEGORY_OF_POST                = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
 	SELECT_CATEGORY                        = "SELECT category_id, category_name FROM categories"
@@ -160,6 +162,29 @@ func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset in
 		err = rows.Scan(&post.PostID, &post.Banner, &post.Title, &post.Body, &post.ViewCount, &post.CommentCount, &post.CreatedAt, &post.UpdatedAt, &post.Author)
 		if err != nil {
 			log.Println("[ERROR] GetBriefsBlogPostData -> error scanning row :", err)
+			return postList, err
+		}
+
+		postList = append(postList, &post)
+	}
+
+	return postList, nil
+}
+
+func (p PostRepositoryImpl) GetBriefsBlogPostDataOfCategories(ctx context.Context, categories string, offset int64, limit int64) (entity.BriefsBlogPost, error) {
+	var postList entity.BriefsBlogPost
+
+	rows, err := p.db.QueryContext(ctx, SELECT_LISF_OF_POST_IN_CATEGORY, categories, offset, limit)
+	if err != nil {
+		log.Println("[ERROR] GetBriefsBlogPostDataOfCategories -> error on executing query :", err)
+		return postList, err
+	}
+
+	for rows.Next() {
+		var post entity.BriefBlogPost
+		err = rows.Scan(&post.PostID, &post.Banner, &post.Title, &post.Body, &post.ViewCount, &post.CommentCount, &post.CreatedAt, &post.UpdatedAt, &post.Author)
+		if err != nil {
+			log.Println("[ERROR] GetBriefsBlogPostDataOfCategories -> error scanning row :", err)
 			return postList, err
 		}
 
@@ -310,6 +335,28 @@ func (p PostRepositoryImpl) CountListOfPost(ctx context.Context) (int64, error) 
 		err = rows.Scan(&count)
 		if err != nil {
 			log.Println("[ERROR] CountListOfPost -> error scanning row :", err)
+			return 0, err
+		}
+
+		return count, nil
+	}
+
+	return 0, errors.New("can't get count of post ")
+}
+
+func (p PostRepositoryImpl) CountListOfPostInCategories(ctx context.Context, categories string) (int64, error) {
+	var count int64
+
+	rows, err := p.db.QueryContext(ctx, COUNT_LIST_OF_POST_IN_CATEGOIES, categories)
+	if err != nil {
+		log.Println("[ERROR] CountListOfPostInCategories -> error on executing query :", err)
+		return 0, err
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&count)
+		if err != nil {
+			log.Println("[ERROR] CountListOfPostInCategories -> error scanning row :", err)
 			return 0, err
 		}
 
