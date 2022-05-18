@@ -298,7 +298,7 @@ func (p *PostController) postInCategoryPageHandler(w http.ResponseWriter, r *htt
 
 	queryVar := r.URL.Query()
 	vars := mux.Vars(r)
-	category, _ := vars["category"]
+	category := vars["category"]
 
 	limit := queryVar.Get("limit")
 	if limit == "" {
