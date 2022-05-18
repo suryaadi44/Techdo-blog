@@ -31,10 +31,15 @@
   <nav class="navbar ps-2 pe-2">
     <div class="container-fluid">
       <div class="left-nav justify-content-start col-6">
-        <a href="/" class="navbar__logo">Techdo-Blog</a>
+        <a href="/" class="navbar__logo col">
+          <img src="/static/img/logo 1.svg" class="white-logo hide">
+          <spam class="align-middle text-logo">
+            <span class="half-logo gradient">Tech</span><span>Do</span>
+          </spam>
+        </a>
 
         <form class="navbar__search-box-container justify-content-start" method="get" action="/search">
-          <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search"
+          <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search" id="search-box"
             name="q">
           <button class="navbar__search-button" type="submit">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -134,10 +139,10 @@
         <!-- Category Input -->
         <label for="blog-category-form">Category</label>
         <select class="form-select mt-2" id="blog-category-filter" aria-label="Default select example">
-          <option selected>Select Category</option>
-          <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
+          <option value="" selected>All</option>
+          {{range $elem := .Data.Categories}}
+          <option value="{{$elem.CategoryName}}" class="text-capitalize">{{$elem.CategoryName}}</option>
+          {{end}}
         </select>
 
         <!-- Start Date Input -->
@@ -191,7 +196,7 @@
               </li>
               {{else}}
               <li class="page-item">
-                <a class="page-link" onclick="goTo({{$elem}})">{{$elem}}</a>
+                <a class="page-link" onclick="goTo('{{$elem}}')">{{$elem}}</a>
               </li>
               {{end}}
               {{end}}
@@ -213,10 +218,37 @@
   <script src="/static/js/index.js"></script>
   <script>
     let url = new URL(window.location.href);
+    const qParam = url.searchParams.get('q');
     const pageParam = url.searchParams.get('page');
     const limitParam = url.searchParams.get('limit');
+    const startDateParam = url.searchParams.get('start');
+    const endDateParam = url.searchParams.get('end');
+    const categoriesParam = url.searchParams.get('category');
+
     let page = 1;
     let limit = 8;
+    let start = '';
+    let end = '';
+    let categories = '';
+
+    if(qParam){
+      document.querySelector("#search-box").value = qParam;
+    }
+
+    if (categoriesParam){
+      categories = categoriesParam
+      document.querySelector("#blog-category-filter").value = categories;
+    }
+
+    if (startDateParam) {
+      start = startDateParam;
+      document.querySelector("#blog-start-date-filter").value = start;
+    }
+
+    if (endDateParam) {
+      end = endDateParam;
+      document.querySelector("#blog-end-date-filter").value = end;
+    }
 
     if (pageParam) {
       page = parseInt(pageParam);
@@ -228,10 +260,10 @@
     }
 
     document.querySelector(".next-button").addEventListener("click", (e) => {
-      if (page < {{$max}}){
-      page++;
-      goPage();
-    }
+      if (page < parseInt("{{$max}}")) {
+        page++;
+        goPage();
+      }
     });
 
     document.querySelector(".prev-button").addEventListener("click", (e) => {
@@ -246,8 +278,38 @@
       setLimit();
     });
 
+    document.querySelector("#blog-start-date-filter").addEventListener("change", (e) => {
+      start = document.querySelector("#blog-start-date-filter").value;
+      setStart();
+    });
+
+    document.querySelector("#blog-end-date-filter").addEventListener("change", (e) => {
+      end = document.querySelector("#blog-end-date-filter").value;
+      setEnd();
+    });
+    
+    document.querySelector("#blog-category-filter").addEventListener("change", (e) => {
+      categories = document.querySelector("#blog-category-filter").value;
+      setCategories();
+    });
+    
     function goPage() {
       url.searchParams.set('page', page);
+      window.location.href = url;
+    }
+
+    function setStart() {
+      url.searchParams.set('start', start);
+      window.location.href = url;
+    }
+
+    function setEnd() {
+      url.searchParams.set('end', end);
+      window.location.href = url;
+    }
+
+    function setCategories() {
+      url.searchParams.set('category', categories);
       window.location.href = url;
     }
 

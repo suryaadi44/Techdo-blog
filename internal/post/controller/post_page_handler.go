@@ -79,6 +79,7 @@ func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Re
 
 	start := queryVar.Get("start")
 	end := queryVar.Get("end")
+	category := queryVar.Get("category")
 
 	dateStart, err = time.Parse("2006-01-02", start)
 	dateStartPtr := &dateStart
@@ -103,7 +104,7 @@ func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Re
 		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
 	}
 
-	contentCount, err := p.postService.GetCountOfSearchResult(r.Context(), q, dateStartPtr, dateEndPtr)
+	contentCount, err := p.postService.GetCountOfSearchResult(r.Context(), q, dateStartPtr, dateEndPtr, category)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
@@ -111,7 +112,12 @@ func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Re
 	pageNavigation := utils.Paginate(pageConv, maxPage)
 	startIndex := (pageConv-1)*limitConv + 1
 
-	postData, err := p.postService.SearchBlogPost(r.Context(), q, pageConv, limitConv, dateStartPtr, dateEndPtr)
+	postData, err := p.postService.SearchBlogPost(r.Context(), q, pageConv, limitConv, dateStartPtr, dateEndPtr, category)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
+	categoryList, err := p.postService.GetCategoryList(r.Context())
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
@@ -125,6 +131,7 @@ func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Re
 		"EndIndex":   startIndex + int64(len(postData)) - 1,
 		"Posts":      postData,
 		"PageNav":    pageNavigation,
+		"Categories": categoryList,
 	}
 
 	if isLoggedIn {
