@@ -5,11 +5,10 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	authControllerPkg "github.com/suryaadi44/Techdo-blog/internal/auth/controller"
-	authServicePkg "github.com/suryaadi44/Techdo-blog/internal/auth/service"
 	middlewarePkg "github.com/suryaadi44/Techdo-blog/internal/middleware"
 	postControllerPkg "github.com/suryaadi44/Techdo-blog/internal/post/controller"
 	postServicePkg "github.com/suryaadi44/Techdo-blog/internal/post/service"
+	userControllerPkg "github.com/suryaadi44/Techdo-blog/internal/user/controller"
 	userServicePkg "github.com/suryaadi44/Techdo-blog/internal/user/service"
 	globalMiddlewarePkg "github.com/suryaadi44/Techdo-blog/pkg/middleware"
 )
@@ -21,11 +20,11 @@ func InitializeController(router *mux.Router, db *sql.DB) {
 		http.StripPrefix("/static/",
 			http.FileServer(http.Dir("web/static/"))))
 
-	SessionService := authServicePkg.NewSessionAuthService(db)
+	SessionService := userServicePkg.NewSessionAuthService(db)
 	AuthMiddleware := middlewarePkg.NewAuthMiddleware(SessionService)
 
-	AuthService := authServicePkg.NewUserAuthService(db, SessionService)
-	AuthController := authControllerPkg.NewController(router, AuthService, SessionService)
+	AuthService := userServicePkg.NewUserAuthService(db, SessionService)
+	AuthController := userControllerPkg.NewController(router, AuthService, SessionService)
 	AuthController.InitializeController()
 
 	UserService := userServicePkg.NewUserService(db)

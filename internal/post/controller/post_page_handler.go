@@ -300,7 +300,7 @@ func (p *PostController) latestPostPageHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (p *PostController) postInCategoryPageHandler(w http.ResponseWriter, r *http.Request) {
-	var tmpl = template.Must(template.ParseFiles("web/template/see-more/see-more.html"))
+	var tmpl = template.Must(template.ParseFiles("web/template/post/see-more.html"))
 	var err error
 
 	queryVar := r.URL.Query()
