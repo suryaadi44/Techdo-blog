@@ -79,6 +79,10 @@ func (p PostServiceImpl) DeletePost(ctx context.Context, id int64) error {
 	return nil
 }
 
+func (p PostServiceImpl) IncreaseView(ctx context.Context, id int64) error {
+	return p.Repository.IncreaseView(ctx, id)
+}
+
 func (p PostServiceImpl) GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error) {
 	var postDto dto.BlogPostResponse
 
@@ -112,6 +116,36 @@ func (p PostServiceImpl) GetBriefsBlogPost(ctx context.Context, page int64, limi
 	return postList, nil
 }
 
+func (p PostServiceImpl) GetTopCategoryPost(ctx context.Context) (dto.TopCategoriesWithPost, error) {
+	var postData dto.TopCategoriesWithPost
+
+	postRaw, categoryRaw, err := p.Repository.GetTopCategoryPost(ctx)
+	if err != nil {
+		log.Println("[ERROR] Fetching list of post -> error:", err)
+		return postData, err
+	}
+
+	postData = dto.NewTopCategoriesAndPost(postRaw, categoryRaw)
+	return postData, nil
+}
+
+func (p PostServiceImpl) GetEditorsPick(ctx context.Context) (dto.BriefBlogPostResponse, error) {
+	var postData dto.BriefBlogPostResponse
+
+	postRaw, err := p.Repository.GetEditorsPick(ctx)
+	if err != nil {
+		log.Println("[ERROR] Fetching list of post -> error:", err)
+		return postData, err
+	}
+
+	postData = dto.NewBriefBlogPostResponse(postRaw)
+	return postData, nil
+}
+
+func (p PostServiceImpl) GetCountListOfPost(ctx context.Context) (int64, error) {
+	return p.Repository.CountListOfPost(ctx)
+}
+
 func (p PostServiceImpl) SearchBlogPost(ctx context.Context, q string, page int64, limit int64, dateStart *time.Time, dateEnd *time.Time) (dto.BriefsBlogPostResponse, error) {
 	var postList dto.BriefsBlogPostResponse
 	offset := (page - 1) * limit
@@ -124,6 +158,10 @@ func (p PostServiceImpl) SearchBlogPost(ctx context.Context, q string, page int6
 
 	postList = dto.NewBriefsBlogPostResponse(postListEntity)
 	return postList, nil
+}
+
+func (p PostServiceImpl) GetCountOfSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time) (int64, error) {
+	return p.Repository.CountSearchResult(ctx, q, dateStart, dateEnd)
 }
 
 func (p PostServiceImpl) GetPostAuthorIdFromId(ctx context.Context, postId int64) (int64, error) {
@@ -152,4 +190,22 @@ func (p PostServiceImpl) GetCategoryList(ctx context.Context) (dto.CategoryList,
 
 func (p PostServiceImpl) UploadImage(ctx context.Context, filename string, image interface{}, folderID string) (*imagekit.UploadResponse, error) {
 	return utils.UploadImage(ctx, filename, image, folderID)
+}
+
+func (p PostServiceImpl) AddComment(ctx context.Context, comment dto.CommentRequest) error {
+	return p.Repository.AddComment(ctx, comment.ToDAO())
+}
+
+func (p PostServiceImpl) GetComments(ctx context.Context, postID int64) (dto.CommentsResponse, error) {
+	var commentResponse dto.CommentsResponse
+
+	comment, user, err := p.Repository.GetPostComments(ctx, postID)
+	if err != nil {
+		log.Println("[ERROR] Fetching list of comment -> error:", err)
+		return commentResponse, err
+	}
+
+	commentResponse = dto.NewCommentsResponse(comment, user)
+
+	return commentResponse, nil
 }

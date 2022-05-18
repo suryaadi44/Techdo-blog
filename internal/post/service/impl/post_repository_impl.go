@@ -16,21 +16,29 @@ type PostRepositoryImpl struct {
 }
 
 var (
+	ADD_VIEW = "UPDATE blog_posts SET view_count = view_count + 1 WHERE post_id = ?"
+
+	COUNT_LIST_OF_POST  = "SELECT COUNT(*) FROM blog_posts"
+	COUNT_SEARCH_RESULT = "SELECT COUNT(*) FROM blog_posts WHERE MATCH(title) AGAINST(? IN NATURAL LANGUAGE MODE)"
+
 	INSERT_BLANK_POST     = "INSERT INTO blog_posts() VALUE ()"
 	INSERT_CATEGORY_ASSOC = "INSERT INTO category_associations(post_id, category_id) VALUE (?, ?)"
+	INSERT_COMMENT        = "INSERT INTO comment(post_id, uid, comment_body) VALUE (?, ?, ?)"
 
 	UPDATE_POST = "UPDATE blog_posts SET author_id = ?, banner = ?, title = ?, body = ? WHERE post_id = ?"
 
 	DELETE_POST = "DELETE FROM blog_posts WHERE post_id = ?"
 
-	SELECT_POST = "SELECT b.post_id, b.author_id, b.banner, b.title, b.body, b.created_at, b.updated_at, u.uid, u.email, u.first_name, u.last_name, u.picture, u.phone, u.about_me, u.created_at, u.updated_at FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
-
-	SELECT_POST_AUTHOR       = "SELECT author_id FROM blog_posts WHERE post_id = ?"
-	SELECT_ID_OF_LAST_INSERT = "SELECT LAST_INSERT_ID() as uid"
-	SELECT_LIST_OF_POST      = "SELECT b.post_id, b.banner, b.title, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid"
-	SELECT_FULL_TEXT_POST    = "SELECT b.post_id, b.banner, b.title, b.created_at, b.updated_at, CONCAT(u.first_name, u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
-	SELECT_CATEGORY_OF_POST  = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
-	SELECT_CATEGORY          = "SELECT category_id, category_name FROM categories"
+	SELECT_POST                            = "SELECT b.post_id, b.author_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, u.uid, u.email, u.first_name, u.last_name, u.picture, u.phone, u.about_me, u.created_at, u.updated_at FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
+	SELECT_POST_AUTHOR                     = "SELECT author_id FROM blog_posts WHERE post_id = ?"
+	SELECT_ID_OF_LAST_INSERT               = "SELECT LAST_INSERT_ID() as uid"
+	SELECT_LIST_OF_POST                    = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid ORDER BY b.created_at DESC LIMIT ?, ? "
+	SELECT_FULL_TEXT_POST                  = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
+	SELECT_CATEGORY_OF_POST                = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
+	SELECT_CATEGORY                        = "SELECT category_id, category_name FROM categories"
+	SELECT_COMMENTS                        = "SELECT c.comment_id, c.uid, c.comment_body, c.created_at, c.updated_at, u.uid, u.first_name, u.last_name, u.picture FROM comment c JOIN user_details u ON c.uid= u.uid WHERE c.post_id = ? ORDER BY c.created_at DESC"
+	SELECT_POST_OF_LATEST_UPDATED_CATEGORY = "SELECT post_id, banner, title, body, view_count, comment_count, created_at, updated_at, author, category_id, category_name FROM homepage_latest"
+	SELECT_EDITOR_PICK                     = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid JOIN editor_pick e ON b.post_id = e.post_id;"
 )
 
 func NewPostRepository(db *sql.DB) PostRepositoryImpl {
@@ -95,6 +103,26 @@ func (p PostRepositoryImpl) DeletePost(ctx context.Context, id int64) error {
 	return nil
 }
 
+func (p PostRepositoryImpl) IncreaseView(ctx context.Context, id int64) error {
+	result, err := p.db.ExecContext(ctx, ADD_VIEW, id)
+	if err != nil {
+		log.Println("[ERROR] IncreaseView -> error on executing query :", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] UpdatePost -> error on getting rows affected :", err)
+		return err
+	}
+	if rowsAffected != 1 {
+		log.Println("[ERROR] UpdatePost -> error on updating row :", err)
+		return err
+	}
+
+	return nil
+}
+
 func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int64) (entity.BlogPost, entity.UserDetail, error) {
 	var post entity.BlogPost
 	var author entity.UserDetail
@@ -106,7 +134,7 @@ func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int64) (entity.B
 	}
 
 	if rows.Next() {
-		err = rows.Scan(&post.PostID, &post.AuthorID, &post.Banner, &post.Title, &post.Body, &post.CreatedAt, &post.UpdatedAt, &author.UserID, &author.Email, &author.FirstName, &author.LastName, &author.Picture, &author.Phone, &author.AboutMe, &author.CreatedAt, &author.UpdatedAt)
+		err = rows.Scan(&post.PostID, &post.AuthorID, &post.Banner, &post.Title, &post.Body, &post.ViewCount, &post.CommentCount, &post.CreatedAt, &post.UpdatedAt, &author.UserID, &author.Email, &author.FirstName, &author.LastName, &author.Picture, &author.Phone, &author.AboutMe, &author.CreatedAt, &author.UpdatedAt)
 		if err != nil {
 			log.Println("[ERROR] GetFullPost -> error scanning row :", err)
 			return post, author, err
@@ -121,8 +149,7 @@ func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int64) (entity.B
 func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset int64, limit int64) (entity.BriefsBlogPost, error) {
 	var postList entity.BriefsBlogPost
 
-	query := SELECT_LIST_OF_POST + " ORDER BY b.created_at DESC LIMIT ?, ? "
-	rows, err := p.db.QueryContext(ctx, query, offset, limit)
+	rows, err := p.db.QueryContext(ctx, SELECT_LIST_OF_POST, offset, limit)
 	if err != nil {
 		log.Println("[ERROR] GetBriefsBlogPostData -> error on executing query :", err)
 		return postList, err
@@ -130,7 +157,7 @@ func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset in
 
 	for rows.Next() {
 		var post entity.BriefBlogPost
-		err = rows.Scan(&post.PostID, &post.Banner, &post.Title, &post.CreatedAt, &post.UpdatedAt, &post.Author)
+		err = rows.Scan(&post.PostID, &post.Banner, &post.Title, &post.Body, &post.ViewCount, &post.CommentCount, &post.CreatedAt, &post.UpdatedAt, &post.Author)
 		if err != nil {
 			log.Println("[ERROR] GetBriefsBlogPostData -> error scanning row :", err)
 			return postList, err
@@ -140,6 +167,54 @@ func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset in
 	}
 
 	return postList, nil
+}
+
+func (p PostRepositoryImpl) GetEditorsPick(ctx context.Context) (entity.BriefBlogPost, error) {
+	var post entity.BriefBlogPost
+
+	rows, err := p.db.QueryContext(ctx, SELECT_EDITOR_PICK)
+	if err != nil {
+		log.Println("[ERROR] GetEditorPick -> error on executing query :", err)
+		return post, err
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&post.PostID, &post.Banner, &post.Title, &post.Body, &post.ViewCount, &post.CommentCount, &post.CreatedAt, &post.UpdatedAt, &post.Author)
+		if err != nil {
+			log.Println("[ERROR] GetEditorPick -> error scanning row :", err)
+			return post, err
+		}
+
+		return post, nil
+	}
+
+	return post, errors.New("can't get editor pick post ")
+}
+
+func (p PostRepositoryImpl) GetTopCategoryPost(ctx context.Context) (entity.BriefsBlogPost, entity.Categories, error) {
+	var postList entity.BriefsBlogPost
+	var categoryList entity.Categories
+
+	rows, err := p.db.QueryContext(ctx, SELECT_POST_OF_LATEST_UPDATED_CATEGORY)
+	if err != nil {
+		log.Println("[ERROR] GetTopCategoryPost -> error on executing query :", err)
+		return postList, categoryList, err
+	}
+
+	for rows.Next() {
+		var post entity.BriefBlogPost
+		var category entity.Category
+		err = rows.Scan(&post.PostID, &post.Banner, &post.Title, &post.Body, &post.ViewCount, &post.CommentCount, &post.CreatedAt, &post.UpdatedAt, &post.Author, &category.CategoryID, &category.CategoryName)
+		if err != nil {
+			log.Println("[ERROR] GetTopCategoryPost -> error scanning row :", err)
+			return postList, categoryList, err
+		}
+
+		postList = append(postList, &post)
+		categoryList = append(categoryList, &category)
+	}
+
+	return postList, categoryList, nil
 }
 
 func (p PostRepositoryImpl) GetBriefsBlogPostFromSearch(ctx context.Context, q string, offset int64, limit int64, dateStart *time.Time, dateEnd *time.Time) (entity.BriefsBlogPost, error) {
@@ -172,7 +247,7 @@ func (p PostRepositoryImpl) GetBriefsBlogPostFromSearch(ctx context.Context, q s
 
 	for rows.Next() {
 		var post entity.BriefBlogPost
-		err = rows.Scan(&post.PostID, &post.Banner, &post.Title, &post.CreatedAt, &post.UpdatedAt, &post.Author)
+		err = rows.Scan(&post.PostID, &post.Banner, &post.Title, &post.Body, &post.ViewCount, &post.CommentCount, &post.CreatedAt, &post.UpdatedAt, &post.Author)
 		if err != nil {
 			log.Println("[ERROR] GetBriefsBlogPostFromSearch -> error scanning row :", err)
 			return postList, err
@@ -182,6 +257,66 @@ func (p PostRepositoryImpl) GetBriefsBlogPostFromSearch(ctx context.Context, q s
 	}
 
 	return postList, nil
+}
+
+func (p PostRepositoryImpl) CountSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time) (int64, error) {
+	var count int64
+	var query string
+	var args []interface{}
+
+	args = append(args, q)
+	query = COUNT_SEARCH_RESULT
+
+	if dateStart != nil && dateEnd != nil {
+		query = query + " AND b.created_at BETWEEN ? AND ?"
+		args = append(args, dateStart.Format("2006-01-02"), dateEnd.Format("2006-01-02"))
+	} else if dateStart != nil {
+		query = query + " AND b.created_at > ?"
+		args = append(args, dateStart.Format("2006-01-02"))
+	} else if dateEnd != nil {
+		query = query + " AND b.created_at < ?"
+		args = append(args, dateEnd.Format("2006-01-02"))
+	}
+
+	rows, err := p.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		log.Println("[ERROR] CountSearchResult -> error on executing query :", err)
+		return 0, err
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&count)
+		if err != nil {
+			log.Println("[ERROR] CountSearchResult -> error scanning row :", err)
+			return 0, err
+		}
+
+		return count, nil
+	}
+
+	return 0, errors.New("can't get count of post ")
+}
+
+func (p PostRepositoryImpl) CountListOfPost(ctx context.Context) (int64, error) {
+	var count int64
+
+	rows, err := p.db.QueryContext(ctx, COUNT_LIST_OF_POST)
+	if err != nil {
+		log.Println("[ERROR] CountListOfPost -> error on executing query :", err)
+		return 0, err
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&count)
+		if err != nil {
+			log.Println("[ERROR] CountListOfPost -> error scanning row :", err)
+			return 0, err
+		}
+
+		return count, nil
+	}
+
+	return 0, errors.New("can't get count of post ")
 }
 
 func (p PostRepositoryImpl) GetPostAuthorId(ctx context.Context, postID int64) (int64, error) {
@@ -275,4 +410,50 @@ func (p PostRepositoryImpl) AddPostCategoryAssoc(ctx context.Context, posdtId in
 	}
 
 	return nil
+}
+
+func (p PostRepositoryImpl) AddComment(ctx context.Context, comment entity.Comment) error {
+	result, err := p.db.ExecContext(ctx, INSERT_COMMENT, comment.PostID, comment.UserID, comment.CommentBody)
+	if err != nil {
+		log.Println("[ERROR] AddComment -> error inserting row :", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] AddComment -> error on getting rows affected :", err)
+		return err
+	}
+	if rowsAffected != 1 {
+		log.Println("[ERROR] AddComment -> error on updating row :", err)
+		return err
+	}
+
+	return nil
+}
+
+func (p PostRepositoryImpl) GetPostComments(ctx context.Context, id int64) (entity.Comments, entity.MiniUsersDetail, error) {
+	var comments entity.Comments
+	var users entity.MiniUsersDetail
+
+	rows, err := p.db.QueryContext(ctx, SELECT_COMMENTS, id)
+	if err != nil {
+		log.Println("[ERROR] GetPostComments -> error on executing query :", err)
+		return comments, users, err
+	}
+
+	for rows.Next() {
+		var comment entity.Comment
+		var user entity.MiniUserDetail
+		err = rows.Scan(&comment.CommentID, &comment.UserID, &comment.CommentBody, &comment.CreatedAt, &comment.UpdatedAt, &user.UserID, &user.FirstName, &user.LastName, &user.Picture)
+		if err != nil {
+			log.Println("[ERROR] GetPostComments -> error scanning row :", err)
+			return comments, users, err
+		}
+
+		comments = append(comments, &comment)
+		users = append(users, &user)
+	}
+
+	return comments, users, nil
 }
