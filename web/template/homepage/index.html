@@ -141,7 +141,7 @@
     <div class="container mb-5">
       <div class="d-flex align-items-center mb-2">
         <span class="h3 m-0">Latest</span>
-        <a href="/latest">
+        <a href="/post/latest">
           <span class="border-badge mx-2">More</span>
         </a>
       </div>
@@ -170,7 +170,7 @@
       {{range $key, $postsData := .Data.LatestCategories}}
       <div class="d-flex align-items-center mb-2">
         <span class="h3 m-0">Latest in <span class="text-capitalize">{{$key}}</span></span>
-        <a href="/latest/{{$key}}">
+        <a href="/post/category/{{$key}}">
           <span class="border-badge mx-2">More</span>
         </a>
       </div>
