@@ -115,6 +115,7 @@
       <div class="title-text">
         <span class="h1 gradient">Tech</span><span class="h1">Do</span><span class="h3">Blog</span>
       </div>
+      {{if ne .Data.EditorsPickCount 0}}
       <div class="post-entry d-block d-lg-flex">
         <div class="img-bg rounded" style="background-image: url('{{.Data.EditorsPick.Banner}}');">
         </div>
@@ -134,6 +135,7 @@
           </div>
         </div>
       </div>
+      {{end}}
     </div>
   </div>
 

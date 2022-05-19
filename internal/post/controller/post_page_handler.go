@@ -28,16 +28,21 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
+	editorsPickCount := 1
 	editorsPick, err := p.postService.GetEditorsPick(r.Context())
 	if err != nil {
 		if !strings.Contains(err.Error(), "can't get") {
 			panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 		}
+		editorsPickCount = 0
+		err = nil
 	}
+
 	token, isLoggedIn := utils.GetSessionToken(r)
 	data := map[string]interface{}{
 		"LoggedIn":         isLoggedIn,
 		"EditorsPick":      editorsPick,
+		"EditorsPickCount": editorsPickCount,
 		"LatestPosts":      latestPosts,
 		"LatestCategories": latestCategories,
 	}
