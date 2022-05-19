@@ -16,6 +16,7 @@ type MiniUserDetailResponse struct {
 
 type UserDetailResponse struct {
 	UserID    int64          `json:"uid"`
+	Username  string         `json:"username"`
 	Email     string         `json:"email"`
 	FirstName string         `json:"first_name"`
 	LastName  string         `json:"last_name"`
@@ -48,6 +49,7 @@ func NewMiniUserDetailDTO(user entity.MiniUserDetail) MiniUserDetailResponse {
 func NewUserDetailDTO(user entity.UserDetail) UserDetailResponse {
 	return UserDetailResponse{
 		UserID:    user.UserID,
+		Email:     user.Email,
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Picture:   user.Picture,

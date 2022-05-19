@@ -17,7 +17,7 @@ var (
 
 	UPDATE_USER_DETAIL = "UPDATE user_details SET email = ?, first_name = ?, last_name = ?, picture = ?, phone = ?, about_me = ? WHERE uid = ?"
 
-	SELECT_USER_DETAIL      = "SELECT uid, email, first_name, last_name, picture, phone, about_me, created_at, updated_at FROM user_details WHERE uid = ?"
+	SELECT_USER_DETAIL      = "SELECT d.uid, u.username, d.email, d.first_name, d.last_name, d.picture, d.phone, d.about_me, d.created_at, d.updated_at FROM user_details d JOIN users u ON d.uid = u.uid WHERE d.uid = ?"
 	SELECT_USER_MINI_DETAIL = "SELECT uid, first_name, last_name, picture FROM user_details WHERE uid = ?"
 
 	DELETE_USER = "DELETE FROM users WHERE uid = ?"
@@ -71,6 +71,7 @@ func (u UserRepositoryImpl) UpdateUserDetail(ctx context.Context, user entity.Us
 
 func (u UserRepositoryImpl) GetUserDetail(ctx context.Context, id int64) (entity.UserDetail, error) {
 	var user entity.UserDetail
+	var username string
 
 	rows, err := u.db.QueryContext(ctx, SELECT_USER_DETAIL, id)
 	if err != nil {
@@ -79,7 +80,7 @@ func (u UserRepositoryImpl) GetUserDetail(ctx context.Context, id int64) (entity
 	}
 
 	if rows.Next() {
-		err = rows.Scan(&user.UserID, &user.Email, &user.FirstName, &user.LastName, &user.Picture, &user.Phone, &user.AboutMe, &user.CreatedAt, &user.UpdatedAt)
+		err = rows.Scan(&user.UserID, &username, &user.Email, &user.FirstName, &user.LastName, &user.Picture, &user.Phone, &user.AboutMe, &user.CreatedAt, &user.UpdatedAt)
 		if err != nil {
 			log.Println("[ERROR] GetUserDetail -> error scanning row :", err)
 			return user, err

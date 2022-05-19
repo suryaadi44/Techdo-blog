@@ -24,6 +24,19 @@ func (u UserServiceImpl) GetUserMiniDetail(ctx context.Context, id int64) (dto.M
 	return userDetail, nil
 }
 
+func (u UserServiceImpl) GetUserDetail(ctx context.Context, id int64) (dto.UserDetailResponse, error) {
+	var userDetail dto.UserDetailResponse
+
+	user, err := u.Repository.GetUserDetail(ctx, id)
+	if err != nil {
+		log.Println("[ERROR] GetUserMiniDetail: Error geting user detail-> error:", err)
+		return userDetail, err
+	}
+
+	userDetail = dto.NewUserDetailDTO(user)
+	return userDetail, nil
+}
+
 func (u UserServiceImpl) UpdateUserDetail(ctx context.Context, user dto.UserDetailRequest) error {
 	userEntity := dto.NewUserDetailDAO(user)
 

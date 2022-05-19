@@ -59,13 +59,14 @@ func (u *UserhController) settingPageHandler(w http.ResponseWriter, r *http.Requ
 		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
 	}
 
-	user, err := u.userService.GetUserMiniDetail(r.Context(), session.UID)
+	user, err := u.userService.GetUserDetail(r.Context(), session.UID)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
 	}
 
 	data := map[string]interface{}{
-		"User": user,
+		"User":     user,
+		"Username": session.Username,
 	}
 
 	if err != nil {

@@ -12,6 +12,7 @@ type UserServiceApi interface {
 	UpdateUserDetail(ctx context.Context, user dto.UserDetailRequest) error
 
 	GetUserMiniDetail(ctx context.Context, id int64) (dto.MiniUserDetailResponse, error)
+	GetUserDetail(ctx context.Context, id int64) (dto.UserDetailResponse, error)
 
 	DeleteUser(ctx context.Context, id int64) error
 }
