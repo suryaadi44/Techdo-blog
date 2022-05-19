@@ -22,13 +22,13 @@ function makeEditProfileView (){
       <div class="user-profiles__details">
         <div class="form-outline mb-2">
           <label class="form-label" for="email-form">Email address</label>
-          <input class="form-control" id="email-form" type="text" value="alitdarmaputra@gmail.com"
+          <input class="form-control" id="email-form" type="text" value="email@techdo.com"
             aria-label="readonly input example" readonly>
         </div>
   
         <div class="form-outline mb-2">
           <label class="form-label" for="username-form">Username</label>
-          <input class="form-control" id="username-form" type="text" value="alitdarmaputra"
+          <input class="form-control" id="username-form" type="text" value="username"
             aria-label="readonly input example" readonly>
         </div>
   
