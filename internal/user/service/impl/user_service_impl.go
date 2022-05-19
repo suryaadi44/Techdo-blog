@@ -50,5 +50,5 @@ func (u UserServiceImpl) UpdateUserDetail(ctx context.Context, user dto.UserDeta
 }
 
 func (u UserServiceImpl) DeleteUser(ctx context.Context, id int64) error {
-	return u.DeleteUser(ctx, id)
+	return u.Repository.DeleteUser(ctx, id)
 }

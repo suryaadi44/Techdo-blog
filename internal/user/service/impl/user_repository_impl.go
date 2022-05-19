@@ -18,7 +18,7 @@ var (
 	UPDATE_USER_DETAIL = "UPDATE user_details SET email = ?, first_name = ?, last_name = ?, picture = ?, phone = ?, about_me = ? WHERE uid = ?"
 
 	SELECT_USER_DETAIL      = "SELECT d.uid, u.username, d.email, d.first_name, d.last_name, d.picture, d.phone, d.about_me, d.created_at, d.updated_at FROM user_details d JOIN users u ON d.uid = u.uid WHERE d.uid = ?"
-	SELECT_USER_MINI_DETAIL = "SELECT uid, first_name, last_name, picture FROM user_details WHERE uid = ?"
+	SELECT_USER_MINI_DETAIL = "SELECT d.uid, u.username, d.first_name, d.last_name, d.picture FROM user_details d JOIN users u ON d.uid = u.uid WHERE d.uid = ?"
 
 	DELETE_USER = "DELETE FROM users WHERE uid = ?"
 )
@@ -102,7 +102,7 @@ func (u UserRepositoryImpl) GetUserMiniDetail(ctx context.Context, id int64) (en
 	}
 
 	if rows.Next() {
-		err = rows.Scan(&user.UserID, &user.FirstName, &user.LastName, &user.Picture)
+		err = rows.Scan(&user.UserID, &user.Username, &user.FirstName, &user.LastName, &user.Picture)
 		if err != nil {
 			log.Println("[ERROR] GetUserMiniDetail -> error scanning row :", err)
 			return user, err

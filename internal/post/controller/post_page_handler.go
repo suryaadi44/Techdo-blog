@@ -30,7 +30,9 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 
 	editorsPick, err := p.postService.GetEditorsPick(r.Context())
 	if err != nil {
-		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+		if !strings.Contains(err.Error(), "can't get") {
+			panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+		}
 	}
 	token, isLoggedIn := utils.GetSessionToken(r)
 	data := map[string]interface{}{

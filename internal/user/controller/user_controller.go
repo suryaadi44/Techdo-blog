@@ -37,6 +37,7 @@ func (u *UserhController) InitializeController() {
 	//API
 	authRouter.HandleFunc("/user/detail", u.updateUserDetailHandler).Methods(http.MethodPost)
 	authRouter.HandleFunc("/user/detail", u.getUserDetailHandler).Methods(http.MethodGet)
+	authRouter.HandleFunc("/user/mini-detail", u.getUserMiniDetailHandler).Methods(http.MethodGet)
 	authRouter.HandleFunc("/user/delete", u.deleteUserHandler).Methods(http.MethodDelete)
 
 	// Page
@@ -107,6 +108,23 @@ func (u *UserhController) updateUserDetailHandler(w http.ResponseWriter, r *http
 }
 
 func (u *UserhController) getUserDetailHandler(w http.ResponseWriter, r *http.Request) {
+	token, _ := utils.GetSessionToken(r)
+	session, err := u.sessionService.GetSession(r.Context(), token)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	user, err := u.userService.GetUserDetail(r.Context(), session.UID)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	globalDTO.NewBaseResponse(http.StatusOK, false, user).SendResponse(&w)
+}
+
+func (u *UserhController) getUserMiniDetailHandler(w http.ResponseWriter, r *http.Request) {
 	token, _ := utils.GetSessionToken(r)
 	session, err := u.sessionService.GetSession(r.Context(), token)
 	if err != nil {
