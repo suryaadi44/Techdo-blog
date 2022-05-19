@@ -1,15 +1,22 @@
-function makeDeleteAccountView (){
-    return `
+function makeDeleteAccountView() {
+  return `
     <h1 class="fw-bold ms-5 mt-5 text-danger">Delete Account</h1>
     <div class="delete-account-container mx-5 mt-3 mb-lg-5">
     <p class="delete-msg">Once you delete your account, there is no going back. Please be certain.</p>
-    <div class="btn btn-danger">Delete Account</div>
+    <div class="btn btn-danger delete-acc-btn">Delete Account</div>
     </div>
+
+    <template id="my-template">
+      </swal-button>
+      <swal-button type="cancel">
+        Cancel
+      </swal-button>
+    </template>
     `
 }
 
-function makeEditProfileView (){
-    return `
+function makeEditProfileView() {
+  return `
     <h1 class="fw-bold ms-5 mt-5">Edit Profiles</h1>
     <div class="container-fluid pt-5 ps-5 pe-5 pb-5 user-profiles-container">
       <div class="user-profiles__img-container">
@@ -69,23 +76,59 @@ function makeEditProfileView (){
     `
 }
 
-function renderContent(content) {
-    const container = $(".setting-content");
-    container.html("");
-    container.html(content);
+function renderContent(content, thirdPartyContent = null) {
+  const container = $(".setting-content");
+  container.html("");
+  container.html(content);
+  container.append(thirdPartyContent);
 }
 
 const navBtn = {
-    editProfileNav: $(".edit-profile-nav"),
-    accountSettingNav: $(".account-setting-nav")
+  editProfileNav: $(".edit-profile-nav"),
+  accountSettingNav: $(".account-setting-nav")
 };
 
 navBtn.editProfileNav.on("click", () => {
-    renderContent(makeEditProfileView());
+  renderContent(makeEditProfileView());
 });
 
-navBtn.accountSettingNav.on("click", () => {
-    renderContent(makeDeleteAccountView());
+navBtn.accountSettingNav.on("click", async (e) => {
+  e.preventDefault();
+  renderContent(makeDeleteAccountView());
+  
+  const deleteAccBtn = $(".delete-acc-btn");
+
+  deleteAccBtn.on("click", async (e) => {
+    e.preventDefault();
+    const { value: confirmation } = await Swal.fire({
+      title: "Are you sure?",
+      icon: "warning",
+      html: '<p>This action cannot be undone. This will permanently delete your account, blog-post, and comments. Please type <b>techdoblog/namaakun</b> to confirm</p>',
+      input: "text",
+      confirmButtonText:"I understand the consequences. Delete this account",
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Confirmation rejected';
+        }
+
+        if (value != "techdoblog/namaakun") {
+          return 'Confirmation rejected';
+        }
+      }
+    });
+
+    if (confirmation === "techdoblog/namaakun") {
+      console.log(confirmation);
+      // Do delete account
+      Swal.fire({
+        title: 'Account Deleted',
+        icon: "success",
+        showConfirmButton: false,
+      }).then((result) => {
+          window.location.href = "/" //Location after deleted is success;
+      })
+    }
+  });
 });
 
 renderContent(makeEditProfileView());
