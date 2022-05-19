@@ -26,6 +26,7 @@ type UserDetail struct {
 
 type MiniUserDetail struct {
 	UserID    int64     `db:"uid"`
+	Username  string    `db:"username"`
 	FirstName string    `db:"first_name"`
 	LastName  string    `db:"last_name"`
 	Picture   string    `db:"picture"`

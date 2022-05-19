@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/suryaadi44/Techdo-blog/internal/auth/service/impl"
+	"github.com/suryaadi44/Techdo-blog/internal/user/service/impl"
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
 )
 

@@ -30,7 +30,9 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 
 	editorsPick, err := p.postService.GetEditorsPick(r.Context())
 	if err != nil {
-		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+		if !strings.Contains(err.Error(), "can't get") {
+			panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+		}
 	}
 	token, isLoggedIn := utils.GetSessionToken(r)
 	data := map[string]interface{}{
@@ -63,7 +65,7 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 }
 
 func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Request) {
-	var tmpl = template.Must(template.ParseFiles("web/template/search-blog/search-blog.html"))
+	var tmpl = template.Must(template.ParseFiles("web/template/post/search-post.html"))
 	var err error
 	var dateStart, dateEnd time.Time
 
@@ -158,7 +160,7 @@ func (p *PostController) searchPostPageHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (p *PostController) viewPostPageHandlder(w http.ResponseWriter, r *http.Request) {
-	var tmpl = template.Must(template.ParseFiles("web/template/blog-view/blog-view.html"))
+	var tmpl = template.Must(template.ParseFiles("web/template/post/post-view.html"))
 
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
@@ -231,7 +233,7 @@ func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (p *PostController) latestPostPageHandler(w http.ResponseWriter, r *http.Request) {
-	var tmpl = template.Must(template.ParseFiles("web/template/see-more/see-more.html"))
+	var tmpl = template.Must(template.ParseFiles("web/template/post/see-more.html"))
 	var err error
 
 	queryVar := r.URL.Query()
@@ -300,7 +302,7 @@ func (p *PostController) latestPostPageHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (p *PostController) postInCategoryPageHandler(w http.ResponseWriter, r *http.Request) {
-	var tmpl = template.Must(template.ParseFiles("web/template/see-more/see-more.html"))
+	var tmpl = template.Must(template.ParseFiles("web/template/post/see-more.html"))
 	var err error
 
 	queryVar := r.URL.Query()

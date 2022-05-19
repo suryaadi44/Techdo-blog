@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/suryaadi44/Techdo-blog/internal/auth/dto"
 	"github.com/suryaadi44/Techdo-blog/internal/global"
+	"github.com/suryaadi44/Techdo-blog/internal/user/dto"
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
 	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
