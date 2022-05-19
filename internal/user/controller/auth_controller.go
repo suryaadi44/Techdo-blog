@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/suryaadi44/Techdo-blog/internal/auth/dto"
-	"github.com/suryaadi44/Techdo-blog/internal/auth/service"
+	"github.com/suryaadi44/Techdo-blog/internal/user/dto"
+	"github.com/suryaadi44/Techdo-blog/internal/user/service"
 	globalDTO "github.com/suryaadi44/Techdo-blog/pkg/dto"
 )
 

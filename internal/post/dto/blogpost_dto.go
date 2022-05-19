@@ -11,7 +11,7 @@ import (
 
 type BlogPostResponse struct {
 	PostID       int64
-	Author       UserDto.UserDetail
+	Author       UserDto.UserDetailResponse
 	Categories   CategoryList
 	Banner       string
 	Title        string

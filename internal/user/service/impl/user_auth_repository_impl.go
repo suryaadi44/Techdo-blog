@@ -14,9 +14,10 @@ type UserAuthRepositoryImpl struct {
 }
 
 var (
-	INSERT_USER        = "INSERT INTO users(username, password) VALUE (?, ?)"
-	INSERT_USER_DETAIL = "INSERT INTO user_details(uid, email, first_name, last_name, picture) VALUE (?, ?, ?, ?, ?)"
-	FIND_USER          = "SELECT uid, username, password FROM users WHERE username = ?"
+	INSERT_USER                = "INSERT INTO users(username, password) VALUE (?, ?)"
+	INSERT_DEFAULT_USER_DETAIL = "INSERT INTO user_details(uid, email, first_name, last_name, picture) VALUE (?, ?, ?, ?, ?)"
+
+	FIND_USER = "SELECT uid, username, password FROM users WHERE username = ?"
 )
 
 func NewUserAuthRepository(db *sql.DB) UserAuthRepositoryImpl {
@@ -49,7 +50,7 @@ func (u UserAuthRepositoryImpl) NewUser(ctx context.Context, user entity.User, u
 		return err
 	}
 
-	result, err = u.db.ExecContext(ctx, INSERT_USER_DETAIL, lid, userDetail.Email, userDetail.FirstName, userDetail.LastName, userDetail.Picture)
+	result, err = u.db.ExecContext(ctx, INSERT_DEFAULT_USER_DETAIL, lid, userDetail.Email, userDetail.FirstName, userDetail.LastName, userDetail.Picture)
 	if err != nil {
 		log.Println("[ERROR] NewUser -> error on executing insert user details query :", err)
 		return err

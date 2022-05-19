@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	authServicePkg "github.com/suryaadi44/Techdo-blog/internal/auth/service"
 	middlewarePkg "github.com/suryaadi44/Techdo-blog/internal/middleware"
 	"github.com/suryaadi44/Techdo-blog/internal/post/service"
+	authServicePkg "github.com/suryaadi44/Techdo-blog/internal/user/service"
 	userServicePkg "github.com/suryaadi44/Techdo-blog/internal/user/service"
 )
 

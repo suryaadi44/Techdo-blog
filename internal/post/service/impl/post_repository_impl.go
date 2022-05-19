@@ -213,7 +213,7 @@ func (p PostRepositoryImpl) GetEditorsPick(ctx context.Context) (entity.BriefBlo
 		return post, nil
 	}
 
-	return post, errors.New("can't get editor pick post ")
+	return post, errors.New("can't get editor pick post")
 }
 
 func (p PostRepositoryImpl) GetTopCategoryPost(ctx context.Context) (entity.BriefsBlogPost, entity.Categories, error) {

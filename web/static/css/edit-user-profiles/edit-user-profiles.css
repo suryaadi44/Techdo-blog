@@ -1,0 +1,29 @@
+@import url("../others/custom-font.css");
+/* Navbar CSS */
+@import url("../others/navbar.css");
+
+.user-profiles-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.user-profiles__img-container {
+    padding: 0 50px 50px 50px;
+}
+.user-profiles__img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background-size: cover;
+}
+
+.user-profiles__details {
+    flex-grow: 1;
+}
+
+.edit-profile-nav:hover, .account-setting-nav:hover {
+    background-image: linear-gradient( 83.2deg, rgba(150,93,233,1) 10.8%, rgba(99,88,238,1) 94.3% );
+    color: #fff;
+    cursor: pointer;
+}
