@@ -52,6 +52,7 @@ func (p *PostController) postDashboardPageHandler(w http.ResponseWriter, r *http
 		if err != nil {
 			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
 		}
+
 		user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
 		if err != nil {
 			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))

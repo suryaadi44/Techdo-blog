@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"log"
 
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
@@ -62,7 +63,7 @@ func (u SessionRepositoryImpl) GetSession(ctx context.Context, token string) (en
 		return user, nil
 	}
 
-	return entity.SessionDetail{}, err
+	return entity.SessionDetail{}, errors.New("no session")
 }
 
 func (u SessionRepositoryImpl) DeleteSession(ctx context.Context, token string) error {

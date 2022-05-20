@@ -7,12 +7,12 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/suryaadi44/Techdo-blog/internal/user/dto"
 	"github.com/suryaadi44/Techdo-blog/internal/user/service"
 	globalDTO "github.com/suryaadi44/Techdo-blog/pkg/dto"
+	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 
 type UserAuthController struct {
@@ -126,11 +126,7 @@ func (u *UserAuthController) logOutHandler(w http.ResponseWriter, r *http.Reques
 		u.sessionService.DeleteSession(r.Context(), storedCookie.Value)
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		MaxAge:  -1,
-		Expires: time.Unix(0, 0),
-	})
+	utils.DeleteSessionCookie(&w)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

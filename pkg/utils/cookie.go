@@ -1,6 +1,9 @@
 package utils
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
 
 func GetSessionToken(r *http.Request) (string, bool) {
 	loggedIn := true
@@ -13,4 +16,12 @@ func GetSessionToken(r *http.Request) (string, bool) {
 	}
 
 	return c.Value, loggedIn
+}
+
+func DeleteSessionCookie(w *http.ResponseWriter) {
+	http.SetCookie(*w, &http.Cookie{
+		Name:    "session_token",
+		MaxAge:  -1,
+		Expires: time.Unix(0, 0),
+	})
 }

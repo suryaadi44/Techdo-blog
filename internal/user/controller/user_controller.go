@@ -155,5 +155,6 @@ func (u *UserhController) deleteUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	utils.DeleteSessionCookie(&w)
 	globalDTO.NewBaseResponse(http.StatusOK, false, nil).SendResponse(&w)
 }

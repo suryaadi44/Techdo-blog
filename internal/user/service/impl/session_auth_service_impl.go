@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"log"
 
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
 )
@@ -15,7 +16,13 @@ func (s SessionServiceImpl) NewSession(ctx context.Context, user entity.Session)
 }
 
 func (s SessionServiceImpl) GetSession(ctx context.Context, token string) (entity.SessionDetail, error) {
-	return s.Repository.GetSession(ctx, token)
+	session, err := s.Repository.GetSession(ctx, token)
+	if err != nil {
+		log.Println("[Session] GetSession error on getting session", err.Error())
+		return session, err
+	}
+
+	return session, nil
 }
 
 func (s SessionServiceImpl) DeleteSession(ctx context.Context, token string) error {
