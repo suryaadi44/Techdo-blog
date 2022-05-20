@@ -22,7 +22,8 @@
   <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
   <!-- Sweet Alert -->
   <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="sweetalert2.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.14/dist/sweetalert2.all.min.js"
+    integrity="sha256-SlWNZPkXxEDQLgOBLlO07HAeNx6ThxLZ+pqQ+VGUEuU=" crossorigin="anonymous"></script>
   <title>Techdo</title>
 </head>
 
@@ -89,11 +90,11 @@
             <h1 class="fw-bold ms-5 mt-5">Edit Profiles</h1>
             <div class="container-fluid pt-5 ps-5 pe-5 pb-5 user-profiles-container">
               <div class="user-profiles__img-container">
-                <div class="user-profiles__img"
-                  style="background-image: url('{{.Data.User.Picture}}');"></div>
+                <div class="user-profiles__img" style="background-image: url('{{.Data.User.Picture}}');"></div>
                 <div class="mb-3 mt-4">
                   <label for="banner" class="form-label">Profile Image</label>
-                  <input class="form-control" type="file" id="banner" name="banner" required>
+                  <input class="form-control" type="file" id="profile-pic" name="profile-pic" accept="image/*" required>
+                  <button type="submit" id="submit-picture" class="btn btn-success mt-3">Upload</button>
                 </div>
               </div>
 
@@ -115,14 +116,14 @@
                   <div class="row">
                     <div class="col">
                       <label class="form-label" for="first-name-form">First name</label>
-                      <input type="text" id="first-name-form" class="form-control" placeholder="First name" value="{{.Data.User.FirstName}}"
-                        aria-label="First name">
+                      <input type="text" id="first-name-form" class="form-control" placeholder="First name"
+                        value="{{.Data.User.FirstName}}" aria-label="First name">
                       <span class="first-name-alert alert" style="font-size: .9em;"></span>
                     </div>
                     <div class="col">
                       <label class="form-label" for="last-name-form">Last name</label>
-                      <input type="text" id="last-name-form" class="form-control" placeholder="Last name" value="{{.Data.User.LastName}}"
-                        aria-label="Last name">
+                      <input type="text" id="last-name-form" class="form-control" placeholder="Last name"
+                        value="{{.Data.User.LastName}}" aria-label="Last name">
                       <span class="last-name-alert alert" style="font-size: .9em;"></span>
                     </div>
                   </div>
@@ -136,13 +137,12 @@
                 <div class="form-outline mb-2">
                   <div class="row">
                     <label class="form-label" for="about-form">About</label>
-                    <textarea name="" id="about-form " cols="10" rows="10" value="{{.Data.User.AboutMe}}"></textarea>
+                    <textarea name="" id="about-form" cols="10" rows="10">{{.Data.User.AboutMe.String}}</textarea>
                   </div>
                 </div>
 
                 <div class="button-container d-flex flex-row-reverse">
-                  <button type="submit" class="btn btn-success">Save</button>
-                  <button type="submit" class="btn btn-danger me-2">Discard</button>
+                  <button type="submit" id="submit-btn" class="btn btn-success">Save</button>
                 </div>
               </div>
             </div>

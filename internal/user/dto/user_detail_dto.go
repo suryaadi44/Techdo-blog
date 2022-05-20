@@ -29,10 +29,8 @@ type UserDetailResponse struct {
 
 type UserDetailRequest struct {
 	UserID    int64  `json:"uid"`
-	Email     string `json:"email"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
-	Picture   string `json:"picture"`
 	Phone     string `json:"phone"`
 	AboutMe   string `json:"about_me"`
 }
@@ -64,10 +62,8 @@ func NewUserDetailDTO(user entity.UserDetail) UserDetailResponse {
 func NewUserDetailDAO(user UserDetailRequest) entity.UserDetail {
 	return entity.UserDetail{
 		UserID:    user.UserID,
-		Email:     user.Email,
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
-		Picture:   user.Picture,
 		Phone:     user.Phone,
 		AboutMe: dto.NullString{
 			String: user.AboutMe,

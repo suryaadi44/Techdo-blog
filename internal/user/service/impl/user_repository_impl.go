@@ -15,7 +15,8 @@ type UserRepositoryImpl struct {
 var (
 	INSERT_USER_DETAIL = "INSERT INTO user_details(uid, email, first_name, last_name, picture, phone, about_me) VALUE (?, ?, ?, ?, ?, ?, ?)"
 
-	UPDATE_USER_DETAIL = "UPDATE user_details SET email = ?, first_name = ?, last_name = ?, picture = ?, phone = ?, about_me = ? WHERE uid = ?"
+	UPDATE_USER_DETAIL  = "UPDATE user_details SET first_name = ?, last_name = ?, phone = ?, about_me = ? WHERE uid = ?"
+	UPDATE_USER_PICTURE = "UPDATE user_details SET picture = ? WHERE uid = ?"
 
 	SELECT_USER_DETAIL      = "SELECT d.uid, u.username, d.email, d.first_name, d.last_name, d.picture, d.phone, d.about_me, d.created_at, d.updated_at FROM user_details d JOIN users u ON d.uid = u.uid WHERE d.uid = ?"
 	SELECT_USER_MINI_DETAIL = "SELECT d.uid, u.username, d.first_name, d.last_name, d.picture FROM user_details d JOIN users u ON d.uid = u.uid WHERE d.uid = ?"
@@ -42,7 +43,7 @@ func (u UserRepositoryImpl) DeleteUser(ctx context.Context, id int64) error {
 		return err
 	}
 	if rows != 1 {
-		log.Println("[ERROR] DeletUser -> error on inserting row :", err)
+		log.Println("[ERROR] DeletUser -> error on deleting row :", err)
 		return err
 	}
 
@@ -50,7 +51,7 @@ func (u UserRepositoryImpl) DeleteUser(ctx context.Context, id int64) error {
 }
 
 func (u UserRepositoryImpl) UpdateUserDetail(ctx context.Context, user entity.UserDetail) error {
-	result, err := u.db.ExecContext(ctx, UPDATE_USER_DETAIL, user.Email, user.FirstName, user.LastName, user.Picture, user.Phone, user.AboutMe, user.UserID)
+	result, err := u.db.ExecContext(ctx, UPDATE_USER_DETAIL, user.FirstName, user.LastName, user.Phone, user.AboutMe.String, user.UserID)
 	if err != nil {
 		log.Println("[ERROR] UpdateUserDetail -> error on executing query :", err)
 		return err
@@ -62,7 +63,26 @@ func (u UserRepositoryImpl) UpdateUserDetail(ctx context.Context, user entity.Us
 		return err
 	}
 	if rows != 1 {
-		log.Println("[ERROR] UpdateUserDetail -> error on inserting row :", err)
+		log.Println("[ERROR] UpdateUserDetail -> error on updating row :", err)
+		return err
+	}
+
+	return nil
+}
+func (u UserRepositoryImpl) UpdateUserPicture(ctx context.Context, url string, id int64) error {
+	result, err := u.db.ExecContext(ctx, UPDATE_USER_PICTURE, url, id)
+	if err != nil {
+		log.Println("[ERROR] UpdateUserPicture -> error on executing query :", err)
+		return err
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] UpdateUserPicture -> error on getting rows affected :", err)
+		return err
+	}
+	if rows != 1 {
+		log.Println("[ERROR] UpdateUserPicture -> error on updating row :", err)
 		return err
 	}
 
