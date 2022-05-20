@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"log"
 
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
@@ -18,8 +19,9 @@ var (
 	UPDATE_USER_DETAIL  = "UPDATE user_details SET first_name = ?, last_name = ?, phone = ?, about_me = ? WHERE uid = ?"
 	UPDATE_USER_PICTURE = "UPDATE user_details SET picture = ? WHERE uid = ?"
 
-	SELECT_USER_DETAIL      = "SELECT d.uid, u.username, d.email, d.first_name, d.last_name, d.picture, d.phone, d.about_me, d.created_at, d.updated_at FROM user_details d JOIN users u ON d.uid = u.uid WHERE d.uid = ?"
-	SELECT_USER_MINI_DETAIL = "SELECT d.uid, u.username, d.first_name, d.last_name, d.picture FROM user_details d JOIN users u ON d.uid = u.uid WHERE d.uid = ?"
+	SELECT_USER_DETAIL          = "SELECT d.uid, u.username, d.email, d.first_name, d.last_name, d.picture, d.phone, d.about_me, d.created_at, d.updated_at FROM user_details d JOIN users u ON d.uid = u.uid WHERE d.uid = ?"
+	SELECT_USER_MINI_DETAIL     = "SELECT d.uid, u.username, d.first_name, d.last_name, d.picture FROM user_details d JOIN users u ON d.uid = u.uid WHERE d.uid = ?"
+	SELECT_USER_PICTURE_PROFILE = "SELECT picture FROM user_details WHERE uid = ?"
 
 	DELETE_USER = "DELETE FROM users WHERE uid = ?"
 )
@@ -109,7 +111,7 @@ func (u UserRepositoryImpl) GetUserDetail(ctx context.Context, id int64) (entity
 		return user, nil
 	}
 
-	return user, err
+	return user, errors.New("can't get user detail")
 }
 
 func (u UserRepositoryImpl) GetUserMiniDetail(ctx context.Context, id int64) (entity.MiniUserDetail, error) {
@@ -131,5 +133,26 @@ func (u UserRepositoryImpl) GetUserMiniDetail(ctx context.Context, id int64) (en
 		return user, nil
 	}
 
-	return user, err
+	return user, errors.New("can't get user mini detail")
+}
+
+func (u UserRepositoryImpl) GetUserPictureID(ctx context.Context, id int64) (string, error) {
+	rows, err := u.db.QueryContext(ctx, SELECT_USER_PICTURE_PROFILE, id)
+	if err != nil {
+		log.Println("[ERROR] GetUserPictureID -> error on executing query :", err)
+		return "", err
+	}
+
+	if rows.Next() {
+		var id string
+		err = rows.Scan(&id)
+		if err != nil {
+			log.Println("[ERROR] GetUserPictureID -> error scanning row :", err)
+			return "", err
+		}
+
+		return id, nil
+	}
+
+	return "", errors.New("can't get user picture")
 }
