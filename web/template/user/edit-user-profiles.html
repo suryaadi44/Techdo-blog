@@ -92,7 +92,8 @@
                 <div class="user-profiles__img" style="background-image: url('{{.Data.User.Picture}}');"></div>
                 <div class="mb-3 mt-4">
                   <label for="banner" class="form-label">Profile Image</label>
-                  <input class="form-control" type="file" id="profile-pic" name="profile-pic" required>
+                  <input class="form-control" type="file" id="profile-pic" name="profile-pic" accept="image/*" required>
+                  <button type="submit" id="submit-picture" class="btn btn-success mt-3">Upload</button>
                 </div>
               </div>
 

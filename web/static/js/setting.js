@@ -49,19 +49,17 @@ navBtn.editProfileNav.on("click", () => {
   $(".account-settings").hide();
 
   const form = {
-    profile: $("#profile-pic"),
+    profile: document.querySelector("#profile-pic"),
     firstName: $("#first-name-form"),
     lastName: $("#last-name-form"),
     phone: $("#phone-form"),
     aboutMe: $("#about-form"),
     submit: $("#submit-btn"),
+    submitPicture: $("#submit-picture"),
   };
 
   form.submit.on("click", async (e) => {
     e.preventDefault();
-
-    console.log(form.value)
-
     try {
       let res = await fetch("/user/detail", {
         method: 'POST',
@@ -79,7 +77,9 @@ navBtn.editProfileNav.on("click", () => {
         Swal.fire({
           title: 'Account Updated',
           icon: "success",
-        })
+        }).then(function () {
+          location.reload()
+        });
       } else {
         Swal.fire({
           title: 'Error',
@@ -88,7 +88,6 @@ navBtn.editProfileNav.on("click", () => {
           showConfirmButton: true,
         });
       }
-
 
     } catch (error) {
       Swal.fire({
@@ -99,7 +98,45 @@ navBtn.editProfileNav.on("click", () => {
       });
     }
   });
+  
 
+  form.submitPicture.on("click", async (e) => {
+    const formData = new FormData();
+
+    formData.append('profile-pic', form.profile.files[0]);
+    try {
+      let res = await fetch("/user/detail/picture", {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+      let response = await res.json();
+
+      if (!response.error) {
+        Swal.fire({
+          title: 'Picture Updated',
+          icon: "success",
+        }).then(function () {
+          location.reload()
+        });
+      } else {
+        Swal.fire({
+          title: 'Error',
+          icon: "error",
+          text: response.data,
+          showConfirmButton: true,
+        });
+      }
+
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        icon: "error",
+        text: error,
+        showConfirmButton: true,
+      });
+    }
+  });
 });
 
 navBtn.accountSettingNav.on("click", async (e) => {

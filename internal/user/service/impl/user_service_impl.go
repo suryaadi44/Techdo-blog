@@ -2,9 +2,12 @@ package impl
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"regexp"
 
 	"github.com/suryaadi44/Techdo-blog/internal/user/dto"
+	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 
 type UserServiceImpl struct {
@@ -43,6 +46,26 @@ func (u UserServiceImpl) UpdateUserDetail(ctx context.Context, user dto.UserDeta
 	err := u.Repository.UpdateUserDetail(ctx, userEntity)
 	if err != nil {
 		log.Println("[ERROR] UpdateUserDetail: Error updating user detail-> error:", err)
+		return err
+	}
+
+	return nil
+}
+
+func (u UserServiceImpl) UpdateUserPicture(ctx context.Context, picture []byte, tempName string, id int64) error {
+	r := regexp.MustCompile(`\.(\w*)$`)
+	extension := r.FindString(tempName)
+	fileName := fmt.Sprintf("%d%s", id, extension)
+
+	response, err := utils.UploadImage(ctx, fileName, picture, "/user")
+	if err != nil {
+		log.Println("[ERROR] UpdateUserPicture: Error on uploading file-> error:", err)
+		return err
+	}
+
+	err = u.Repository.UpdateUserPicture(ctx, response.URL, id)
+	if err != nil {
+		log.Println("[ERROR] UpdateUserPicture: Error updating user detail-> error:", err)
 		return err
 	}
 

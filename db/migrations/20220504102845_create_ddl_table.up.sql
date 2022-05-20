@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS user_details(
     email VARCHAR(25) NOT NULL,
     first_name VARCHAR(20) NOT NULL,
     last_name VARCHAR(20) NOT NULL,
-    picture VARCHAR(50) NOT NULL,
+    picture VARCHAR(100) NOT NULL,
     phone VARCHAR(15) DEFAULT "",
     about_me TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

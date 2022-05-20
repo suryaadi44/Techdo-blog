@@ -10,6 +10,7 @@ import (
 
 type UserServiceApi interface {
 	UpdateUserDetail(ctx context.Context, user dto.UserDetailRequest) error
+	UpdateUserPicture(ctx context.Context, picture []byte, Filename string, id int64) error
 
 	GetUserMiniDetail(ctx context.Context, id int64) (dto.MiniUserDetailResponse, error)
 	GetUserDetail(ctx context.Context, id int64) (dto.UserDetailResponse, error)
