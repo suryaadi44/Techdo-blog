@@ -93,10 +93,7 @@ func (u *UserhController) updateUserDetailHandler(w http.ResponseWriter, r *http
 		return
 	}
 
-	if payload.UserID != session.UID {
-		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
-		return
-	}
+	payload.UserID = session.UID
 
 	err = u.userService.UpdateUserDetail(r.Context(), payload)
 	if err != nil {

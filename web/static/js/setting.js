@@ -1,5 +1,10 @@
+const navBtn = {
+  editProfileNav: $(".edit-profile-nav"),
+  accountSettingNav: $(".account-setting-nav")
+};
+
 async function getUserMiniDetail() {
-  try{
+  try {
     let res = await fetch("/user/mini-detail", {
       method: 'GET',
       credentials: 'include'
@@ -15,7 +20,7 @@ async function getUserMiniDetail() {
   }
 }
 
-async function deleteAccount(){
+async function deleteAccount() {
   try {
     let res = await fetch("/user/delete", {
       method: 'DELETE',
@@ -30,7 +35,6 @@ async function deleteAccount(){
       showConfirmButton: true,
     });
   }
-
 }
 
 function renderContent(content, thirdPartyContent = null) {
@@ -40,14 +44,62 @@ function renderContent(content, thirdPartyContent = null) {
   container.append(thirdPartyContent);
 }
 
-const navBtn = {
-  editProfileNav: $(".edit-profile-nav"),
-  accountSettingNav: $(".account-setting-nav")
-};
-
 navBtn.editProfileNav.on("click", () => {
   $(".edit-profile").show();
   $(".account-settings").hide();
+
+  const form = {
+    profile: $("#profile-pic"),
+    firstName: $("#first-name-form"),
+    lastName: $("#last-name-form"),
+    phone: $("#phone-form"),
+    aboutMe: $("#about-form"),
+    submit: $("#submit-btn"),
+  };
+
+  form.submit.on("click", async (e) => {
+    e.preventDefault();
+
+    console.log(form.value)
+
+    try {
+      let res = await fetch("/user/detail", {
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify({
+          first_name: form.firstName.val(),
+          last_name: form.lastName.val(),
+          phone: form.phone.val(),
+          about_me: form.aboutMe.val(),
+        }),
+      });
+      let response = await res.json();
+
+      if (!response.error) {
+        Swal.fire({
+          title: 'Account Updated',
+          icon: "success",
+        })
+      } else {
+        Swal.fire({
+          title: 'Error',
+          icon: "error",
+          text: response.data,
+          showConfirmButton: true,
+        });
+      }
+
+
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        icon: "error",
+        text: error,
+        showConfirmButton: true,
+      });
+    }
+  });
+
 });
 
 navBtn.accountSettingNav.on("click", async (e) => {
@@ -81,7 +133,7 @@ navBtn.accountSettingNav.on("click", async (e) => {
     if (confirmation === "techdoblog/" + user.data.username) {
       // Do delete account
       let result = await deleteAccount()
-      
+
       if (!result.error) {
         Swal.fire({
           title: 'Account Deleted',
@@ -90,7 +142,7 @@ navBtn.accountSettingNav.on("click", async (e) => {
         }).then(() => {
           window.location.href = "/" //Location after deleted is success;
         })
-      } else{
+      } else {
         Swal.fire({
           title: 'Error',
           icon: "error",
@@ -102,5 +154,4 @@ navBtn.accountSettingNav.on("click", async (e) => {
   });
 });
 
-$(".edit-profile").show();
-$(".account-settings").hide();
+navBtn.editProfileNav.click()
