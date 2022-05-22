@@ -36,9 +36,9 @@
         <a href="/" class="navbar__logo col">
           <img src="/static/img/logo 2.svg" class="dark-logo">
           <img src="/static/img/logo 1.svg" class="white-logo hide">
-          <spam class="align-middle text-logo">
+          <span class="align-middle text-logo">
             <span class="half-logo gradient">Tech</span><span>Do</span>
-          </spam>
+          </span>
         </a>
         <form class="navbar__search-box-container justify-content-start" method="get" action="/search">
           <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search"
@@ -62,53 +62,54 @@
         <i class="fa-solid fa-user"></i>
       </button>
     </div>
+
+    <!-- User-Profile Nav -->
+    {{if .Data.LoggedIn}}
+    <div class="card user-nav" style="width: 18rem">
+      <div class="card-body">
+        <ul>
+          <li>
+            <a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a>
+          </li>
+          <hr />
+          <li><a href="/">Dashboard</a></li>
+          <li><a href="/post/create">Create Post</a></li>
+          <li><a href="/user/settings">Settings</a></li>
+          <hr />
+          <li><a href="/logout">Sign Out</a></li>
+        </ul>
+      </div>
+    </div>
+  
+    <div class="card auth-nav" style="width: 18rem">
+      <div class="card-body">
+        <ul>
+          <li>
+            <a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a>
+          </li>
+          <hr />
+          <li><a href="/">Dashboard</a></li>
+          <li><a href="/post/create">Create Post</a></li>
+          <li><a href="/user/settings">Settings</a></li>
+          <hr />
+          <li><a href="/logout">Sign Out</a></li>
+        </ul>
+      </div>
+    </div>
+    {{else}}
+  
+    <!-- Auth Nav Menu -->
+    <div class="card auth-nav" style="width: 18rem">
+      <div class="card-body">
+        <ul>
+          <li><a href="/login">Login</a></li>
+          <li><a href="/signup">Create Account</a></li>
+        </ul>
+      </div>
+    </div>
+    {{end}}
   </nav>
 
-  <!-- User-Profile Nav -->
-  {{if .Data.LoggedIn}}
-  <div class="card user-nav" style="width: 18rem">
-    <div class="card-body">
-      <ul>
-        <li>
-          <a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a>
-        </li>
-        <hr />
-        <li><a href="/">Dashboard</a></li>
-        <li><a href="/post/create">Create Post</a></li>
-        <li><a href="/user/settings">Settings</a></li>
-        <hr />
-        <li><a href="/logout">Sign Out</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="card auth-nav" style="width: 18rem">
-    <div class="card-body">
-      <ul>
-        <li>
-          <a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a>
-        </li>
-        <hr />
-        <li><a href="/">Dashboard</a></li>
-        <li><a href="/post/create">Create Post</a></li>
-        <li><a href="/user/settings">Settings</a></li>
-        <hr />
-        <li><a href="/logout">Sign Out</a></li>
-      </ul>
-    </div>
-  </div>
-  {{else}}
-
-  <!-- Auth Nav Menu -->
-  <div class="card auth-nav" style="width: 18rem">
-    <div class="card-body">
-      <ul>
-        <li><a href="/login">Login</a></li>
-        <li><a href="/signup">Create Account</a></li>
-      </ul>
-    </div>
-  </div>
-  {{end}}
 
   <!-- Index Body -->
   <div class="py-0 hero-section">

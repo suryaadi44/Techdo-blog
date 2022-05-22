@@ -29,19 +29,19 @@
 
 <body>
   <!-- Navbar -->
-  <nav class="navbar ps-2 pe-2">
+  <nav class="navbar sticky-top ps-2 pe-2">
     <div class="container-fluid">
       <div class="left-nav justify-content-start col-6">
         <a href="/" class="navbar__logo col">
-          <img src="/static/img/logo 1.svg" class="white-logo hide">
-          <spam class="align-middle text-logo">
+          <img src="/static/img/logo 1.svg" class="white-logo">
+          <span class="align-middle text-logo">
             <span class="half-logo gradient">Tech</span><span>Do</span>
-          </spam>
+          </span>
         </a>
 
         <form class="navbar__search-box-container justify-content-start" method="get" action="/search">
-          <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search" id="search-box"
-            name="q">
+          <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search"
+            id="search-box" name="q">
           <button class="navbar__search-button" type="submit">
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>
@@ -60,48 +60,49 @@
       </div>
       <button href="" class="navbar__auth-nav-btn"><i class="fa-solid fa-user"></i></button>
     </div>
+
+    {{if .Data.LoggedIn}}
+    <!-- User-Profile Nav -->
+    <div class="card user-nav" style="width: 18rem;">
+      <div class="card-body">
+        <ul>
+          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+          <hr>
+          <li><a href="/">Dashboard</a></li>
+          <li><a href="/post/create">Create Post</a></li>
+          <li><a href="/user/settings">Settings</a></li>
+          <hr>
+          <li><a href="/logout">Sign Out</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card auth-nav" style="width: 18rem;">
+      <div class="card-body">
+        <ul>
+          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+          <hr>
+          <li><a href="/">Dashboard</a></li>
+          <li><a href="/post/create">Create Post</a></li>
+          <li><a href="/user/settings">Settings</a></li>
+          <hr>
+          <li><a href="/logout">Sign Out</a></li>
+        </ul>
+      </div>
+    </div>
+    {{else}}
+    <!-- Auth Nav Menu -->
+    <div class="card auth-nav" style="width: 18rem;">
+      <div class="card-body">
+        <ul>
+          <li><a href="/login">Login</a></li>
+          <li><a href="/signup">Create Account</a></li>
+        </ul>
+      </div>
+    </div>
+    {{end}}
   </nav>
 
-  {{if .Data.LoggedIn}}
-  <!-- User-Profile Nav -->
-  <div class="card user-nav" style="width: 18rem;">
-    <div class="card-body">
-      <ul>
-        <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
-        <hr>
-        <li><a href="/">Dashboard</a></li>
-        <li><a href="/post/create">Create Post</a></li>
-        <li><a href="/user/settings">Settings</a></li>
-        <hr>
-        <li><a href="/logout">Sign Out</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="card auth-nav" style="width: 18rem;">
-    <div class="card-body">
-      <ul>
-        <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
-        <hr>
-        <li><a href="/">Dashboard</a></li>
-        <li><a href="/post/create">Create Post</a></li>
-        <li><a href="/user/settings">Settings</a></li>
-        <hr>
-        <li><a href="/logout">Sign Out</a></li>
-      </ul>
-    </div>
-  </div>
-  {{else}}
-  <!-- Auth Nav Menu -->
-  <div class="card auth-nav" style="width: 18rem;">
-    <div class="card-body">
-      <ul>
-        <li><a href="/login">Login</a></li>
-        <li><a href="/signup">Create Account</a></li>
-      </ul>
-    </div>
-  </div>
-  {{end}}
 
   <!-- Search Body -->
   {{$post := len .Data.Posts}}
@@ -232,11 +233,11 @@
     let end = '';
     let categories = '';
 
-    if(qParam){
+    if (qParam) {
       document.querySelector("#search-box").value = qParam;
     }
 
-    if (categoriesParam){
+    if (categoriesParam) {
       categories = categoriesParam
       document.querySelector("#blog-category-filter").value = categories;
     }
@@ -288,12 +289,12 @@
       end = document.querySelector("#blog-end-date-filter").value;
       setEnd();
     });
-    
+
     document.querySelector("#blog-category-filter").addEventListener("change", (e) => {
       categories = document.querySelector("#blog-category-filter").value;
       setCategories();
     });
-    
+
     function goPage() {
       url.searchParams.set('page', page);
       window.location.href = url;
