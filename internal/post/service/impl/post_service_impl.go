@@ -92,6 +92,12 @@ func (p PostServiceImpl) GetFullPost(ctx context.Context, id int64) (dto.BlogPos
 		return postDto, err
 	}
 
+	author.Picture, err = utils.GetPictureUrl(ctx, author.Picture)
+	if err != nil {
+		log.Println("[ERROR] Error geting user picture url-> error:", err)
+		return postDto, err
+	}
+
 	categories, err := p.Repository.GetCategoriesFromID(ctx, id)
 	if err != nil {
 		log.Println("[ERROR] Fetching categories for post with id", id, "-> error:", err)
