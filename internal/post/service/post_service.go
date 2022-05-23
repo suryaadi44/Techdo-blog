@@ -11,7 +11,8 @@ import (
 )
 
 type PostServiceApi interface {
-	SearchBlogPost(ctx context.Context, q string, page int64, limit int64, dateStart *time.Time, dateEnd *time.Time) (dto.BriefsBlogPostResponse, error)
+	IncreaseView(ctx context.Context, id int64) error
+	SearchBlogPost(ctx context.Context, q string, page int64, limit int64, dateStart *time.Time, dateEnd *time.Time, category string) (dto.BriefsBlogPostResponse, error)
 
 	AddPost(ctx context.Context, post dto.BlogPostRequest, authorID int64) (int64, error)
 	AddComment(ctx context.Context, comment dto.CommentRequest) error
@@ -19,10 +20,15 @@ type PostServiceApi interface {
 	DeletePost(ctx context.Context, id int64) error
 
 	GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error)
+	GetTopCategoryPost(ctx context.Context) (dto.TopCategoriesWithPost, error)
 	GetBriefsBlogPost(ctx context.Context, page int64, limit int64) (dto.BriefsBlogPostResponse, error)
-	GetCountListOfPost(ctx context.Context) (int64, error)
+	GetBriefsBlogPostOfCategories(ctx context.Context, categories string, page int64, limit int64) (dto.BriefsBlogPostResponse, error)
+	GetEditorsPick(ctx context.Context) (dto.BriefBlogPostResponse, error)
 	GetPostAuthorIdFromId(ctx context.Context, postId int64) (int64, error)
-	GetCountOfSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time) (int64, error)
+
+	GetCountListOfPost(ctx context.Context) (int64, error)
+	GetCountOfSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time, category string) (int64, error)
+	GetCountListOfPostInCategories(ctx context.Context, categories string) (int64, error)
 
 	GetCategoriesFromID(ctx context.Context, id int64) (dto.CategoryList, error)
 	GetCategoryList(ctx context.Context) (dto.CategoryList, error)

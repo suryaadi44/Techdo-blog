@@ -4,15 +4,22 @@
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
 }
 
-.navbar a.navbar__logo{
-    color: #fff;
-    font-family: 'arcade-classic', monospace;
-    font-size: 2em;
-    text-decoration: none;
-    white-space: nowrap;
-    line-height: normal;
-    width: 33%;
+
+.navbar__logo img {
+	width: 40px;
+	height: 40px;
 }
+
+.navbar a .text-logo {
+    font-weight: 500;
+	font-size: 1.25em;
+    line-height: 1.25em;
+    color: white;
+	text-decoration: none;
+	background-color: transparent;
+    transition: color 200ms linear;
+}
+
 
 .navbar .left-nav {
     display: flex;
@@ -65,7 +72,6 @@
 }
 
 .navbar .user-profile-container {
-    background-color: gray;
     padding: 20px;
     border-radius: 150%;
     background-size: cover;

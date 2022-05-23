@@ -7,15 +7,17 @@ import (
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
 )
 
-type MiniUserDetail struct {
+type MiniUserDetailResponse struct {
 	UserID    int64  `json:"uid"`
+	Username  string `json:"username"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Picture   string `json:"picture"`
 }
 
-type UserDetail struct {
+type UserDetailResponse struct {
 	UserID    int64          `json:"uid"`
+	Email     string         `json:"email"`
 	FirstName string         `json:"first_name"`
 	LastName  string         `json:"last_name"`
 	Picture   string         `json:"picture"`
@@ -25,18 +27,28 @@ type UserDetail struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 }
 
-func NewMiniUserDetailDTO(user entity.MiniUserDetail) MiniUserDetail {
-	return MiniUserDetail{
+type UserDetailRequest struct {
+	UserID    int64  `json:"uid"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Phone     string `json:"phone"`
+	AboutMe   string `json:"about_me"`
+}
+
+func NewMiniUserDetailDTO(user entity.MiniUserDetail) MiniUserDetailResponse {
+	return MiniUserDetailResponse{
 		UserID:    user.UserID,
+		Username:  user.Username,
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Picture:   user.Picture,
 	}
 }
 
-func NewUserDetailDTO(user entity.UserDetail) UserDetail {
-	return UserDetail{
+func NewUserDetailDTO(user entity.UserDetail) UserDetailResponse {
+	return UserDetailResponse{
 		UserID:    user.UserID,
+		Email:     user.Email,
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Picture:   user.Picture,
@@ -44,5 +56,18 @@ func NewUserDetailDTO(user entity.UserDetail) UserDetail {
 		AboutMe:   user.AboutMe,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
+	}
+}
+
+func NewUserDetailDAO(user UserDetailRequest) entity.UserDetail {
+	return entity.UserDetail{
+		UserID:    user.UserID,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Phone:     user.Phone,
+		AboutMe: dto.NullString{
+			String: user.AboutMe,
+			Valid:  true,
+		},
 	}
 }

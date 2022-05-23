@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	sessionServicePkg "github.com/suryaadi44/Techdo-blog/internal/auth/service"
+	sessionServicePkg "github.com/suryaadi44/Techdo-blog/internal/user/service"
 	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 

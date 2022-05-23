@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <!-- CSS -->
+  <link rel="stylesheet" href="/static/css/blog-view/blog-view.css">
+  <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+  <!-- Icon -->
+  <script src="https://kit.fontawesome.com/ede9e54d69.js" crossorigin="anonymous"></script>
+  <!-- Summer Note -->
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+    crossorigin="anonymous"></script>
+  <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
+  <title>{{.Data.Posts.Title}} - Techdo</title>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar sticky-top ps-5 pe-5">
+    <div class="container-fluid">
+      <div class="left-nav justify-content-start col-6">
+        <a href="/" class="navbar__logo col">
+          <img src="/static/img/logo 1.svg" class="white-logo">
+          <span class="align-middle text-logo">
+            <span class="half-logo gradient">Tech</span><span>Do</span>
+          </span>
+        </a>
+        <form class="navbar__search-box-container justify-content-start" method="get" action="/search">
+          <input class="navbar__search-box form-control me-2" type="search" placeholder="Search" aria-label="Search"
+            name="q">
+          <button class="navbar__search-button" type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
+      </div>
+
+      <div class="right-nav justify-content-end col">
+        {{if .Data.LoggedIn}}
+        <a class="navbar__create-post-btn" href="/post/create">Create Post</a>
+        <div class="user-profile-container" style="background-image: url('{{.Data.User.Picture}}');"></div>
+        {{else}}
+        <a class="navbar__login-btn" href="/login">Login</a>
+        <a class="navbar__create-acc-btn" href="/signup">Create Account</a>
+        {{end}}
+      </div>
+      <button href="" class="navbar__auth-nav-btn"><i class="fa-solid fa-user"></i></button>
+    </div>
+
+    {{if .Data.LoggedIn}}
+    <!-- User-Profile Nav -->
+    <div class="card user-nav" style="width: 18rem;">
+      <div class="card-body">
+        <ul>
+          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+          <hr>
+          <li><a href="/">Dashboard</a></li>
+          <li><a href="/post/create">Create Post</a></li>
+          <li><a href="/user/settings">Settings</a></li>
+          <hr>
+          <li><a href="/logout">Sign Out</a></li>
+        </ul>
+      </div>
+    </div>
+  
+    <div class="card auth-nav" style="width: 18rem;">
+      <div class="card-body">
+        <ul>
+          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+          <hr>
+          <li><a href="/">Dashboard</a></li>
+          <li><a href="/post/create">Create Post</a></li>
+          <li><a href="/user/settings">Settings</a></li>
+          <hr>
+          <li><a href="/logout">Sign Out</a></li>
+        </ul>
+      </div>
+    </div>
+    {{else}}
+    <!-- Auth Nav Menu -->
+    <div class="card auth-nav" style="width: 18rem;">
+      <div class="card-body">
+        <ul>
+          <li><a href="/login">Login</a></li>
+          <li><a href="/signup">Create Account</a></li>
+        </ul>
+      </div>
+    </div>
+    {{end}}
+  </nav>
+
+
+
+  <!-- Index Body -->
+  <div class="container-fluid pt-4 ps-5 pe-5 body-container">
+    <div class="row">
+      <div class="post-container col-lg-8">
+        <div class="card mb-3 post" style="width: 100%;">
+          <div class="blog-cover" style="background-image: url('{{.Data.Posts.Banner}}');"></div>
+          <div class="card-body px-5">
+            {{range $elem := .Data.Posts.Categories}}
+              <h5 class="col blog-category text-capitalize">{{$elem.CategoryName}}</h5>
+            {{end}}
+            <h1 class="card-title mb-3">{{.Data.Posts.Title}}</h1>
+
+            <!-- Author -->
+            <div class="post-meta d-flex mb-5">
+              <div class="bio-pic mr-3">
+                <img src="{{.Data.Posts.Author.Picture}}" alt="Image" class="img-fluidid">
+              </div>
+              <div class="vcard">
+                <span class="d-block">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</span>
+                <span class="d-block text-muted date-post">Posted on {{.Data.Posts.CreatedAt}}</span>
+              </div>
+            </div>
+
+            <div class="card-text">
+              {{.Data.Posts.Body}}
+            </div>
+          </div>
+
+          <div class="comment-body container">
+            <h2 class="comment-title">Comment(<span class="comment-count">{{.Data.Posts.CommentCount}}</span>)</h2>
+            {{if .Data.LoggedIn}}
+            <div class="comment-form-body container row mt-4">
+              <div class="col-2 user-pict" style="background-image: url('{{.Data.User.Picture}}');">
+              </div>
+              <div class="col">
+                <textarea class="px-3" name="comment" id="comment-form" cols="30" rows="10" placeholder="Add comment"></textarea>
+                <button class="btn btn-primary comment-btn">Submit</button>
+              </div>
+            </div>
+            {{end}}
+            <div class="comment-wrapper mt-3 px-4" data-postid="{{.Data.Posts.PostID}}">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div class="container author-detail-container card">
+          <div class="cover"></div>
+          <div class="post-meta d-flex mt-3">
+            <div class="bio-pic mr-3">
+              <img src="{{.Data.Posts.Author.Picture}}" alt="Image" class="img-fluidid">
+            </div>
+            <div class="vcard">
+              <span class="d-block">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</span>
+            </div>
+          </div>
+          <hr>
+          {{if .Data.Posts.Author.AboutMe.Valid}}
+            <p class="author-about-header">About</p>
+            <p class="autor-about-body">{{.Data.Posts.Author.AboutMe.String}}</p>
+          {{end}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
+
+  <script src="/static/js/index.js"></script>
+  <script src="/static/js/comment.js"></script>
+</body>

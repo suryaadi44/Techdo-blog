@@ -85,3 +85,24 @@ func DeleteFolder(ctx context.Context, path string) error {
 
 	return nil
 }
+
+func GetPictureUrl(ctx context.Context, id string) (string, error) {
+	opts := imagekit.Options{
+		PrivateKey: os.Getenv("IMGKIT_PRIVKEY"),
+		PublicKey:  os.Getenv("IMGKIT_PUBKEY"),
+	}
+
+	ik, err := imagekit.NewClient(&opts)
+	if err != nil {
+		log.Println("[IMGKIT] Error creating imgkit client -> error:", err)
+		return "", err
+	}
+
+	res, err := ik.Media.GetFileDetails(ctx, id)
+	if err != nil {
+		log.Println("[IMGKIT] Error getting file details -> error:", err)
+		return "", err
+	}
+
+	return res.URL, nil
+}
