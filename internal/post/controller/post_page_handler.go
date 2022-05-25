@@ -169,7 +169,10 @@ func (p *PostController) viewPostPageHandlder(w http.ResponseWriter, r *http.Req
 	var tmpl = template.Must(template.ParseFiles("web/template/post/post-view.html"))
 
 	vars := mux.Vars(r)
-	id, _ := strconv.ParseInt(vars["id"], 10, 64)
+	id, err := strconv.ParseInt(vars["id"], 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
 
 	postData, err := p.postService.GetFullPost(r.Context(), id)
 	if err != nil {
@@ -220,6 +223,48 @@ func (p *PostController) createPostPageHandler(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
 	}
+	user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+
+	categoryList, err := p.postService.GetCategoryList(r.Context())
+	data := map[string]interface{}{
+		"Categories": categoryList,
+		"User":       user,
+	}
+
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, nil))
+	}
+
+	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
+}
+
+func (p *PostController) editPostPageHandlder(w http.ResponseWriter, r *http.Request) {
+	var tmpl = template.Must(template.ParseFiles("web/template/post/editPost.html"))
+
+	vars := mux.Vars(r)
+	id, err := strconv.ParseInt(vars["id"], 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+
+	token, _ := utils.GetSessionToken(r)
+	session, err := p.sessionService.GetSession(r.Context(), token)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+
+	postAuthor, err := p.postService.GetPostAuthorIdFromId(r.Context(), id)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+
+	if postAuthor != session.UID {
+		panic(globalDTO.NewBaseResponse(http.StatusUnauthorized, true, "Cannot edit other user post"))
+	}
+
 	user, err := p.userService.GetUserMiniDetail(r.Context(), session.UID)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
