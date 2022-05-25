@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 	middlewarePkg "github.com/suryaadi44/Techdo-blog/internal/middleware"
@@ -46,12 +45,12 @@ func (u *UserController) InitializeController() {
 
 	// Page
 	authRouter.HandleFunc("/user/settings", u.settingPageHandler).Methods(http.MethodGet)
+	authRouter.HandleFunc("/user", u.userDashboardPageHandler).Methods(http.MethodGet)
 
 	//without middleware
 	//API
 
 	// Page
-	u.router.HandleFunc("/user/{id:[0-9]+}", u.userDashboardPageHandler).Methods(http.MethodGet)
 
 }
 
@@ -85,43 +84,31 @@ func (u *UserController) settingPageHandler(w http.ResponseWriter, r *http.Reque
 func (u *UserController) userDashboardPageHandler(w http.ResponseWriter, r *http.Request) {
 	var tmpl = template.Must(template.ParseFiles("web/template/user/dashboard.html"))
 
-	vars := mux.Vars(r)
-	id, _ := strconv.ParseInt(vars["id"], 10, 64)
+	token, _ := utils.GetSessionToken(r)
+	session, err := u.sessionService.GetSession(r.Context(), token)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+	user, err := u.userService.GetUserMiniDetail(r.Context(), session.UID)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
 
-	totalComment, err := u.userService.GetUserTotalCommentCount(r.Context(), id)
+	totalComment, err := u.userService.GetUserTotalCommentCount(r.Context(), user.UserID)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
-	totalPost, err := u.userService.GetUserTotalPostCount(r.Context(), id)
+	totalPost, err := u.userService.GetUserTotalPostCount(r.Context(), user.UserID)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
-	token, isLoggedIn := utils.GetSessionToken(r)
 	data := map[string]interface{}{
-		"LoggedIn":     isLoggedIn,
+		"User":         user,
 		"CommentCount": totalComment,
 		"PostCount":    totalPost,
 	}
-
-	if isLoggedIn {
-		session, err := u.sessionService.GetSession(r.Context(), token)
-		if err != nil {
-			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
-		}
-		user, err := u.userService.GetUserMiniDetail(r.Context(), session.UID)
-		if err != nil {
-			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
-		}
-
-		if err == nil {
-			data["User"] = user
-		}
-	}
-	// if err != nil {
-	// 	panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
-	// }
 
 	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
 }
