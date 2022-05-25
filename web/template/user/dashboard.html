@@ -107,10 +107,8 @@
         <ul>
           <li class="my-2 py-3 ps-4 dashboard-btn"><i class="fa-solid fa-chart-line"></i><span
               class="link-title">Dashboard</span></li>
-          <li class="my-2 py-3 ps-4 blog-btn"><i class="fa-regular fa-file-lines"></i><span class="link-title">Your
-              Post</span></li>
-          <li class="my-2 py-3 ps-4 comment-btn"><i class="fa-regular fa-comment-dots"></i><span class="link-title">Your
-              Comment</span></li>
+          <li class="my-2 py-3 ps-4 blog-btn"><i class="fa-regular fa-file-lines"></i><span class="link-title">Post</span></li>
+          <li class="my-2 py-3 ps-4 comment-btn"><i class="fa-regular fa-comment-dots"></i><span class="link-title">Comment</span></li>
         </ul>
       </div>
 
@@ -124,12 +122,12 @@
               <div class="card-body">
                 <h4 class="card-title">Total Post</h4>
                 <div class="row py-1 statistic-container">
-                  <h2 class="total-post col">12</h2>
+                  <h2 class="total-post col">{{.Data.PostCount}}</h2>
                   <div class="col">
                     <i class="fa-regular fa-file-lines"></i>
                   </div>
                 </div>
-                <p class="total-post col">Posted blog</p>
+                <p class="total-post col">Posted Blog Post</p>
               </div>
             </div>
 
@@ -137,12 +135,12 @@
               <div class="card-body">
                 <h4 class="card-title">Total Comment</h4>
                 <div class="row py-1 statistic-container">
-                  <h2 class="total-comment col">12</h2>
+                  <h2 class="total-comment col">{{.Data.CommentCount}}</h2>
                   <div class="col">
                     <i class="fa-regular fa-comment-dots"></i>
                   </div>
                 </div>
-                <p class="total-post col">Posted blog</p>
+                <p class="total-post col">Posted Comment</p>
               </div>
             </div>
 
@@ -226,7 +224,7 @@
 
         <!-- Your Post -->
         <div class="blog-wrapper">
-          <h2>Your Post</h2>
+          <h2>Post</h2>
           <div class="col your-blog-list">
 
             <div class="row card blog-items my-3">
@@ -250,7 +248,7 @@
 
         <!-- Your Comments -->
         <div class="comment-wrapper">
-          <h2>Your Comment</h2>
+          <h2>Comment</h2>
           <div class="col your-blog-list">
 
             <div class="row card blog-items my-3">

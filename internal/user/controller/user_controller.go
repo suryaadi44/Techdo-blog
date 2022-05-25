@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"html/template"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -89,9 +88,21 @@ func (u *UserController) userDashboardPageHandler(w http.ResponseWriter, r *http
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
 
+	totalComment, err := u.userService.GetUserTotalCommentCount(r.Context(), id)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
+	totalPost, err := u.userService.GetUserTotalPostCount(r.Context(), id)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
 	token, isLoggedIn := utils.GetSessionToken(r)
 	data := map[string]interface{}{
-		"LoggedIn": isLoggedIn,
+		"LoggedIn":     isLoggedIn,
+		"CommentCount": totalComment,
+		"PostCount":    totalPost,
 	}
 
 	if isLoggedIn {
@@ -108,7 +119,6 @@ func (u *UserController) userDashboardPageHandler(w http.ResponseWriter, r *http
 			data["User"] = user
 		}
 	}
-	log.Println(id)
 	// if err != nil {
 	// 	panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	// }
