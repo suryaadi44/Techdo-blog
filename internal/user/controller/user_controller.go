@@ -107,10 +107,22 @@ func (u *UserController) userDashboardPageHandler(w http.ResponseWriter, r *http
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
+	recentComments, err := u.postService.GetCommentsByUser(r.Context(), user.UserID, 1, 5)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
+	recentPost, err := u.postService.GetMiniBlogPostsByUser(r.Context(), user.UserID, 1, 5)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
 	data := map[string]interface{}{
-		"User":         user,
-		"CommentCount": totalComment,
-		"PostCount":    totalPost,
+		"User":           user,
+		"CommentCount":   totalComment,
+		"PostCount":      totalPost,
+		"RecentComments": recentComments,
+		"RecentPost":     recentPost,
 	}
 
 	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))

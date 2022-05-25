@@ -74,6 +74,12 @@ body {
 	border-radius: 15px;
 }
 
+.post-link {
+	color: #007bff;
+	text-decoration: none;
+	background-color: transparent;
+}
+
 .side-menu li:hover {
 	background-image: linear-gradient(
 		83.2deg,

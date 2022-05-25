@@ -102,6 +102,80 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 	globalDTO.NewBaseResponse(http.StatusCreated, false, fmt.Sprintf("/post/%d", postID)).SendResponse(&w)
 }
 
+func (p *PostController) userPostHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	id, err := strconv.ParseInt(vars["id"], 10, 64)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	queryVar := r.URL.Query()
+	limit := queryVar.Get("limit")
+	if limit == "" {
+		limit = "12"
+	}
+	page := queryVar.Get("page")
+	if page == "" {
+		page = "1"
+	}
+
+	limitConv, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+	pageConv, err := strconv.ParseInt(page, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+
+	postData, err := p.postService.GetMiniBlogPostsByUser(r.Context(), id, pageConv, limitConv)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	globalDTO.NewBaseResponse(http.StatusOK, false, postData).SendResponse(&w)
+}
+
+func (p *PostController) userCommentHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	id, err := strconv.ParseInt(vars["id"], 10, 64)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	queryVar := r.URL.Query()
+	limit := queryVar.Get("limit")
+	if limit == "" {
+		limit = "12"
+	}
+	page := queryVar.Get("page")
+	if page == "" {
+		page = "1"
+	}
+
+	limitConv, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+	pageConv, err := strconv.ParseInt(page, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+
+	postData, err := p.postService.GetCommentsByUser(r.Context(), id, pageConv, limitConv)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	globalDTO.NewBaseResponse(http.StatusOK, false, postData).SendResponse(&w)
+}
+
 func (p *PostController) viewCommentHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 

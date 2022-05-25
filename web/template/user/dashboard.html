@@ -145,21 +145,13 @@
                       </tr>
                     </thead>
                     <tbody>
+                      {{range $each := .Data.RecentPost}}
                       <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
+                        <th scope="row">{{$each.Index}}</th>
+                        <td><a href="/post/{{$each.PostID}}" class="post-link">{{$each.Title}}</a></td>
+                        <td>{{$each.CreatedAt}}</td>
                       </tr>
-                      <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">3</th>
-                        <td>Larry</td>
-                        <td>the Bird</td>
-                      </tr>
+                      {{end}}
                     </tbody>
                   </table>
                 </div>
@@ -177,26 +169,18 @@
                     <thead>
                       <tr>
                         <th scope="col">No.</th>
-                        <th scope="col">Title</th>
+                        <th scope="col">Post ID</th>
                         <th scope="col">Comment</th>
                       </tr>
                     </thead>
                     <tbody>
+                      {{range $each := .Data.RecentComments}}
                       <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
+                        <th scope="row">{{$each.Index}}</th>
+                        <td><a href="/post/{{$each.PostID}}" class="post-link">{{$each.PostID}}</a></td>
+                        <td>{{$each.CommentBody}}</td>
                       </tr>
-                      <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">3</th>
-                        <td>Larry</td>
-                        <td>the Bird</td>
-                      </tr>
+                      {{end}}
                     </tbody>
                   </table>
                 </div>

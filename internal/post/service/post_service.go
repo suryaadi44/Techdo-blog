@@ -22,6 +22,7 @@ type PostServiceApi interface {
 	GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error)
 	GetTopCategoryPost(ctx context.Context) (dto.TopCategoriesWithPost, error)
 	GetBriefsBlogPost(ctx context.Context, page int64, limit int64) (dto.BriefsBlogPostResponse, error)
+	GetMiniBlogPostsByUser(ctx context.Context, id int64, page int64, limit int64) (dto.MiniBlogPostsResponse, error)
 	GetBriefsBlogPostOfCategories(ctx context.Context, categories string, page int64, limit int64) (dto.BriefsBlogPostResponse, error)
 	GetEditorsPick(ctx context.Context) (dto.BriefBlogPostResponse, error)
 	GetPostAuthorIdFromId(ctx context.Context, postId int64) (int64, error)
@@ -34,7 +35,8 @@ type PostServiceApi interface {
 
 	GetCategoriesFromID(ctx context.Context, id int64) (dto.CategoryList, error)
 	GetCategoryList(ctx context.Context) (dto.CategoryList, error)
-	GetComments(ctx context.Context, postID int64) (dto.CommentsResponse, error)
+	GetComments(ctx context.Context, postID int64) (dto.PostCommentsResponse, error)
+	GetCommentsByUser(ctx context.Context, uid int64, page int64, limit int64) (dto.UserCommentsResponse, error)
 
 	UploadImage(ctx context.Context, filename string, image interface{}, folderID string) (*imagekit.UploadResponse, error)
 }
