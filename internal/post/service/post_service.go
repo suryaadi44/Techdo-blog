@@ -14,11 +14,14 @@ type PostServiceApi interface {
 	IncreaseView(ctx context.Context, id int64) error
 	SearchBlogPost(ctx context.Context, q string, page int64, limit int64, dateStart *time.Time, dateEnd *time.Time, category string) (dto.BriefsBlogPostResponse, error)
 
-	AddPost(ctx context.Context, post dto.BlogPostRequest, authorID int64) (int64, error)
+	AddPost(ctx context.Context, post dto.BlogPostRequest) (int64, error)
 	AddComment(ctx context.Context, comment dto.CommentRequest) error
 
 	DeletePost(ctx context.Context, id int64) error
 
+	EditPost(ctx context.Context, post dto.BlogPostRequest, PostID int64) (int64, error)
+
+	GetRawPost(ctx context.Context, id int64) (dto.RawBlogPostResponse, error)
 	GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error)
 	GetTopCategoryPost(ctx context.Context) (dto.TopCategoriesWithPost, error)
 	GetBriefsBlogPost(ctx context.Context, page int64, limit int64) (dto.BriefsBlogPostResponse, error)

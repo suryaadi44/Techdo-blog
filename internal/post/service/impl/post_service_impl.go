@@ -17,7 +17,7 @@ type PostServiceImpl struct {
 	Repository PostRepositoryImpl
 }
 
-func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest, authorID int64) (int64, error) {
+func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest) (int64, error) {
 	reservedID, err := p.Repository.ReserveID(ctx)
 	if err != nil {
 		log.Println("[ERROR] AddPost: Error geting reserved ID-> error:", err)
@@ -29,6 +29,10 @@ func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest, 
 	extension := r.FindString(post.BannerName)
 	bannerName := fmt.Sprintf("%d%s", reservedID, extension)
 	bannerUrl, err := utils.UploadImage(ctx, bannerName, post.Banner, pictureFolder)
+	if err != nil {
+		log.Println("[ERROR] EditPost: Error uploading banner picture-> error:", err)
+		return -1, err
+	}
 
 	r = regexp.MustCompile(`src=\"([^\"]+)\"`)
 	matches := r.FindAllStringSubmatch(post.Body, -1)
@@ -47,7 +51,7 @@ func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest, 
 		}
 	}
 
-	err = p.Repository.UpdatePost(ctx, post.ToDAO(reservedID, authorID, bannerUrl.URL))
+	err = p.Repository.UpdatePost(ctx, post.ToDAO(reservedID, bannerUrl.URL))
 	if err != nil {
 		log.Println("[ERROR] AddPost: Error adding post data -> error:", err)
 		return -1, err
@@ -60,6 +64,50 @@ func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest, 
 	}
 
 	return reservedID, nil
+}
+
+func (p PostServiceImpl) EditPost(ctx context.Context, post dto.BlogPostRequest, PostID int64) (int64, error) {
+	pictureFolder := fmt.Sprintf("/%d", PostID)
+
+	r := regexp.MustCompile(`\.(\w*)$`)
+	extension := r.FindString(post.BannerName)
+	bannerName := fmt.Sprintf("%d%s", PostID, extension)
+	bannerUrl, err := utils.UploadImage(ctx, bannerName, post.Banner, pictureFolder)
+	if err != nil {
+		log.Println("[ERROR] EditPost: Error uploading banner picture-> error:", err)
+		return -1, err
+	}
+
+	r = regexp.MustCompile(`src=\"([^\"]+)\"`)
+	matches := r.FindAllStringSubmatch(post.Body, -1)
+	for _, v := range matches {
+		r := regexp.MustCompile(`image/(\w*)`)
+		extension := r.FindAllStringSubmatch(v[1], -1)
+		if len(extension) == 0 {
+			continue
+		}
+
+		pictureName := fmt.Sprintf("%d.%s", PostID, extension[0][1])
+		imgkitResponse, err := utils.UploadImage(ctx, pictureName, v[1], pictureFolder)
+
+		if err == nil {
+			post.Body = strings.ReplaceAll(post.Body, v[1], imgkitResponse.URL)
+		}
+	}
+
+	err = p.Repository.UpdatePost(ctx, post.ToDAO(PostID, bannerUrl.URL))
+	if err != nil {
+		log.Println("[ERROR] EditPost: Error adding post data -> error:", err)
+		return -1, err
+	}
+
+	err = p.Repository.EditPostCategoryAssoc(ctx, PostID, post.Category)
+	if err != nil {
+		log.Println("[ERROR] EditPost: Error editing post category data -> error:", err)
+		return -1, err
+	}
+
+	return PostID, nil
 }
 
 func (p PostServiceImpl) DeletePost(ctx context.Context, id int64) error {
@@ -81,6 +129,25 @@ func (p PostServiceImpl) DeletePost(ctx context.Context, id int64) error {
 
 func (p PostServiceImpl) IncreaseView(ctx context.Context, id int64) error {
 	return p.Repository.IncreaseView(ctx, id)
+}
+
+func (p PostServiceImpl) GetRawPost(ctx context.Context, id int64) (dto.RawBlogPostResponse, error) {
+	var postDto dto.RawBlogPostResponse
+
+	post, err := p.Repository.GetRawPost(ctx, id)
+	if err != nil {
+		log.Println("[ERROR] Fetching Raw Post with id", id, "-> error:", err)
+		return postDto, err
+	}
+
+	categories, err := p.Repository.GetCategoriesFromID(ctx, id)
+	if err != nil {
+		log.Println("[ERROR] Fetching categories for post with id", id, "-> error:", err)
+		return postDto, err
+	}
+
+	postDto = dto.NewRawBlogPostResponse(post, categories)
+	return postDto, nil
 }
 
 func (p PostServiceImpl) GetFullPost(ctx context.Context, id int64) (dto.BlogPostResponse, error) {
