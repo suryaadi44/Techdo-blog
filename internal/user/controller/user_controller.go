@@ -9,6 +9,7 @@ import (
 
 	"github.com/gorilla/mux"
 	middlewarePkg "github.com/suryaadi44/Techdo-blog/internal/middleware"
+	postPkg "github.com/suryaadi44/Techdo-blog/internal/post/service"
 	"github.com/suryaadi44/Techdo-blog/internal/user/dto"
 	"github.com/suryaadi44/Techdo-blog/internal/user/service"
 	globalDTO "github.com/suryaadi44/Techdo-blog/pkg/dto"
@@ -19,14 +20,16 @@ type UserController struct {
 	router         *mux.Router
 	userService    service.UserServiceApi
 	sessionService service.SessionServiceApi
+	postService    postPkg.PostServiceApi
 	authMiddleware middlewarePkg.AuthMiddleware
 }
 
-func NewUserController(router *mux.Router, userService service.UserServiceApi, sessionService service.SessionServiceApi, authMiddleware middlewarePkg.AuthMiddleware) *UserController {
+func NewUserController(router *mux.Router, userService service.UserServiceApi, sessionService service.SessionServiceApi, postService postPkg.PostServiceApi, authMiddleware middlewarePkg.AuthMiddleware) *UserController {
 	return &UserController{
 		router:         router,
 		userService:    userService,
 		sessionService: sessionService,
+		postService:    postService,
 		authMiddleware: authMiddleware,
 	}
 }
@@ -94,12 +97,12 @@ func (u *UserController) userDashboardPageHandler(w http.ResponseWriter, r *http
 		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
 	}
 
-	totalComment, err := u.userService.GetUserTotalCommentCount(r.Context(), user.UserID)
+	totalComment, err := u.postService.GetUserTotalCommentCount(r.Context(), user.UserID)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
-	totalPost, err := u.userService.GetUserTotalPostCount(r.Context(), user.UserID)
+	totalPost, err := u.postService.GetUserTotalPostCount(r.Context(), user.UserID)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}

@@ -7,6 +7,10 @@ body {
 	background-color: #f5f5f5;
 }
 
+.statistic-container i {
+	text-align: center;
+}
+
 .body-container {
 	font-family: "Poppins", sans-serif;
 }

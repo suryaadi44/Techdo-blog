@@ -21,6 +21,8 @@ var (
 	COUNT_LIST_OF_POST              = "SELECT COUNT(*) FROM blog_posts"
 	COUNT_LIST_OF_POST_IN_CATEGOIES = "SELECT COUNT(*) FROM blog_posts b JOIN category_associations a ON  a.post_id =  b.post_id JOIN categories c ON c.category_id = a.category_id WHERE c.category_name = ?"
 	COUNT_SEARCH_RESULT             = "SELECT COUNT(*) FROM blog_posts b"
+	COUNT_TOTAL_USER_POST           = "SELECT COUNT(*) FROM blog_posts WHERE author_id = ?"
+	COUNT_TOTAL_USER_COMMENT        = "SELECT COUNT(*) FROM comment WHERE uid = ?"
 
 	INSERT_BLANK_POST     = "INSERT INTO blog_posts() VALUE ()"
 	INSERT_CATEGORY_ASSOC = "INSERT INTO category_associations(post_id, category_id) VALUE (?, ?)"
@@ -369,6 +371,28 @@ func (p PostRepositoryImpl) CountListOfPost(ctx context.Context) (int64, error) 
 	return 0, errors.New("can't get count of post ")
 }
 
+func (p PostRepositoryImpl) CountUserTotalPost(ctx context.Context, id int64) (int64, error) {
+	var count int64
+
+	rows, err := p.db.QueryContext(ctx, COUNT_TOTAL_USER_POST, id)
+	if err != nil {
+		log.Println("[ERROR] GetUserTotalPostCount -> error on executing query :", err)
+		return 0, err
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&count)
+		if err != nil {
+			log.Println("[ERROR] GetUserTotalPostCount -> error scanning row :", err)
+			return 0, err
+		}
+
+		return count, nil
+	}
+
+	return 0, errors.New("can't get count of total user post")
+}
+
 func (p PostRepositoryImpl) CountListOfPostInCategories(ctx context.Context, categories string) (int64, error) {
 	var count int64
 
@@ -528,4 +552,26 @@ func (p PostRepositoryImpl) GetPostComments(ctx context.Context, id int64) (enti
 	}
 
 	return comments, users, nil
+}
+
+func (p PostRepositoryImpl) CountUserTotalComment(ctx context.Context, id int64) (int64, error) {
+	var count int64
+
+	rows, err := p.db.QueryContext(ctx, COUNT_TOTAL_USER_COMMENT, id)
+	if err != nil {
+		log.Println("[ERROR] GetUserTotalCommentCount -> error on executing query :", err)
+		return 0, err
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&count)
+		if err != nil {
+			log.Println("[ERROR] GetUserTotalCommentCount -> error scanning row :", err)
+			return 0, err
+		}
+
+		return count, nil
+	}
+
+	return 0, errors.New("can't get count of total user comment")
 }

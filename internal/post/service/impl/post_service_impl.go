@@ -233,3 +233,23 @@ func (p PostServiceImpl) GetComments(ctx context.Context, postID int64) (dto.Com
 
 	return commentResponse, nil
 }
+
+func (p PostServiceImpl) GetUserTotalPostCount(ctx context.Context, id int64) (int64, error) {
+	total, err := p.Repository.CountUserTotalPost(ctx, id)
+	if err != nil {
+		log.Println("[ERROR] GetUserTotalPostCount: Error getting count of user total post-> error:", err)
+		return 0, err
+	}
+
+	return total, nil
+}
+
+func (p PostServiceImpl) GetUserTotalCommentCount(ctx context.Context, id int64) (int64, error) {
+	total, err := p.Repository.CountUserTotalComment(ctx, id)
+	if err != nil {
+		log.Println("[ERROR] GetUserTotalPostCount: Error getting count of user total post-> error:", err)
+		return 0, err
+	}
+
+	return total, nil
+}

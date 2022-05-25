@@ -101,23 +101,3 @@ func (u UserServiceImpl) UpdateUserPicture(ctx context.Context, picture []byte, 
 func (u UserServiceImpl) DeleteUser(ctx context.Context, id int64) error {
 	return u.Repository.DeleteUser(ctx, id)
 }
-
-func (u UserServiceImpl) GetUserTotalPostCount(ctx context.Context, id int64) (int64, error) {
-	total, err := u.Repository.GetUserTotalPostCount(ctx, id)
-	if err != nil {
-		log.Println("[ERROR] GetUserTotalPostCount: Error getting count of user total post-> error:", err)
-		return 0, err
-	}
-
-	return total, nil
-}
-
-func (u UserServiceImpl) GetUserTotalCommentCount(ctx context.Context, id int64) (int64, error) {
-	total, err := u.Repository.GetUserTotalCommentCount(ctx, id)
-	if err != nil {
-		log.Println("[ERROR] GetUserTotalPostCount: Error getting count of user total post-> error:", err)
-		return 0, err
-	}
-
-	return total, nil
-}

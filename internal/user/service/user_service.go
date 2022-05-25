@@ -14,8 +14,6 @@ type UserServiceApi interface {
 
 	GetUserMiniDetail(ctx context.Context, id int64) (dto.MiniUserDetailResponse, error)
 	GetUserDetail(ctx context.Context, id int64) (dto.UserDetailResponse, error)
-	GetUserTotalPostCount(ctx context.Context, id int64) (int64, error)
-	GetUserTotalCommentCount(ctx context.Context, id int64) (int64, error)
 
 	DeleteUser(ctx context.Context, id int64) error
 }
