@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	middlewarePkg "github.com/suryaadi44/Techdo-blog/internal/middleware"
@@ -50,6 +52,7 @@ func (u *UserController) InitializeController() {
 	//API
 
 	// Page
+	u.router.HandleFunc("/user/{id:[0-9]+}", u.userDashboardPageHandler).Methods(http.MethodGet)
 
 }
 
@@ -76,6 +79,39 @@ func (u *UserController) settingPageHandler(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
+
+	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
+}
+
+func (u *UserController) userDashboardPageHandler(w http.ResponseWriter, r *http.Request) {
+	var tmpl = template.Must(template.ParseFiles("web/template/user/dashboard.html"))
+
+	vars := mux.Vars(r)
+	id, _ := strconv.ParseInt(vars["id"], 10, 64)
+
+	token, isLoggedIn := utils.GetSessionToken(r)
+	data := map[string]interface{}{
+		"LoggedIn": isLoggedIn,
+	}
+
+	if isLoggedIn {
+		session, err := u.sessionService.GetSession(r.Context(), token)
+		if err != nil {
+			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+		}
+		user, err := u.userService.GetUserMiniDetail(r.Context(), session.UID)
+		if err != nil {
+			panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+		}
+
+		if err == nil {
+			data["User"] = user
+		}
+	}
+	log.Println(id)
+	// if err != nil {
+	// 	panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	// }
 
 	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
 }

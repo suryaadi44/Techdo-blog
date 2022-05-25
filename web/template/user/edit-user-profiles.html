@@ -24,6 +24,7 @@
   <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.14/dist/sweetalert2.all.min.js"
     integrity="sha256-SlWNZPkXxEDQLgOBLlO07HAeNx6ThxLZ+pqQ+VGUEuU=" crossorigin="anonymous"></script>
+  <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
   <title>Techdo</title>
 </head>
 
@@ -58,7 +59,7 @@
     <div class="card user-nav" style="width: 18rem;">
       <div class="card-body">
         <ul>
-          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+          <li><a href="/user/{{.Data.User.UserID}}">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
           <hr>
           <li><a href="/">Dashboard</a></li>
           <li><a href="/post/create">Create Post</a></li>

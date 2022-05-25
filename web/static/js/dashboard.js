@@ -12,21 +12,24 @@ const wrappers = {
 
 function restartState() {
   for (const wrapper in wrappers) {
-    wrapper.css("display", "none");
+    wrappers[wrapper].hide();
   }
 }
 
 navMenu.dashboardBtn.on("click", e => {
   restartState();
-  e.css("display", "block");
+  wrappers.dashboard.show();
 });
 
 navMenu.blogBtn.on("click", e => {
   restartState();
-  e.css("display", "block");
+  wrappers.blog.show();
 });
 
 navMenu.commentBtn.on("click", e => {
   restartState();
-  e.css("display", "block");
+  wrappers.comment.show();
 });
+
+restartState();
+wrappers.dashboard.show();

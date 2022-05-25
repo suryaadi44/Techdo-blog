@@ -58,7 +58,7 @@
     <div class="card user-nav" style="width: 18rem;">
       <div class="card-body">
         <ul>
-          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+          <li><a href="/user/{{.Data.User.UserID}}">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
           <hr>
           <li><a href="/">Dashboard</a></li>
           <li><a href="/post/create">Create Post</a></li>
@@ -72,7 +72,7 @@
     <div class="card auth-nav" style="width: 18rem;">
       <div class="card-body">
         <ul>
-          <li><a href="">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+          <li><a href="/user/{{.Data.User.UserID}}">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
           <hr>
           <li><a href="/">Dashboard</a></li>
           <li><a href="/post/create">Create Post</a></li>
