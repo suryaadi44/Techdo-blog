@@ -29,6 +29,10 @@ func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest) 
 	extension := r.FindString(post.BannerName)
 	bannerName := fmt.Sprintf("%d%s", reservedID, extension)
 	bannerUrl, err := utils.UploadImage(ctx, bannerName, post.Banner, pictureFolder)
+	if err != nil {
+		log.Println("[ERROR] EditPost: Error uploading banner picture-> error:", err)
+		return -1, err
+	}
 
 	r = regexp.MustCompile(`src=\"([^\"]+)\"`)
 	matches := r.FindAllStringSubmatch(post.Body, -1)
@@ -69,6 +73,10 @@ func (p PostServiceImpl) EditPost(ctx context.Context, post dto.BlogPostRequest,
 	extension := r.FindString(post.BannerName)
 	bannerName := fmt.Sprintf("%d%s", PostID, extension)
 	bannerUrl, err := utils.UploadImage(ctx, bannerName, post.Banner, pictureFolder)
+	if err != nil {
+		log.Println("[ERROR] EditPost: Error uploading banner picture-> error:", err)
+		return -1, err
+	}
 
 	r = regexp.MustCompile(`src=\"([^\"]+)\"`)
 	matches := r.FindAllStringSubmatch(post.Body, -1)
