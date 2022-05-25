@@ -39,8 +39,8 @@ func (p *PostController) InitializeController() {
 	// API
 	authRouter.HandleFunc("/post/create", p.createPostHandler).Methods(http.MethodPost)
 	authRouter.HandleFunc("/post/delete/{id:[0-9]+}", p.deletePostHandlder).Methods(http.MethodDelete)
-	authRouter.HandleFunc("/user/{id:[0-9]+}/post", p.userPostHandler).Methods(http.MethodGet)
-	authRouter.HandleFunc("/user/{id:[0-9]+}/comment", p.userCommentHandler).Methods(http.MethodGet)
+	authRouter.HandleFunc("/user/post", p.userPostHandler).Methods(http.MethodGet)
+	authRouter.HandleFunc("/user/comment", p.userCommentHandler).Methods(http.MethodGet)
 	authRouter.HandleFunc("/post/{id:[0-9]+}/comment/add", p.addCommentHandler).Methods(http.MethodPost)
 
 	// Without middleware

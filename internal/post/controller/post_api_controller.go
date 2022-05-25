@@ -103,12 +103,10 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (p *PostController) userPostHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	id, err := strconv.ParseInt(vars["id"], 10, 64)
+	token, _ := utils.GetSessionToken(r)
+	session, err := p.sessionService.GetSession(r.Context(), token)
 	if err != nil {
 		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
-		return
 	}
 
 	queryVar := r.URL.Query()
@@ -130,7 +128,7 @@ func (p *PostController) userPostHandler(w http.ResponseWriter, r *http.Request)
 		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
 	}
 
-	postData, err := p.postService.GetMiniBlogPostsByUser(r.Context(), id, pageConv, limitConv)
+	postData, err := p.postService.GetMiniBlogPostsByUser(r.Context(), session.UID, pageConv, limitConv)
 	if err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return
@@ -140,12 +138,10 @@ func (p *PostController) userPostHandler(w http.ResponseWriter, r *http.Request)
 }
 
 func (p *PostController) userCommentHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	id, err := strconv.ParseInt(vars["id"], 10, 64)
+	token, _ := utils.GetSessionToken(r)
+	session, err := p.sessionService.GetSession(r.Context(), token)
 	if err != nil {
 		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
-		return
 	}
 
 	queryVar := r.URL.Query()
@@ -167,7 +163,7 @@ func (p *PostController) userCommentHandler(w http.ResponseWriter, r *http.Reque
 		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
 	}
 
-	postData, err := p.postService.GetCommentsByUser(r.Context(), id, pageConv, limitConv)
+	postData, err := p.postService.GetCommentsByUser(r.Context(), session.UID, pageConv, limitConv)
 	if err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return
