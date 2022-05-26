@@ -63,6 +63,26 @@ navMenu.blogBtn.on("click", async e => {
   wrappers.blog.show();
 });
 
+function makeCommentItem(comment) {
+  return `
+  <div class="row card comment-items my-3">
+    <div class="row py-3 px-3">
+      <div class="col align-self-center">
+        <h5>Blog Title</h5>
+      </div>
+
+      <div class="col mt-2 align-self-center">
+        <p class="text-muted">${comment.commentBody}</p>
+      </div>
+
+      <div class="col-3 align-self-center">
+        <div data-commentID="${comment.index}" class="btn btn-danger delete-btn mb-2"><i class="fa-regular fa-trash-can"></i></div>
+      </div>
+    </div>
+  </div>
+  `
+}
+
 navMenu.commentBtn.on("click", async e => {
   restartState();
   const commentListContainer = $(".your-comment-list");
@@ -77,7 +97,9 @@ navMenu.commentBtn.on("click", async e => {
   .then((result) => result.json());
 
   commentData = commentData.data;
-  console.log(commentData);
+  for(const comment of commentData) {
+    commentListContainer.append(makeCommentItem(comment));
+  }
   wrappers.comment.show();
 });
 
