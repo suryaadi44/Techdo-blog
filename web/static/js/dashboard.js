@@ -21,8 +21,18 @@ navMenu.dashboardBtn.on("click", e => {
   wrappers.dashboard.show();
 });
 
-navMenu.blogBtn.on("click", e => {
+navMenu.blogBtn.on("click", async e => {
   restartState();
+  const blogListContainer = $(".your-blog-list");
+  let blogData = await fetch("/user/post", {
+    method: "GET",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  }, (response) => JSON.stringify(response))
+  .then((result) => result.json());
+  blogData = blogData.data;
+  console.log(blogData);
   wrappers.blog.show();
 });
 
