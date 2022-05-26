@@ -63,8 +63,21 @@ navMenu.blogBtn.on("click", async e => {
   wrappers.blog.show();
 });
 
-navMenu.commentBtn.on("click", e => {
+navMenu.commentBtn.on("click", async e => {
   restartState();
+  const commentListContainer = $(".your-comment-list");
+  commentListContainer.html("");
+  // Fetch comment data from backend
+  let commentData = await fetch("/user/comment", {
+    method: "GET",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  }, (response) => JSON.stringify(response))
+  .then((result) => result.json());
+
+  commentData = commentData.data;
+  console.log(commentData);
   wrappers.comment.show();
 });
 
