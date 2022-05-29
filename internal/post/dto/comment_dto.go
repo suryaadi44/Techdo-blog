@@ -23,7 +23,8 @@ type PostCommentResponse struct {
 type UserCommentResponse struct {
 	Index       int64  `json:"index"`
 	CommentID   int64  `json:"commentID"`
-	PostID      int64  `json:"postId"`
+	PostID      int64  `json:"postID"`
+	PostTitle   string `json:"postTitle"`
 	CommentBody string `json:"commentBody"`
 	CreatedAt   string `json:"createdAt"`
 	UpdatedAt   string `json:"updatedAt"`
@@ -66,22 +67,23 @@ func NewPostCommentsResponse(comments entity.Comments, users entity.MiniUsersDet
 	return response
 }
 
-func NewUserCommentResponse(comment entity.Comment, index int64) UserCommentResponse {
+func NewUserCommentResponse(comment entity.Comment, post entity.BriefBlogPost, index int64) UserCommentResponse {
 	return UserCommentResponse{
 		Index:       index,
 		CommentID:   comment.CommentID,
-		PostID:      comment.PostID,
+		PostID:      post.PostID,
+		PostTitle:   post.Title,
 		CommentBody: comment.CommentBody,
 		CreatedAt:   comment.CreatedAt.Format("15:04, Jan 02, 2006"),
 		UpdatedAt:   comment.UpdatedAt.Format("15:04, Jan 02, 2006"),
 	}
 }
 
-func NewUserCommentsResponse(comments entity.Comments) UserCommentsResponse {
+func NewUserCommentsResponse(comments entity.Comments, posts entity.BriefsBlogPost) UserCommentsResponse {
 	var response UserCommentsResponse
 
-	for idx, each := range comments {
-		comment := NewUserCommentResponse(*each, int64(idx+1))
+	for idx := range comments {
+		comment := NewUserCommentResponse(*comments[idx], *posts[idx], int64(idx+1))
 		response = append(response, &comment)
 	}
 
