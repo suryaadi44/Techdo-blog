@@ -35,12 +35,14 @@ func (p *PostController) InitializeController() {
 	// With middlerware
 	// Page
 	authRouter.HandleFunc("/post/create", p.createPostPageHandler).Methods(http.MethodGet)
+	authRouter.HandleFunc("/post/{id:[0-9]+}/edit", p.editPostPageHandlder).Methods(http.MethodGet)
 
 	// API
 	authRouter.HandleFunc("/post/create", p.createPostHandler).Methods(http.MethodPost)
-	authRouter.HandleFunc("/post/delete/{id:[0-9]+}", p.deletePostHandlder).Methods(http.MethodDelete)
 	authRouter.HandleFunc("/user/post", p.userPostHandler).Methods(http.MethodGet)
 	authRouter.HandleFunc("/user/comment", p.userCommentHandler).Methods(http.MethodGet)
+	authRouter.HandleFunc("/post/{id:[0-9]+}/delete", p.deletePostHandlder).Methods(http.MethodDelete)
+	authRouter.HandleFunc("/post/{id:[0-9]+}/edit", p.editPostHandler).Methods(http.MethodPost)
 	authRouter.HandleFunc("/post/{id:[0-9]+}/comment/add", p.addCommentHandler).Methods(http.MethodPost)
 
 	// Without middleware
@@ -52,5 +54,6 @@ func (p *PostController) InitializeController() {
 	p.router.HandleFunc("/post/category/{category}", p.postInCategoryPageHandler).Methods(http.MethodGet)
 
 	// API
+	p.router.HandleFunc("/post/{id:[0-9]+}/raw", p.viewRawPostHandler).Methods(http.MethodGet)
 	p.router.HandleFunc("/post/{id:[0-9]+}/comment", p.viewCommentHandler).Methods(http.MethodGet)
 }

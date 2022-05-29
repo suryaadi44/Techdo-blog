@@ -28,10 +28,12 @@ var (
 	INSERT_CATEGORY_ASSOC = "INSERT INTO category_associations(post_id, category_id) VALUE (?, ?)"
 	INSERT_COMMENT        = "INSERT INTO comment(post_id, uid, comment_body) VALUE (?, ?, ?)"
 
-	UPDATE_POST = "UPDATE blog_posts SET author_id = ?, banner = ?, title = ?, body = ? WHERE post_id = ?"
+	UPDATE_POST           = "UPDATE blog_posts SET author_id = ?, banner = ?, title = ?, body = ? WHERE post_id = ?"
+	UPDATE_CATEGORY_ASSOC = "UPDATE category_associations SET category_id = ? WHERE post_id = ?"
 
 	DELETE_POST = "DELETE FROM blog_posts WHERE post_id = ?"
 
+	SELECT_RAW_POST                        = "SELECT post_id, author_id, banner, title, body, created_at, updated_at FROM blog_posts WHERE post_id = ?"
 	SELECT_POST                            = "SELECT b.post_id, b.author_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, u.uid, u.email, u.first_name, u.last_name, u.picture, u.phone, u.about_me, u.created_at, u.updated_at FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
 	SELECT_POST_AUTHOR                     = "SELECT author_id FROM blog_posts WHERE post_id = ?"
 	SELECT_ID_OF_LAST_INSERT               = "SELECT LAST_INSERT_ID() as uid"
@@ -127,6 +129,28 @@ func (p PostRepositoryImpl) IncreaseView(ctx context.Context, id int64) error {
 	}
 
 	return nil
+}
+
+func (p PostRepositoryImpl) GetRawPost(ctx context.Context, id int64) (entity.BlogPost, error) {
+	var post entity.BlogPost
+
+	rows, err := p.db.QueryContext(ctx, SELECT_RAW_POST, id)
+	if err != nil {
+		log.Println("[ERROR] GetRawPost -> error on executing query :", err)
+		return post, err
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&post.PostID, &post.AuthorID, &post.Banner, &post.Title, &post.Body, &post.CreatedAt, &post.UpdatedAt)
+		if err != nil {
+			log.Println("[ERROR] GetRawPost -> error scanning row :", err)
+			return post, err
+		}
+
+		return post, nil
+	}
+
+	return post, fmt.Errorf("No post with id %d", id)
 }
 
 func (p PostRepositoryImpl) GetFullPost(ctx context.Context, id int64) (entity.BlogPost, entity.UserDetail, error) {
@@ -527,6 +551,26 @@ func (p PostRepositoryImpl) AddPostCategoryAssoc(ctx context.Context, posdtId in
 	}
 	if rowsAffected != 1 {
 		log.Println("[ERROR] AddPostCategoryAssoc -> error on updating row :", err)
+		return err
+	}
+
+	return nil
+}
+
+func (p PostRepositoryImpl) EditPostCategoryAssoc(ctx context.Context, posdtId int64, categoryId int64) error {
+	result, err := p.db.ExecContext(ctx, UPDATE_CATEGORY_ASSOC, categoryId, posdtId)
+	if err != nil {
+		log.Println("[ERROR] EditPostCategoryAssoc -> error inserting row :", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] EditPostCategoryAssoc -> error on getting rows affected :", err)
+		return err
+	}
+	if rowsAffected == 0 {
+		log.Println("[ERROR] EditPostCategoryAssoc -> error on updating row :", err)
 		return err
 	}
 

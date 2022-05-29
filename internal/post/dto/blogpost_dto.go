@@ -9,29 +9,40 @@ import (
 	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 
+type RawBlogPostResponse struct {
+	PostID     int64         `json:"postId"`
+	AuthorID   int64         `json:"authorId"`
+	Banner     string        `json:"banner"`
+	Title      string        `json:"title"`
+	Categories CategoryList  `json:"categories"`
+	Body       template.HTML `json:"body"`
+	CreatedAt  string        `json:"createdAt"`
+	UpdatedAt  string        `json:"updatedAt"`
+}
+
 type BlogPostResponse struct {
-	PostID       int64
-	Author       UserDto.UserDetailResponse
-	Categories   CategoryList
-	Banner       string
-	Title        string
-	Body         template.HTML
-	ViewCount    int64
-	CommentCount int64
-	CreatedAt    string
-	UpdatedAt    string
+	PostID       int64                      `json:"postId"`
+	Author       UserDto.UserDetailResponse `json:"author"`
+	Categories   CategoryList               `json:"categories"`
+	Banner       string                     `json:"banner"`
+	Title        string                     `json:"title"`
+	Body         template.HTML              `json:"body"`
+	ViewCount    int64                      `json:"viewCount"`
+	CommentCount int64                      `json:"commentCount"`
+	CreatedAt    string                     `json:"createdAt"`
+	UpdatedAt    string                     `json:"updatedAt"`
 }
 
 type BriefBlogPostResponse struct {
-	PostID       int64
-	Author       string
-	Banner       string
-	Title        string
-	Body         string
-	ViewCount    int64
-	CommentCount int64
-	CreatedAt    string
-	UpdatedAt    string
+	PostID       int64  `json:"postId"`
+	Author       string `json:"author"`
+	Banner       string `json:"banner"`
+	Title        string `json:"title"`
+	Body         string `json:"body"`
+	ViewCount    int64  `json:"viewCount"`
+	CommentCount int64  `json:"commentCount"`
+	CreatedAt    string `json:"createdAt"`
+	UpdatedAt    string `json:"updatedAt"`
 }
 
 type MiniBlogPostResponse struct {
@@ -42,16 +53,17 @@ type MiniBlogPostResponse struct {
 }
 
 type BlogPostRequest struct {
-	Category   int64
-	Banner     []byte
-	BannerName string
-	Title      string
-	Body       string
+	AuthorID   int64  `json:"authorId"`
+	Category   int64  `json:"category"`
+	Banner     []byte `json:"banner"`
+	BannerName string `json:"bannerName"`
+	Title      string `json:"title"`
+	Body       string `json:"body"`
 }
 
 type Category struct {
-	CategoryID   int64
-	CategoryName string
+	CategoryID   int64  `json:"categoryID"`
+	CategoryName string `json:"categoryName"`
 }
 
 type CategoryList []Category
@@ -75,6 +87,19 @@ func NewCategoryList(c entity.Categories) CategoryList {
 	}
 
 	return categoryList
+}
+
+func NewRawBlogPostResponse(post entity.BlogPost, categories entity.Categories) RawBlogPostResponse {
+	return RawBlogPostResponse{
+		PostID:     post.PostID,
+		AuthorID:   post.AuthorID,
+		Banner:     post.Banner,
+		Title:      post.Title,
+		Categories: NewCategoryList(categories),
+		Body:       template.HTML(post.Body),
+		CreatedAt:  post.CreatedAt.Format("Jan 02, 2006"),
+		UpdatedAt:  post.UpdatedAt.Format("Jan 02, 2006"),
+	}
 }
 
 func NewBlogPostResponse(post entity.BlogPost, categories entity.Categories, author entity.UserDetail) BlogPostResponse {
@@ -152,10 +177,10 @@ func NewTopCategoriesAndPost(posts entity.BriefsBlogPost, categories entity.Cate
 	return topCategoriesAndPost
 }
 
-func (b *BlogPostRequest) ToDAO(PostID int64, AuthorID int64, BannerURL string) entity.BlogPost {
+func (b *BlogPostRequest) ToDAO(PostID int64, BannerURL string) entity.BlogPost {
 	return entity.BlogPost{
 		PostID:   PostID,
-		AuthorID: AuthorID,
+		AuthorID: b.AuthorID,
 		Banner:   BannerURL,
 		Title:    b.Title,
 		Body:     b.Body,
