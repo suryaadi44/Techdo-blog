@@ -46,7 +46,7 @@ var (
 	SELECT_CATEGORY_OF_POST                = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
 	SELECT_CATEGORY                        = "SELECT category_id, category_name FROM categories"
 	SELECT_COMMENTS                        = "SELECT c.comment_id, c.uid, c.comment_body, c.created_at, c.updated_at, u.uid, u.first_name, u.last_name, u.picture FROM comment c JOIN user_details u ON c.uid= u.uid WHERE c.post_id = ? ORDER BY c.created_at DESC"
-	SELECT_COMMENTS_BY_UID                 = "SELECT comment_id, post_id, comment_body, created_at, updated_at FROM comment WHERE uid = ? ORDER BY created_at DESC LIMIT ?, ?"
+	SELECT_COMMENTS_BY_UID                 = "SELECT c.comment_id, p.post_id, p.title, c.comment_body, c.created_at, c.updated_at FROM comment c JOIN blog_posts p ON c.post_id = p.post_id WHERE uid = ? ORDER BY created_at DESC LIMIT ?, ?"
 	SELECT_POST_OF_LATEST_UPDATED_CATEGORY = "SELECT post_id, banner, title, body, view_count, comment_count, created_at, updated_at, author, category_id, category_name FROM homepage_latest"
 	SELECT_EDITOR_PICK                     = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid JOIN editor_pick e ON b.post_id = e.post_id;"
 )
@@ -666,27 +666,30 @@ func (p PostRepositoryImpl) GetCommentAuthorId(ctx context.Context, id int64) (i
 	return -1, fmt.Errorf("No comment with id %d", id)
 }
 
-func (p PostRepositoryImpl) GetUserComments(ctx context.Context, id int64, offset int64, limit int64) (entity.Comments, error) {
+func (p PostRepositoryImpl) GetUserComments(ctx context.Context, id int64, offset int64, limit int64) (entity.Comments, entity.BriefsBlogPost, error) {
 	var comments entity.Comments
+	var posts entity.BriefsBlogPost
 
 	rows, err := p.db.QueryContext(ctx, SELECT_COMMENTS_BY_UID, id, offset, limit)
 	if err != nil {
 		log.Println("[ERROR] GetUserComments -> error on executing query :", err)
-		return comments, err
+		return comments, posts, err
 	}
 
 	for rows.Next() {
 		var comment entity.Comment
-		err = rows.Scan(&comment.CommentID, &comment.PostID, &comment.CommentBody, &comment.CreatedAt, &comment.UpdatedAt)
+		var post entity.BriefBlogPost
+		err = rows.Scan(&comment.CommentID, &post.PostID, &post.Title, &comment.CommentBody, &comment.CreatedAt, &comment.UpdatedAt)
 		if err != nil {
 			log.Println("[ERROR] GetPostComments -> error scanning row :", err)
-			return comments, err
+			return comments, posts, err
 		}
 
 		comments = append(comments, &comment)
+		posts = append(posts, &post)
 	}
 
-	return comments, nil
+	return comments, posts, nil
 }
 
 func (p PostRepositoryImpl) CountUserTotalComment(ctx context.Context, id int64) (int64, error) {

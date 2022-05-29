@@ -129,7 +129,9 @@ function makeCommentItem(comment) {
   <div class="row card comment-items my-3">
     <div class="row py-3 px-3">
       <div class="col align-self-center">
-        <h5>Blog Title</h5>
+        <h5>
+        <a href="/post/${comment.postID}" class="post-link">${comment.postTitle}</a>
+        </h5>
       </div>
 
       <div class="col mt-2 align-self-center">

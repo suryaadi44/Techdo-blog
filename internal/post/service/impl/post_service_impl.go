@@ -337,13 +337,13 @@ func (p PostServiceImpl) GetCommentsByUser(ctx context.Context, uid int64, page 
 	var commentResponse dto.UserCommentsResponse
 	offset := (page - 1) * limit
 
-	comment, err := p.Repository.GetUserComments(ctx, uid, offset, limit)
+	comment, posts, err := p.Repository.GetUserComments(ctx, uid, offset, limit)
 	if err != nil {
 		log.Println("[ERROR] Fetching list of comment -> error:", err)
 		return commentResponse, err
 	}
 
-	commentResponse = dto.NewUserCommentsResponse(comment)
+	commentResponse = dto.NewUserCommentsResponse(comment, posts)
 
 	return commentResponse, nil
 }
