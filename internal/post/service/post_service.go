@@ -18,6 +18,7 @@ type PostServiceApi interface {
 	AddComment(ctx context.Context, comment dto.CommentRequest) error
 
 	DeletePost(ctx context.Context, id int64) error
+	DeleteComment(ctx context.Context, id int64) error
 
 	EditPost(ctx context.Context, post dto.BlogPostRequest, PostID int64) (int64, error)
 
@@ -40,6 +41,7 @@ type PostServiceApi interface {
 	GetCategoryList(ctx context.Context) (dto.CategoryList, error)
 	GetComments(ctx context.Context, postID int64) (dto.PostCommentsResponse, error)
 	GetCommentsByUser(ctx context.Context, uid int64, page int64, limit int64) (dto.UserCommentsResponse, error)
+	GetCommentAuthorIdFromId(ctx context.Context, id int64) (int64, error)
 
 	UploadImage(ctx context.Context, filename string, image interface{}, folderID string) (*imagekit.UploadResponse, error)
 }

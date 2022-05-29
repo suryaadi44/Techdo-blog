@@ -22,6 +22,7 @@ type PostCommentResponse struct {
 
 type UserCommentResponse struct {
 	Index       int64  `json:"index"`
+	CommentID   int64  `json:"commentID"`
 	PostID      int64  `json:"postId"`
 	CommentBody string `json:"commentBody"`
 	CreatedAt   string `json:"createdAt"`
@@ -68,6 +69,7 @@ func NewPostCommentsResponse(comments entity.Comments, users entity.MiniUsersDet
 func NewUserCommentResponse(comment entity.Comment, index int64) UserCommentResponse {
 	return UserCommentResponse{
 		Index:       index,
+		CommentID:   comment.CommentID,
 		PostID:      comment.PostID,
 		CommentBody: comment.CommentBody,
 		CreatedAt:   comment.CreatedAt.Format("15:04, Jan 02, 2006"),

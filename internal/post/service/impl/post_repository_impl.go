@@ -31,11 +31,13 @@ var (
 	UPDATE_POST           = "UPDATE blog_posts SET author_id = ?, banner = ?, title = ?, body = ? WHERE post_id = ?"
 	UPDATE_CATEGORY_ASSOC = "UPDATE category_associations SET category_id = ? WHERE post_id = ?"
 
-	DELETE_POST = "DELETE FROM blog_posts WHERE post_id = ?"
+	DELETE_POST    = "DELETE FROM blog_posts WHERE post_id = ?"
+	DELETE_COMMENT = "DELETE FROM comment WHERE comment_id = ?"
 
 	SELECT_RAW_POST                        = "SELECT post_id, author_id, banner, title, body, created_at, updated_at FROM blog_posts WHERE post_id = ?"
 	SELECT_POST                            = "SELECT b.post_id, b.author_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, u.uid, u.email, u.first_name, u.last_name, u.picture, u.phone, u.about_me, u.created_at, u.updated_at FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
 	SELECT_POST_AUTHOR                     = "SELECT author_id FROM blog_posts WHERE post_id = ?"
+	SELECT_COMMENT_AUTHOR                  = "SELECT uid FROM comment WHERE comment_id = ?"
 	SELECT_ID_OF_LAST_INSERT               = "SELECT LAST_INSERT_ID() as uid"
 	SELECT_LIST_OF_POST                    = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid ORDER BY b.created_at DESC LIMIT ?, ? "
 	SELECT_LIST_OF_POST_BY_USER            = "SELECT post_id, title, created_at FROM blog_posts WHERE author_id = ? ORDER BY created_at DESC LIMIT ?, ? "
@@ -597,6 +599,26 @@ func (p PostRepositoryImpl) AddComment(ctx context.Context, comment entity.Comme
 	return nil
 }
 
+func (p PostRepositoryImpl) DeleteComment(ctx context.Context, id int64) error {
+	result, err := p.db.ExecContext(ctx, DELETE_COMMENT, id)
+	if err != nil {
+		log.Println("[ERROR] DeleteComment -> error deleting row :", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] AddComment -> error on getting rows affected :", err)
+		return err
+	}
+	if rowsAffected != 1 {
+		log.Println("[ERROR] AddComment -> error on updating row :", err)
+		return err
+	}
+
+	return nil
+}
+
 func (p PostRepositoryImpl) GetPostComments(ctx context.Context, id int64) (entity.Comments, entity.MiniUsersDetail, error) {
 	var comments entity.Comments
 	var users entity.MiniUsersDetail
@@ -621,6 +643,27 @@ func (p PostRepositoryImpl) GetPostComments(ctx context.Context, id int64) (enti
 	}
 
 	return comments, users, nil
+}
+
+func (p PostRepositoryImpl) GetCommentAuthorId(ctx context.Context, id int64) (int64, error) {
+	rows, err := p.db.QueryContext(ctx, SELECT_COMMENT_AUTHOR, id)
+	if err != nil {
+		log.Println("[ERROR] GetCommentAuthorId -> error on executing query :", err)
+		return -1, err
+	}
+
+	var uid int64
+	if rows.Next() {
+		err = rows.Scan(&uid)
+		if err != nil {
+			log.Println("[ERROR] GetCommentAuthorId -> error scanning row :", err)
+			return -1, err
+		}
+
+		return uid, nil
+	}
+
+	return -1, fmt.Errorf("No comment with id %d", id)
 }
 
 func (p PostRepositoryImpl) GetUserComments(ctx context.Context, id int64, offset int64, limit int64) (entity.Comments, error) {

@@ -311,6 +311,14 @@ func (p PostServiceImpl) AddComment(ctx context.Context, comment dto.CommentRequ
 	return p.Repository.AddComment(ctx, comment.ToDAO())
 }
 
+func (p PostServiceImpl) DeleteComment(ctx context.Context, id int64) error {
+	return p.Repository.DeleteComment(ctx, id)
+}
+
+func (p PostServiceImpl) GetCommentAuthorIdFromId(ctx context.Context, id int64) (int64, error) {
+	return p.Repository.GetCommentAuthorId(ctx, id)
+}
+
 func (p PostServiceImpl) GetComments(ctx context.Context, postID int64) (dto.PostCommentsResponse, error) {
 	var commentResponse dto.PostCommentsResponse
 
