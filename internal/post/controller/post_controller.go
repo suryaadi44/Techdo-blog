@@ -38,10 +38,13 @@ func (p *PostController) InitializeController() {
 	authRouter.HandleFunc("/post/{id:[0-9]+}/edit", p.editPostPageHandlder).Methods(http.MethodGet)
 
 	// API
+	authRouter.HandleFunc("/user/post", p.userPostHandler).Methods(http.MethodGet)
+	authRouter.HandleFunc("/user/comment", p.userCommentHandler).Methods(http.MethodGet)
 	authRouter.HandleFunc("/post/create", p.createPostHandler).Methods(http.MethodPost)
 	authRouter.HandleFunc("/post/{id:[0-9]+}/delete", p.deletePostHandlder).Methods(http.MethodDelete)
 	authRouter.HandleFunc("/post/{id:[0-9]+}/edit", p.editPostHandler).Methods(http.MethodPost)
 	authRouter.HandleFunc("/post/{id:[0-9]+}/comment/add", p.addCommentHandler).Methods(http.MethodPost)
+	authRouter.HandleFunc("/post/comment/delete", p.deleteCommentHandler).Methods(http.MethodDelete)
 
 	// Without middleware
 	// Page

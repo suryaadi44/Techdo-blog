@@ -9,6 +9,7 @@ import (
 
 	"github.com/gorilla/mux"
 	middlewarePkg "github.com/suryaadi44/Techdo-blog/internal/middleware"
+	postPkg "github.com/suryaadi44/Techdo-blog/internal/post/service"
 	"github.com/suryaadi44/Techdo-blog/internal/user/dto"
 	"github.com/suryaadi44/Techdo-blog/internal/user/service"
 	globalDTO "github.com/suryaadi44/Techdo-blog/pkg/dto"
@@ -19,14 +20,16 @@ type UserController struct {
 	router         *mux.Router
 	userService    service.UserServiceApi
 	sessionService service.SessionServiceApi
+	postService    postPkg.PostServiceApi
 	authMiddleware middlewarePkg.AuthMiddleware
 }
 
-func NewUserController(router *mux.Router, userService service.UserServiceApi, sessionService service.SessionServiceApi, authMiddleware middlewarePkg.AuthMiddleware) *UserController {
+func NewUserController(router *mux.Router, userService service.UserServiceApi, sessionService service.SessionServiceApi, postService postPkg.PostServiceApi, authMiddleware middlewarePkg.AuthMiddleware) *UserController {
 	return &UserController{
 		router:         router,
 		userService:    userService,
 		sessionService: sessionService,
+		postService:    postService,
 		authMiddleware: authMiddleware,
 	}
 }
@@ -45,6 +48,7 @@ func (u *UserController) InitializeController() {
 
 	// Page
 	authRouter.HandleFunc("/user/settings", u.settingPageHandler).Methods(http.MethodGet)
+	authRouter.HandleFunc("/user", u.userDashboardPageHandler).Methods(http.MethodGet)
 
 	//without middleware
 	//API
@@ -75,6 +79,50 @@ func (u *UserController) settingPageHandler(w http.ResponseWriter, r *http.Reque
 
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
+	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))
+}
+
+func (u *UserController) userDashboardPageHandler(w http.ResponseWriter, r *http.Request) {
+	var tmpl = template.Must(template.ParseFiles("web/template/user/dashboard.html"))
+
+	token, _ := utils.GetSessionToken(r)
+	session, err := u.sessionService.GetSession(r.Context(), token)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+	user, err := u.userService.GetUserMiniDetail(r.Context(), session.UID)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+
+	totalComment, err := u.postService.GetUserTotalCommentCount(r.Context(), user.UserID)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
+	totalPost, err := u.postService.GetUserTotalPostCount(r.Context(), user.UserID)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
+	recentComments, err := u.postService.GetCommentsByUser(r.Context(), user.UserID, 1, 5)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
+	recentPost, err := u.postService.GetMiniBlogPostsByUser(r.Context(), user.UserID, 1, 5)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
+	}
+
+	data := map[string]interface{}{
+		"User":           user,
+		"CommentCount":   totalComment,
+		"PostCount":      totalPost,
+		"RecentComments": recentComments,
+		"RecentPost":     recentPost,
 	}
 
 	tmpl.Execute(w, globalDTO.NewBaseResponse(http.StatusOK, false, data))

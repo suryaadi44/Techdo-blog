@@ -189,6 +189,20 @@ func (p PostServiceImpl) GetBriefsBlogPost(ctx context.Context, page int64, limi
 	return postList, nil
 }
 
+func (p PostServiceImpl) GetMiniBlogPostsByUser(ctx context.Context, id int64, page int64, limit int64) (dto.MiniBlogPostsResponse, error) {
+	var postList dto.MiniBlogPostsResponse
+	offset := (page - 1) * limit
+
+	postListEntity, err := p.Repository.GetMiniBlogPostsDataByUser(ctx, id, offset, limit)
+	if err != nil {
+		log.Println("[ERROR] Fetching list of post -> error:", err)
+		return postList, err
+	}
+
+	postList = dto.NewMiniBlogPostsResponse(postListEntity)
+	return postList, nil
+}
+
 func (p PostServiceImpl) GetBriefsBlogPostOfCategories(ctx context.Context, categories string, page int64, limit int64) (dto.BriefsBlogPostResponse, error) {
 	var postList dto.BriefsBlogPostResponse
 	offset := (page - 1) * limit
@@ -251,6 +265,16 @@ func (p PostServiceImpl) SearchBlogPost(ctx context.Context, q string, page int6
 	return postList, nil
 }
 
+func (p PostServiceImpl) GetUserTotalPostCount(ctx context.Context, id int64) (int64, error) {
+	total, err := p.Repository.CountUserTotalPost(ctx, id)
+	if err != nil {
+		log.Println("[ERROR] GetUserTotalPostCount: Error getting count of user total post-> error:", err)
+		return 0, err
+	}
+
+	return total, nil
+}
+
 func (p PostServiceImpl) GetCountOfSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time, category string) (int64, error) {
 	return p.Repository.CountSearchResult(ctx, q, dateStart, dateEnd, category)
 }
@@ -287,8 +311,16 @@ func (p PostServiceImpl) AddComment(ctx context.Context, comment dto.CommentRequ
 	return p.Repository.AddComment(ctx, comment.ToDAO())
 }
 
-func (p PostServiceImpl) GetComments(ctx context.Context, postID int64) (dto.CommentsResponse, error) {
-	var commentResponse dto.CommentsResponse
+func (p PostServiceImpl) DeleteComment(ctx context.Context, id int64) error {
+	return p.Repository.DeleteComment(ctx, id)
+}
+
+func (p PostServiceImpl) GetCommentAuthorIdFromId(ctx context.Context, id int64) (int64, error) {
+	return p.Repository.GetCommentAuthorId(ctx, id)
+}
+
+func (p PostServiceImpl) GetComments(ctx context.Context, postID int64) (dto.PostCommentsResponse, error) {
+	var commentResponse dto.PostCommentsResponse
 
 	comment, user, err := p.Repository.GetPostComments(ctx, postID)
 	if err != nil {
@@ -296,7 +328,32 @@ func (p PostServiceImpl) GetComments(ctx context.Context, postID int64) (dto.Com
 		return commentResponse, err
 	}
 
-	commentResponse = dto.NewCommentsResponse(comment, user)
+	commentResponse = dto.NewPostCommentsResponse(comment, user)
 
 	return commentResponse, nil
+}
+
+func (p PostServiceImpl) GetCommentsByUser(ctx context.Context, uid int64, page int64, limit int64) (dto.UserCommentsResponse, error) {
+	var commentResponse dto.UserCommentsResponse
+	offset := (page - 1) * limit
+
+	comment, err := p.Repository.GetUserComments(ctx, uid, offset, limit)
+	if err != nil {
+		log.Println("[ERROR] Fetching list of comment -> error:", err)
+		return commentResponse, err
+	}
+
+	commentResponse = dto.NewUserCommentsResponse(comment)
+
+	return commentResponse, nil
+}
+
+func (p PostServiceImpl) GetUserTotalCommentCount(ctx context.Context, id int64) (int64, error) {
+	total, err := p.Repository.CountUserTotalComment(ctx, id)
+	if err != nil {
+		log.Println("[ERROR] GetUserTotalPostCount: Error getting count of user total post-> error:", err)
+		return 0, err
+	}
+
+	return total, nil
 }

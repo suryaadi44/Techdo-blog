@@ -21,6 +21,8 @@ var (
 	COUNT_LIST_OF_POST              = "SELECT COUNT(*) FROM blog_posts"
 	COUNT_LIST_OF_POST_IN_CATEGOIES = "SELECT COUNT(*) FROM blog_posts b JOIN category_associations a ON  a.post_id =  b.post_id JOIN categories c ON c.category_id = a.category_id WHERE c.category_name = ?"
 	COUNT_SEARCH_RESULT             = "SELECT COUNT(*) FROM blog_posts b"
+	COUNT_TOTAL_USER_POST           = "SELECT COUNT(*) FROM blog_posts WHERE author_id = ?"
+	COUNT_TOTAL_USER_COMMENT        = "SELECT COUNT(*) FROM comment WHERE uid = ?"
 
 	INSERT_BLANK_POST     = "INSERT INTO blog_posts() VALUE ()"
 	INSERT_CATEGORY_ASSOC = "INSERT INTO category_associations(post_id, category_id) VALUE (?, ?)"
@@ -29,18 +31,22 @@ var (
 	UPDATE_POST           = "UPDATE blog_posts SET author_id = ?, banner = ?, title = ?, body = ? WHERE post_id = ?"
 	UPDATE_CATEGORY_ASSOC = "UPDATE category_associations SET category_id = ? WHERE post_id = ?"
 
-	DELETE_POST = "DELETE FROM blog_posts WHERE post_id = ?"
+	DELETE_POST    = "DELETE FROM blog_posts WHERE post_id = ?"
+	DELETE_COMMENT = "DELETE FROM comment WHERE comment_id = ?"
 
 	SELECT_RAW_POST                        = "SELECT post_id, author_id, banner, title, body, created_at, updated_at FROM blog_posts WHERE post_id = ?"
 	SELECT_POST                            = "SELECT b.post_id, b.author_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, u.uid, u.email, u.first_name, u.last_name, u.picture, u.phone, u.about_me, u.created_at, u.updated_at FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
 	SELECT_POST_AUTHOR                     = "SELECT author_id FROM blog_posts WHERE post_id = ?"
+	SELECT_COMMENT_AUTHOR                  = "SELECT uid FROM comment WHERE comment_id = ?"
 	SELECT_ID_OF_LAST_INSERT               = "SELECT LAST_INSERT_ID() as uid"
 	SELECT_LIST_OF_POST                    = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid ORDER BY b.created_at DESC LIMIT ?, ? "
+	SELECT_LIST_OF_POST_BY_USER            = "SELECT post_id, title, created_at FROM blog_posts WHERE author_id = ? ORDER BY created_at DESC LIMIT ?, ? "
 	SELECT_LISF_OF_POST_IN_CATEGORY        = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid JOIN category_associations a ON  a.post_id =  b.post_id JOIN categories c ON c.category_id = a.category_id WHERE c.category_name = ? ORDER BY b.created_at DESC LIMIT ?, ?"
 	SELECT_FULL_TEXT_POST                  = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid"
 	SELECT_CATEGORY_OF_POST                = "SELECT c.category_id, c.category_name FROM categories c JOIN category_associations a ON c.category_id = a.category_id WHERE a.post_id = ?"
 	SELECT_CATEGORY                        = "SELECT category_id, category_name FROM categories"
 	SELECT_COMMENTS                        = "SELECT c.comment_id, c.uid, c.comment_body, c.created_at, c.updated_at, u.uid, u.first_name, u.last_name, u.picture FROM comment c JOIN user_details u ON c.uid= u.uid WHERE c.post_id = ? ORDER BY c.created_at DESC"
+	SELECT_COMMENTS_BY_UID                 = "SELECT comment_id, post_id, comment_body, created_at, updated_at FROM comment WHERE uid = ? ORDER BY created_at DESC LIMIT ?, ?"
 	SELECT_POST_OF_LATEST_UPDATED_CATEGORY = "SELECT post_id, banner, title, body, view_count, comment_count, created_at, updated_at, author, category_id, category_name FROM homepage_latest"
 	SELECT_EDITOR_PICK                     = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid JOIN editor_pick e ON b.post_id = e.post_id;"
 )
@@ -186,6 +192,29 @@ func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset in
 		err = rows.Scan(&post.PostID, &post.Banner, &post.Title, &post.Body, &post.ViewCount, &post.CommentCount, &post.CreatedAt, &post.UpdatedAt, &post.Author)
 		if err != nil {
 			log.Println("[ERROR] GetBriefsBlogPostData -> error scanning row :", err)
+			return postList, err
+		}
+
+		postList = append(postList, &post)
+	}
+
+	return postList, nil
+}
+
+func (p PostRepositoryImpl) GetMiniBlogPostsDataByUser(ctx context.Context, id int64, offset int64, limit int64) (entity.BriefsBlogPost, error) {
+	var postList entity.BriefsBlogPost
+
+	rows, err := p.db.QueryContext(ctx, SELECT_LIST_OF_POST_BY_USER, id, offset, limit)
+	if err != nil {
+		log.Println("[ERROR] GetMiniBlogPostsDataByUser -> error on executing query :", err)
+		return postList, err
+	}
+
+	for rows.Next() {
+		var post entity.BriefBlogPost
+		err = rows.Scan(&post.PostID, &post.Title, &post.CreatedAt)
+		if err != nil {
+			log.Println("[ERROR] GetMiniBlogPostsDataByUser -> error scanning row :", err)
 			return postList, err
 		}
 
@@ -393,6 +422,28 @@ func (p PostRepositoryImpl) CountListOfPost(ctx context.Context) (int64, error) 
 	return 0, errors.New("can't get count of post ")
 }
 
+func (p PostRepositoryImpl) CountUserTotalPost(ctx context.Context, id int64) (int64, error) {
+	var count int64
+
+	rows, err := p.db.QueryContext(ctx, COUNT_TOTAL_USER_POST, id)
+	if err != nil {
+		log.Println("[ERROR] GetUserTotalPostCount -> error on executing query :", err)
+		return 0, err
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&count)
+		if err != nil {
+			log.Println("[ERROR] GetUserTotalPostCount -> error scanning row :", err)
+			return 0, err
+		}
+
+		return count, nil
+	}
+
+	return 0, errors.New("can't get count of total user post")
+}
+
 func (p PostRepositoryImpl) CountListOfPostInCategories(ctx context.Context, categories string) (int64, error) {
 	var count int64
 
@@ -548,6 +599,26 @@ func (p PostRepositoryImpl) AddComment(ctx context.Context, comment entity.Comme
 	return nil
 }
 
+func (p PostRepositoryImpl) DeleteComment(ctx context.Context, id int64) error {
+	result, err := p.db.ExecContext(ctx, DELETE_COMMENT, id)
+	if err != nil {
+		log.Println("[ERROR] DeleteComment -> error deleting row :", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] AddComment -> error on getting rows affected :", err)
+		return err
+	}
+	if rowsAffected != 1 {
+		log.Println("[ERROR] AddComment -> error on updating row :", err)
+		return err
+	}
+
+	return nil
+}
+
 func (p PostRepositoryImpl) GetPostComments(ctx context.Context, id int64) (entity.Comments, entity.MiniUsersDetail, error) {
 	var comments entity.Comments
 	var users entity.MiniUsersDetail
@@ -572,4 +643,70 @@ func (p PostRepositoryImpl) GetPostComments(ctx context.Context, id int64) (enti
 	}
 
 	return comments, users, nil
+}
+
+func (p PostRepositoryImpl) GetCommentAuthorId(ctx context.Context, id int64) (int64, error) {
+	rows, err := p.db.QueryContext(ctx, SELECT_COMMENT_AUTHOR, id)
+	if err != nil {
+		log.Println("[ERROR] GetCommentAuthorId -> error on executing query :", err)
+		return -1, err
+	}
+
+	var uid int64
+	if rows.Next() {
+		err = rows.Scan(&uid)
+		if err != nil {
+			log.Println("[ERROR] GetCommentAuthorId -> error scanning row :", err)
+			return -1, err
+		}
+
+		return uid, nil
+	}
+
+	return -1, fmt.Errorf("No comment with id %d", id)
+}
+
+func (p PostRepositoryImpl) GetUserComments(ctx context.Context, id int64, offset int64, limit int64) (entity.Comments, error) {
+	var comments entity.Comments
+
+	rows, err := p.db.QueryContext(ctx, SELECT_COMMENTS_BY_UID, id, offset, limit)
+	if err != nil {
+		log.Println("[ERROR] GetUserComments -> error on executing query :", err)
+		return comments, err
+	}
+
+	for rows.Next() {
+		var comment entity.Comment
+		err = rows.Scan(&comment.CommentID, &comment.PostID, &comment.CommentBody, &comment.CreatedAt, &comment.UpdatedAt)
+		if err != nil {
+			log.Println("[ERROR] GetPostComments -> error scanning row :", err)
+			return comments, err
+		}
+
+		comments = append(comments, &comment)
+	}
+
+	return comments, nil
+}
+
+func (p PostRepositoryImpl) CountUserTotalComment(ctx context.Context, id int64) (int64, error) {
+	var count int64
+
+	rows, err := p.db.QueryContext(ctx, COUNT_TOTAL_USER_COMMENT, id)
+	if err != nil {
+		log.Println("[ERROR] GetUserTotalCommentCount -> error on executing query :", err)
+		return 0, err
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&count)
+		if err != nil {
+			log.Println("[ERROR] GetUserTotalCommentCount -> error scanning row :", err)
+			return 0, err
+		}
+
+		return count, nil
+	}
+
+	return 0, errors.New("can't get count of total user comment")
 }

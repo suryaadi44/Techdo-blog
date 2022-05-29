@@ -45,6 +45,13 @@ type BriefBlogPostResponse struct {
 	UpdatedAt    string `json:"updatedAt"`
 }
 
+type MiniBlogPostResponse struct {
+	Index     int64
+	PostID    int64
+	Title     string
+	CreatedAt string
+}
+
 type BlogPostRequest struct {
 	AuthorID   int64  `json:"authorId"`
 	Category   int64  `json:"category"`
@@ -61,6 +68,7 @@ type Category struct {
 
 type CategoryList []Category
 type BriefsBlogPostResponse []BriefBlogPostResponse
+type MiniBlogPostsResponse []MiniBlogPostResponse
 type TopCategoriesWithPost map[string]BriefsBlogPostResponse
 
 func NewCategory(c entity.Category) Category {
@@ -124,6 +132,15 @@ func NewBriefBlogPostResponse(post entity.BriefBlogPost) BriefBlogPostResponse {
 		CreatedAt:    post.CreatedAt.Format("Jan 02, 2006"),
 		UpdatedAt:    post.UpdatedAt.Format("Jan 02, 2006"),
 	}
+}
+
+func NewMiniBlogPostResponse(post entity.BriefBlogPost, index int64) MiniBlogPostResponse {
+	return MiniBlogPostResponse{
+		Index:     index,
+		PostID:    post.PostID,
+		Title:     post.Title,
+		CreatedAt: post.CreatedAt.Format("Jan 02, 2006"),
+	}
 
 }
 
@@ -132,6 +149,17 @@ func NewBriefsBlogPostResponse(posts entity.BriefsBlogPost) BriefsBlogPostRespon
 
 	for _, each := range posts {
 		eachPost := NewBriefBlogPostResponse(*each)
+		postList = append(postList, eachPost)
+	}
+
+	return postList
+}
+
+func NewMiniBlogPostsResponse(posts entity.BriefsBlogPost) MiniBlogPostsResponse {
+	var postList MiniBlogPostsResponse
+
+	for idx, each := range posts {
+		eachPost := NewMiniBlogPostResponse(*each, int64(idx+1))
 		postList = append(postList, eachPost)
 	}
 

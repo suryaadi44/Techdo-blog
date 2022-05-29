@@ -10,7 +10,7 @@ type CommentRequest struct {
 	CommentBody string `json:"commentBody"`
 }
 
-type CommentResponse struct {
+type PostCommentResponse struct {
 	UserID      int64  `json:"uid"`
 	FirstName   string `json:"firstName"`
 	LastName    string `json:"lastName"`
@@ -20,7 +20,17 @@ type CommentResponse struct {
 	UpdatedAt   string `json:"updatedAt"`
 }
 
-type CommentsResponse []*CommentResponse
+type UserCommentResponse struct {
+	Index       int64  `json:"index"`
+	CommentID   int64  `json:"commentID"`
+	PostID      int64  `json:"postId"`
+	CommentBody string `json:"commentBody"`
+	CreatedAt   string `json:"createdAt"`
+	UpdatedAt   string `json:"updatedAt"`
+}
+
+type PostCommentsResponse []*PostCommentResponse
+type UserCommentsResponse []*UserCommentResponse
 
 func (c *CommentRequest) ToDAO() entity.Comment {
 	return entity.Comment{
@@ -30,8 +40,8 @@ func (c *CommentRequest) ToDAO() entity.Comment {
 	}
 }
 
-func NewCommentResponse(comment entity.Comment, user entity.MiniUserDetail) CommentResponse {
-	return CommentResponse{
+func NewPostCommentResponse(comment entity.Comment, user entity.MiniUserDetail) PostCommentResponse {
+	return PostCommentResponse{
 		UserID:      comment.UserID,
 		FirstName:   user.FirstName,
 		LastName:    user.LastName,
@@ -42,14 +52,36 @@ func NewCommentResponse(comment entity.Comment, user entity.MiniUserDetail) Comm
 	}
 }
 
-func NewCommentsResponse(comments entity.Comments, users entity.MiniUsersDetail) CommentsResponse {
-	var response CommentsResponse
+func NewPostCommentsResponse(comments entity.Comments, users entity.MiniUsersDetail) PostCommentsResponse {
+	var response PostCommentsResponse
 
 	for idx := range comments {
 		eachComment := comments[idx]
 		eachUsers := users[idx]
 
-		comment := NewCommentResponse(*eachComment, *eachUsers)
+		comment := NewPostCommentResponse(*eachComment, *eachUsers)
+		response = append(response, &comment)
+	}
+
+	return response
+}
+
+func NewUserCommentResponse(comment entity.Comment, index int64) UserCommentResponse {
+	return UserCommentResponse{
+		Index:       index,
+		CommentID:   comment.CommentID,
+		PostID:      comment.PostID,
+		CommentBody: comment.CommentBody,
+		CreatedAt:   comment.CreatedAt.Format("15:04, Jan 02, 2006"),
+		UpdatedAt:   comment.UpdatedAt.Format("15:04, Jan 02, 2006"),
+	}
+}
+
+func NewUserCommentsResponse(comments entity.Comments) UserCommentsResponse {
+	var response UserCommentsResponse
+
+	for idx, each := range comments {
+		comment := NewUserCommentResponse(*each, int64(idx+1))
 		response = append(response, &comment)
 	}
 

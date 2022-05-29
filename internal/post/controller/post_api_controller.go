@@ -108,6 +108,41 @@ func (p *PostController) createPostHandler(w http.ResponseWriter, r *http.Reques
 	globalDTO.NewBaseResponse(http.StatusCreated, false, fmt.Sprintf("/post/%d", postID)).SendResponse(&w)
 }
 
+func (p *PostController) userPostHandler(w http.ResponseWriter, r *http.Request) {
+	token, _ := utils.GetSessionToken(r)
+	session, err := p.sessionService.GetSession(r.Context(), token)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+	}
+
+	queryVar := r.URL.Query()
+	limit := queryVar.Get("limit")
+	if limit == "" {
+		limit = "12"
+	}
+	page := queryVar.Get("page")
+	if page == "" {
+		page = "1"
+	}
+
+	limitConv, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+	pageConv, err := strconv.ParseInt(page, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+
+	postData, err := p.postService.GetMiniBlogPostsByUser(r.Context(), session.UID, pageConv, limitConv)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	globalDTO.NewBaseResponse(http.StatusOK, false, postData).SendResponse(&w)
+}
+
 func (p *PostController) editPostHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
@@ -220,6 +255,41 @@ func (p *PostController) viewCommentHandler(w http.ResponseWriter, r *http.Reque
 	globalDTO.NewBaseResponse(http.StatusOK, false, commentsData).SendResponse(&w)
 }
 
+func (p *PostController) userCommentHandler(w http.ResponseWriter, r *http.Request) {
+	token, _ := utils.GetSessionToken(r)
+	session, err := p.sessionService.GetSession(r.Context(), token)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+	}
+
+	queryVar := r.URL.Query()
+	limit := queryVar.Get("limit")
+	if limit == "" {
+		limit = "12"
+	}
+	page := queryVar.Get("page")
+	if page == "" {
+		page = "1"
+	}
+
+	limitConv, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+	pageConv, err := strconv.ParseInt(page, 10, 64)
+	if err != nil {
+		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
+	}
+
+	postData, err := p.postService.GetCommentsByUser(r.Context(), session.UID, pageConv, limitConv)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	globalDTO.NewBaseResponse(http.StatusOK, false, postData).SendResponse(&w)
+}
+
 func (p *PostController) addCommentHandler(w http.ResponseWriter, r *http.Request) {
 	token, _ := utils.GetSessionToken(r)
 	session, err := p.sessionService.GetSession(r.Context(), token)
@@ -252,4 +322,44 @@ func (p *PostController) addCommentHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	globalDTO.NewBaseResponse(http.StatusCreated, false, nil).SendResponse(&w)
+}
+
+func (p *PostController) deleteCommentHandler(w http.ResponseWriter, r *http.Request) {
+	token, _ := utils.GetSessionToken(r)
+	session, err := p.sessionService.GetSession(r.Context(), token)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var payload map[string]string
+	if err := decoder.Decode(&payload); err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	id, err := strconv.ParseInt(payload["commentID"], 10, 64)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	commentAuthor, err := p.postService.GetCommentAuthorIdFromId(r.Context(), id)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	if commentAuthor != session.UID {
+		globalDTO.NewBaseResponse(http.StatusUnauthorized, true, "Cannot delete other user comment").SendResponse(&w)
+		return
+	}
+
+	err = p.postService.DeleteComment(r.Context(), id)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	globalDTO.NewBaseResponse(http.StatusOK, false, "Comment deleted").SendResponse(&w)
 }

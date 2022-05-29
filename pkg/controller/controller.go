@@ -24,14 +24,14 @@ func InitializeController(router *mux.Router, db *sql.DB) {
 	AuthMiddleware := middlewarePkg.NewAuthMiddleware(SessionService)
 
 	AuthService := userServicePkg.NewUserAuthService(db, SessionService)
-	AuthController := userControllerPkg.NewController(router, AuthService, SessionService)
-	AuthController.InitializeController()
-
-	UserService := userServicePkg.NewUserService(db)
-	UserController := userControllerPkg.NewUserController(router, UserService, SessionService, AuthMiddleware)
-	UserController.InitializeController()
-
 	PostService := postServicePkg.NewPostService(db)
+	UserService := userServicePkg.NewUserService(db)
+
+	AuthController := userControllerPkg.NewController(router, AuthService, SessionService)
 	PostController := postControllerPkg.NewController(router, PostService, SessionService, AuthMiddleware, UserService)
+	UserController := userControllerPkg.NewUserController(router, UserService, SessionService, PostService, AuthMiddleware)
+
+	AuthController.InitializeController()
 	PostController.InitializeController()
+	UserController.InitializeController()
 }
