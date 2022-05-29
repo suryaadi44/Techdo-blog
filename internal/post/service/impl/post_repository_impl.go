@@ -300,7 +300,7 @@ func (p PostRepositoryImpl) GetBriefsBlogPostFromSearch(ctx context.Context, q s
 	var query string
 	var args []interface{}
 
-	args = append(args, q)
+	args = append(args, fmt.Sprintf("%%%s%%", q))
 	query = SELECT_FULL_TEXT_POST
 
 	if category != "" {
@@ -308,7 +308,7 @@ func (p PostRepositoryImpl) GetBriefsBlogPostFromSearch(ctx context.Context, q s
 	}
 
 	// Add where clause
-	query = query + " WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
+	query = query + " WHERE b.title LIKE ?"
 
 	// Add argument
 	if category != "" {
@@ -355,14 +355,14 @@ func (p PostRepositoryImpl) CountSearchResult(ctx context.Context, q string, dat
 	var query string
 	var args []interface{}
 
-	args = append(args, q)
+	args = append(args, fmt.Sprintf("%%%s%%", q))
 	query = COUNT_SEARCH_RESULT
 	if category != "" {
 		query = query + " JOIN category_associations a ON  a.post_id = b.post_id JOIN categories c ON c.category_id = a.category_id"
 	}
 
 	// Add where clause
-	query = query + " WHERE MATCH(b.title) AGAINST(? IN NATURAL LANGUAGE MODE)"
+	query = query + " WHERE b.title LIKE ?"
 
 	// Add argument
 	if category != "" {
