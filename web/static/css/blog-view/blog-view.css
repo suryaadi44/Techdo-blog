@@ -30,6 +30,7 @@ img {
     height: 50vh;
     margin-top: -2px;
     background-size: cover;
+    background-position: center center;
 }
 
 .bio-pic {
