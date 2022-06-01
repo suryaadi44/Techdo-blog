@@ -115,7 +115,7 @@
                 <img src="{{.Data.Posts.Author.Picture}}" alt="Image" class="img-fluidid">
               </div>
               <div class="vcard">
-                <span class="d-block">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</span>
+                <span class="d-block"><a href="/user/{{.Data.Posts.Author.UserID}}" class="user-link">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</a></span>
                 <span class="d-block text-muted date-post">Posted on {{.Data.Posts.CreatedAt}}</span>
               </div>
             </div>
@@ -150,7 +150,7 @@
               <img src="{{.Data.Posts.Author.Picture}}" alt="Image" class="img-fluidid">
             </div>
             <div class="vcard">
-              <span class="d-block">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</span>
+              <span class="d-block"><a href="/user/{{.Data.Posts.Author.UserID}}" class="user-link">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</a></span>
             </div>
           </div>
           <hr>

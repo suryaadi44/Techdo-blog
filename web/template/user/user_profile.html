@@ -163,6 +163,19 @@
 
           </div>
 
+          {{if .Data.User.AboutMe.Valid}}
+          <div class="row">
+            <div class="mt-3 blog-post-list card" style="width: 100%;">
+              <div class="card-body">
+                <h4 class="card-title">About Me</h4>
+                <div class="post-list-container">
+                  <p class="autor-about-body">{{.Data.User.AboutMe.String}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          {{end}}
+
           <div class="row">
             <div class="mt-3 blog-post-list card" style="width: 100%;">
               <div class="card-body">
@@ -217,7 +230,7 @@
                       {{if $each.Title.Valid}}
                       <tr>
                         <th scope="row">{{$each.Index}}</th>
-                        <td><a href="/post/{{$each.PostID}}" class="post-link">{{$each.Title.String}}</a></td>
+                        <td><a href="/post/{{$each.PostID.Int64}}" class="post-link">{{$each.Title.String}}</a></td>
                         {{if $each.CreatedAt.Valid}}
                         <td>{{$each.CreatedAt.Time}}</td>
                         {{end}}
@@ -270,7 +283,6 @@
       crossorigin="anonymous"></script>
 
     <script src="/static/js/index.js"></script>
-    <script src="/static/js/dashboard.js"></script>
 </body>
 
 </html>

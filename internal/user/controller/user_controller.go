@@ -150,7 +150,7 @@ func (u *UserController) userProfilePageHandler(w http.ResponseWriter, r *http.R
 		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
 	}
 
-	user, err := u.userService.GetUserMiniDetail(r.Context(), id)
+	user, err := u.userService.GetUserDetail(r.Context(), id)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
