@@ -269,6 +269,19 @@ func (p PostServiceImpl) SearchBlogPost(ctx context.Context, q string, page int6
 	return postList, nil
 }
 
+func (p PostServiceImpl) GetUserPostStatisticOfEachCategory(ctx context.Context, id int64) (dto.EachCategoryStats, error) {
+	var statsResponse dto.EachCategoryStats
+
+	stats, err := p.Repository.GetUserPostStatisticOfEachCategory(ctx, id)
+	if err != nil {
+		log.Println("[ERROR] Fetching list of statistic -> error:", err)
+		return statsResponse, err
+	}
+
+	statsResponse = dto.NewEachCategoryStats(stats)
+	return statsResponse, nil
+}
+
 func (p PostServiceImpl) GetUserTotalPostCount(ctx context.Context, id int64) (int64, error) {
 	total, err := p.Repository.CountUserTotalPost(ctx, id)
 	if err != nil {

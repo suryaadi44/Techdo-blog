@@ -34,6 +34,7 @@ type PostServiceApi interface {
 	GetCountListOfPost(ctx context.Context) (int64, error)
 	GetCountOfSearchResult(ctx context.Context, q string, dateStart *time.Time, dateEnd *time.Time, category string) (int64, error)
 	GetCountListOfPostInCategories(ctx context.Context, categories string) (int64, error)
+	GetUserPostStatisticOfEachCategory(ctx context.Context, id int64) (dto.EachCategoryStats, error)
 	GetUserTotalPostCount(ctx context.Context, id int64) (int64, error)
 	GetUserTotalCommentCount(ctx context.Context, id int64) (int64, error)
 

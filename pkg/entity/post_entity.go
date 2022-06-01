@@ -36,6 +36,12 @@ type PostTitleWithCategory struct {
 	Category  dto.NullString `db:"category_name"`
 }
 
+type UserPostStatisticByCategory struct {
+	Category  dto.NullString `db:"category_name"`
+	TotalPost int64          `db:"TotalPost"`
+	TotalView int64          `db:"TotalView"`
+}
+
 type Category struct {
 	CategoryID   int64  `db:"category_id"`
 	CategoryName string `db:"category_name"`
@@ -54,3 +60,4 @@ type Categories []*Category
 type Comments []*Comment
 type BriefsBlogPost []*BriefBlogPost
 type PostsTitleWithCategory []*PostTitleWithCategory
+type ListOfUserPostStatisticByCategory []*UserPostStatisticByCategory

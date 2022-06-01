@@ -54,6 +54,13 @@ type MiniBlogPostResponse struct {
 	Category  dto.NullString `json:"category"`
 }
 
+type EachCategoryStat struct {
+	Index     int64          `json:"index"`
+	Category  dto.NullString `json:"category"`
+	TotalPost int64          `json:"totalPost"`
+	TotalView int64          `json:"totalView"`
+}
+
 type BlogPostRequest struct {
 	AuthorID   int64  `json:"authorId"`
 	Category   int64  `json:"category"`
@@ -72,6 +79,7 @@ type CategoryList []Category
 type BriefsBlogPostResponse []BriefBlogPostResponse
 type MiniBlogPostsResponse []MiniBlogPostResponse
 type TopCategoriesWithPost map[string]BriefsBlogPostResponse
+type EachCategoryStats []EachCategoryStat
 
 func NewCategory(c entity.Category) Category {
 	return Category{
@@ -146,6 +154,15 @@ func NewMiniBlogPostResponse(post entity.PostTitleWithCategory, index int64) Min
 	}
 }
 
+func NewEachCategoryStat(stat entity.UserPostStatisticByCategory, index int64) EachCategoryStat {
+	return EachCategoryStat{
+		Index:     index,
+		Category:  stat.Category,
+		TotalPost: stat.TotalPost,
+		TotalView: stat.TotalView,
+	}
+}
+
 func NewBriefsBlogPostResponse(posts entity.BriefsBlogPost) BriefsBlogPostResponse {
 	var postList BriefsBlogPostResponse
 
@@ -177,6 +194,17 @@ func NewTopCategoriesAndPost(posts entity.BriefsBlogPost, categories entity.Cate
 	}
 
 	return topCategoriesAndPost
+}
+
+func NewEachCategoryStats(stats entity.ListOfUserPostStatisticByCategory) EachCategoryStats {
+	var statsResponse EachCategoryStats
+
+	for idx, each := range stats {
+		stat := NewEachCategoryStat(*each, int64(idx+1))
+		statsResponse = append(statsResponse, stat)
+	}
+
+	return statsResponse
 }
 
 func (b *BlogPostRequest) ToDAO(PostID int64, BannerURL string) entity.BlogPost {
