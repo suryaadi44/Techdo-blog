@@ -28,7 +28,7 @@ function makeBlogItems(blog) {
         <div class="row py-3 px-3">
           <div class="col align-self-center">
             <h5>
-              <a href="/post/${blog.postID}" class="post-link">${blog.title}</a>
+              <a href="/post/${blog.postId}" class="post-link">${blog.title}</a>
             </h5>
           </div>
   
@@ -37,10 +37,10 @@ function makeBlogItems(blog) {
           </div>
   
           <div class="col-3 align-self-center">
-            <div data-blogId = "${blog.postID}" class="btn btn-warning edit-post-btn mb-2">
+            <div data-blogId = "${blog.postId}" class="btn btn-warning edit-post-btn mb-2">
               <i class="fa-regular fa-pen-to-square"></i>
             </div>
-            <div data-blogId = "${blog.postID}" class="btn btn-danger delete-post-btn mb-2">
+            <div data-blogId = "${blog.postId}" class="btn btn-danger delete-post-btn mb-2">
               <i class="fa-regular fa-trash-can"></i>
             </div>
           </div>

@@ -41,19 +41,41 @@
           </button>
         </form>
       </div>
+      <!-- User-Profile Nav -->
+      <div class="card user-nav" style="width: 18rem;">
+        <div class="card-body">
+          <ul>
+            <li><a href="/user/{{.Data.CurrentUser.UserID}}">{{.Data.CurrentUser.FirstName}}
+                {{.Data.CurrentUser.LastName}}</a></li>
+            <hr>
+            <li><a href="/user">Dashboard</a></li>
+            <li><a href="/post/create">Create Post</a></li>
+            <li><a href="/user/settings">Settings</a></li>
+            <hr>
+            <li><a href="/logout">Sign Out</a></li>
+          </ul>
+        </div>
+      </div>
 
       <div class="right-nav justify-content-end col">
+        {{if .Data.LoggedIn}}
         <a class="navbar__create-post-btn" href="/post/create">Create Post</a>
         <div class="user-profile-container" style="background-image: url('{{.Data.User.Picture}}');"></div>
+        {{else}}
+        <a class="navbar__login-btn" href="/login">Login</a>
+        <a class="navbar__create-acc-btn" href="/signup">Create Account</a>
+        {{end}}
       </div>
       <button href="" class="navbar__auth-nav-btn"><i class="fa-solid fa-user"></i></button>
     </div>
 
+    {{if .Data.LoggedIn}}
     <!-- User-Profile Nav -->
     <div class="card user-nav" style="width: 18rem;">
       <div class="card-body">
         <ul>
-          <li><a href="/user/{{.Data.User.UserID}}">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+          <li><a href="/user/{{.Data.CurrentUser.UserID}}">{{.Data.CurrentUser.FirstName}}
+              {{.Data.CurrentUser.LastName}}</a></li>
           <hr>
           <li><a href="/user">Dashboard</a></li>
           <li><a href="/post/create">Create Post</a></li>
@@ -67,7 +89,8 @@
     <div class="card auth-nav" style="width: 18rem;">
       <div class="card-body">
         <ul>
-          <li><a href="/user/{{.Data.User.UserID}}">{{.Data.User.FirstName}} {{.Data.User.LastName}}</a></li>
+          <li><a href="/user/{{.Data.CurrentUser.UserID}}">{{.Data.CurrentUser.FirstName}}
+              {{.Data.CurrentUser.LastName}}</a></li>
           <hr>
           <li><a href="/user">Dashboard</a></li>
           <li><a href="/post/create">Create Post</a></li>
@@ -76,6 +99,18 @@
           <li><a href="/logout">Sign Out</a></li>
         </ul>
       </div>
+    </div>
+    {{else}}
+    <!-- Auth Nav Menu -->
+    <div class="card auth-nav" style="width: 18rem;">
+      <div class="card-body">
+        <ul>
+          <li><a href="/login">Login</a></li>
+          <li><a href="/signup">Create Account</a></li>
+        </ul>
+      </div>
+    </div>
+    {{end}}
     </div>
   </nav>
 
@@ -91,10 +126,6 @@
         <ul>
           <li class="my-2 py-3 ps-4 dashboard-btn"><i class="fa-solid fa-chart-line"></i><span
               class="link-title">Dashboard</span></li>
-          <li class="my-2 py-3 ps-4 blog-btn"><i class="fa-regular fa-file-lines"></i><span
-              class="link-title">Post</span></li>
-          <li class="my-2 py-3 ps-4 comment-btn"><i class="fa-regular fa-comment-dots"></i><span
-              class="link-title">Comment</span></li>
         </ul>
       </div>
 
@@ -102,7 +133,7 @@
         <!-- Content will be rendered here -->
         <!-- Dashboard -->
         <div class="dashboard-wrapper">
-          <h2>Dashboard</h2>
+          <h2>{{.Data.User.FirstName}} {{.Data.User.LastName}} Profile</h2>
           <div class="row statistic-container">
             <div class="col-md me-3 card post-statistic-container" style="width: 100%;">
               <div class="card-body">
@@ -132,6 +163,19 @@
 
           </div>
 
+          {{if .Data.User.AboutMe.Valid}}
+          <div class="row">
+            <div class="mt-3 blog-post-list card" style="width: 100%;">
+              <div class="card-body">
+                <h4 class="card-title">About Me</h4>
+                <div class="post-list-container">
+                  <p class="autor-about-body">{{.Data.User.AboutMe.String}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          {{end}}
+
           <div class="row">
             <div class="mt-3 blog-post-list card" style="width: 100%;">
               <div class="card-body">
@@ -152,12 +196,12 @@
                       <tr>
                         <th scope="row">{{$each.Index}}</th>
                         {{if $each.Category.Valid}}
-                          <td style="text-transform: capitalize;">{{$each.Category.String}}</td>
+                        <td style="text-transform: capitalize;">{{$each.Category.String}}</td>
                         {{else}}
-                          <td>No Category</td>
+                        <td>No Category</td>
                         {{end}}
-                        <td>{{$each.TotalPost}}</td>  
-                        <td>{{$each.TotalView}}</td>  
+                        <td>{{$each.TotalPost}}</td>
+                        <td>{{$each.TotalView}}</td>
                       </tr>
                       {{end}}
                     </tbody>
@@ -218,7 +262,7 @@
                       {{range $each := .Data.RecentComments}}
                       <tr>
                         <th scope="row">{{$each.Index}}</th>
-                        <td><a href="/post/{{$each.PostID.Int64}}" class="post-link">{{$each.PostID.Int64}}</a></td>
+                        <td><a href="/post/{{$each.PostID}}" class="post-link">{{$each.PostID}}</a></td>
                         <td>{{$each.CommentBody}}</td>
                       </tr>
                       {{end}}
@@ -230,26 +274,6 @@
           </div>
 
         </div>
-
-        <!-- Your Post -->
-        <div class="blog-wrapper">
-          <h2>Post</h2>
-          <div class="col your-blog-list">
-
-            <!-- Blog items will be rendered here -->
-
-          </div>
-        </div>
-
-        <!-- Your Comments -->
-        <div class="comment-wrapper">
-          <h2>Comment</h2>
-          <div class="col your-comment-list">
-
-            <!-- Comment items will be rendered here -->
-
-          </div>
-        </div>
       </div>
     </div>
 
@@ -259,7 +283,6 @@
       crossorigin="anonymous"></script>
 
     <script src="/static/js/index.js"></script>
-    <script src="/static/js/dashboard.js"></script>
 </body>
 
 </html>

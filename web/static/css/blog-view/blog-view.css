@@ -73,6 +73,11 @@ img {
     border-radius: 50%;
 }
 
+.user-link {
+    text-decoration: none;
+    color: black;
+}
+
 #comment-form {
     width: 100%;
     height: 100px;
