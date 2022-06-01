@@ -32,10 +32,12 @@ func (u UserServiceImpl) RegisterUser(ctx context.Context, user dto.SignUpReques
 	}
 
 	userCount, err := u.Repository.GetUserCount(ctx)
+	log.Println(userCount)
 	if err != nil {
 		return err
 	}
 
+	userEntity.Type = 1
 	if userCount == 0 {
 		userEntity.Type = 0
 	}

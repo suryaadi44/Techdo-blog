@@ -15,7 +15,7 @@ type SessionRepositoryImpl struct {
 
 var (
 	INSERT_SESSION = "INSERT INTO sessions(token, uid, expireAt) VALUE (?, ?, ?)"
-	FIND_SESSION   = "SELECT s.token, s.uid, u.username, s.expireAt FROM sessions s JOIN users u ON s.uid = u.uid WHERE token = ?"
+	FIND_SESSION   = "SELECT s.token, s.uid, u.username, u.type, s.expireAt FROM sessions s JOIN users u ON s.uid = u.uid WHERE token = ?"
 	DELETE_SESSION = "DELETE FROM sessions WHERE token = ?"
 )
 
@@ -54,7 +54,7 @@ func (u SessionRepositoryImpl) GetSession(ctx context.Context, token string) (en
 
 	var user entity.SessionDetail
 	if rows.Next() {
-		err = rows.Scan(&user.Token, &user.UID, &user.Username, &user.ExpireAt)
+		err = rows.Scan(&user.Token, &user.UID, &user.Username, &user.Type, &user.ExpireAt)
 		if err != nil {
 			log.Println("[ERROR] GetSession -> error scanning row :", err)
 			return entity.SessionDetail{}, err

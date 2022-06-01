@@ -13,10 +13,11 @@
   <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
   <!-- Icon -->
   <script src="https://kit.fontawesome.com/ede9e54d69.js" crossorigin="anonymous"></script>
-  <!-- Summer Note -->
   <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
     integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
     crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.14/dist/sweetalert2.all.min.js"
+    integrity="sha256-SlWNZPkXxEDQLgOBLlO07HAeNx6ThxLZ+pqQ+VGUEuU=" crossorigin="anonymous"></script>
   <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
   <title>{{.Data.Posts.Title}} - Techdo</title>
 </head>
@@ -68,7 +69,7 @@
         </ul>
       </div>
     </div>
-  
+
     <div class="card auth-nav" style="width: 18rem;">
       <div class="card-body">
         <ul>
@@ -105,9 +106,14 @@
           <div class="blog-cover" style="background-image: url('{{.Data.Posts.Banner}}');"></div>
           <div class="card-body px-5">
             {{range $elem := .Data.Posts.Categories}}
-              <h5 class="col blog-category text-capitalize">{{$elem.CategoryName}}</h5>
+            <h5 class="col blog-category text-capitalize">{{$elem.CategoryName}}</h5>
             {{end}}
             <h1 class="card-title mb-3">{{.Data.Posts.Title}}</h1>
+            {{if .Data.IsAdmin}}
+            <div class="mb-3">
+              <button class="btn btn-primary pick-btn">Pick</button>
+            </div>
+            {{end}}
 
             <!-- Author -->
             <div class="post-meta d-flex mb-5">
@@ -115,11 +121,11 @@
                 <img src="{{.Data.Posts.Author.Picture}}" alt="Image" class="img-fluidid">
               </div>
               <div class="vcard">
-                <span class="d-block"><a href="/user/{{.Data.Posts.Author.UserID}}" class="user-link">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</a></span>
+                <span class="d-block"><a href="/user/{{.Data.Posts.Author.UserID}}"
+                    class="user-link">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</a></span>
                 <span class="d-block text-muted date-post">Posted on {{.Data.Posts.CreatedAt}}</span>
               </div>
             </div>
-
             <div class="card-text">
               {{.Data.Posts.Body}}
             </div>
@@ -132,7 +138,8 @@
               <div class="col-2 user-pict" style="background-image: url('{{.Data.User.Picture}}');">
               </div>
               <div class="col">
-                <textarea class="px-3" name="comment" id="comment-form" cols="30" rows="10" placeholder="Add comment"></textarea>
+                <textarea class="px-3" name="comment" id="comment-form" cols="30" rows="10"
+                  placeholder="Add comment"></textarea>
                 <button class="btn btn-primary comment-btn">Submit</button>
               </div>
             </div>
@@ -150,13 +157,14 @@
               <img src="{{.Data.Posts.Author.Picture}}" alt="Image" class="img-fluidid">
             </div>
             <div class="vcard">
-              <span class="d-block"><a href="/user/{{.Data.Posts.Author.UserID}}" class="user-link">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</a></span>
+              <span class="d-block"><a href="/user/{{.Data.Posts.Author.UserID}}"
+                  class="user-link">{{.Data.Posts.Author.FirstName}} {{.Data.Posts.Author.LastName}}</a></span>
             </div>
           </div>
           <hr>
           {{if .Data.Posts.Author.AboutMe.Valid}}
-            <p class="author-about-header">About</p>
-            <p class="autor-about-body">{{.Data.Posts.Author.AboutMe.String}}</p>
+          <p class="author-about-header">About</p>
+          <p class="autor-about-body">{{.Data.Posts.Author.AboutMe.String}}</p>
           {{end}}
         </div>
       </div>
@@ -170,4 +178,7 @@
 
   <script src="/static/js/index.js"></script>
   <script src="/static/js/comment.js"></script>
+  {{if .Data.IsAdmin}}
+  <script src="/static/js/pick.js"></script>
+  {{end}}
 </body>

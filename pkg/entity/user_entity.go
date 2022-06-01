@@ -30,6 +30,7 @@ type MiniUserDetail struct {
 	Username  string    `db:"username"`
 	FirstName string    `db:"first_name"`
 	LastName  string    `db:"last_name"`
+	Type      int64     `db:"type"`
 	Picture   string    `db:"picture"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
@@ -45,6 +46,7 @@ type SessionDetail struct {
 	Token    string    `db:"token"`
 	UID      int64     `db:"uid"`
 	Username string    `db:"username"`
+	Type     int64     `db:"type"`
 	ExpireAt time.Time `db:"expireAt"`
 }
 

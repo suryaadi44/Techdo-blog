@@ -372,3 +372,7 @@ func (p PostServiceImpl) GetUserTotalCommentCount(ctx context.Context, id int64)
 
 	return total, nil
 }
+
+func (p PostServiceImpl) PickHeaderPost(ctx context.Context, id int64) error {
+	return p.Repository.PicHeaderPost(ctx, id)
+}
