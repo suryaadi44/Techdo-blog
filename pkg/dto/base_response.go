@@ -13,7 +13,7 @@ type BaseResponse struct {
 
 func (baseResponse *BaseResponse) SendResponse(w *http.ResponseWriter) error {
 	(*w).WriteHeader(baseResponse.Code)
-	(*w).Header().Set("Content-Type", "application/json; charset=utf-8")
+	(*w).Header().Set("Content-Type", "application/json")
 
 	return json.NewEncoder(*w).Encode(baseResponse)
 }
