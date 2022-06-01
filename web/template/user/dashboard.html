@@ -91,8 +91,10 @@
         <ul>
           <li class="my-2 py-3 ps-4 dashboard-btn"><i class="fa-solid fa-chart-line"></i><span
               class="link-title">Dashboard</span></li>
-          <li class="my-2 py-3 ps-4 blog-btn"><i class="fa-regular fa-file-lines"></i><span class="link-title">Post</span></li>
-          <li class="my-2 py-3 ps-4 comment-btn"><i class="fa-regular fa-comment-dots"></i><span class="link-title">Comment</span></li>
+          <li class="my-2 py-3 ps-4 blog-btn"><i class="fa-regular fa-file-lines"></i><span
+              class="link-title">Post</span></li>
+          <li class="my-2 py-3 ps-4 comment-btn"><i class="fa-regular fa-comment-dots"></i><span
+              class="link-title">Comment</span></li>
         </ul>
       </div>
 
@@ -146,11 +148,15 @@
                     </thead>
                     <tbody>
                       {{range $each := .Data.RecentPost}}
+                      {{if $each.Title.Valid}}
                       <tr>
                         <th scope="row">{{$each.Index}}</th>
-                        <td><a href="/post/{{$each.PostID}}" class="post-link">{{$each.Title}}</a></td>
-                        <td>{{$each.CreatedAt}}</td>
+                        <td><a href="/post/{{$each.PostID}}" class="post-link">{{$each.Title.String}}</a></td>
+                        {{if $each.CreatedAt.Valid}}
+                        <td>{{$each.CreatedAt.Time}}</td>
+                        {{end}}
                       </tr>
+                      {{end}}
                       {{end}}
                     </tbody>
                   </table>
@@ -206,7 +212,7 @@
           <div class="col your-comment-list">
 
             <!-- Comment items will be rendered here -->
-            
+
           </div>
         </div>
       </div>
