@@ -18,16 +18,16 @@ import (
 )
 
 type UserAuthController struct {
-	router          *mux.Router
-	userAuthService service.UserAuthServiceApi
-	sessionService  service.SessionServiceApi
+	router         *mux.Router
+	userService    service.UserServiceApi
+	sessionService service.SessionServiceApi
 }
 
-func NewController(router *mux.Router, userAuthService service.UserAuthServiceApi, sessionService service.SessionServiceApi) *UserAuthController {
+func NewController(router *mux.Router, userAuthService service.UserServiceApi, sessionService service.SessionServiceApi) *UserAuthController {
 	return &UserAuthController{
-		router:          router,
-		userAuthService: userAuthService,
-		sessionService:  sessionService,
+		router:         router,
+		userService:    userAuthService,
+		sessionService: sessionService,
 	}
 }
 
@@ -55,7 +55,7 @@ func (u *UserAuthController) loginHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	session, err := u.userAuthService.AuthenticateUser(r.Context(), payload)
+	session, err := u.userService.AuthenticateUser(r.Context(), payload)
 	if err != nil {
 		log.Println("[Auth] Login failed :", payload.Username)
 		globalDTO.NewBaseResponse(http.StatusUnauthorized, true, "Inccorect Username or Password").SendResponse(&w)
@@ -98,7 +98,7 @@ func (u *UserAuthController) signUpHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err := u.userAuthService.RegisterUser(r.Context(), payload)
+	err := u.userService.RegisterUser(r.Context(), payload)
 	if err == nil {
 		log.Println("[Auth] Success :", payload.Username, "created")
 		globalDTO.NewBaseResponse(http.StatusSeeOther, false, "/login").SendResponse(&w)

@@ -10,6 +10,7 @@ type User struct {
 	UserID   int64  `db:"uid"`
 	Username string `db:"username"`
 	Password string `db:"password"`
+	Type     int64  `db:"type"`
 }
 
 type UserDetail struct {

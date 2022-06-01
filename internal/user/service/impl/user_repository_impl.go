@@ -14,7 +14,11 @@ type UserRepositoryImpl struct {
 }
 
 var (
-	INSERT_USER_DETAIL = "INSERT INTO user_details(uid, email, first_name, last_name, picture, phone, about_me) VALUE (?, ?, ?, ?, ?, ?, ?)"
+	COUNT_USER = "SELECT COUNT(*) FROM users"
+
+	INSERT_USER_DETAIL         = "INSERT INTO user_details(uid, email, first_name, last_name, picture, phone, about_me) VALUE (?, ?, ?, ?, ?, ?, ?)"
+	INSERT_USER                = "INSERT INTO users(username, password) VALUE (?, ?)"
+	INSERT_DEFAULT_USER_DETAIL = "INSERT INTO user_details(uid, email, first_name, last_name, picture) VALUE (?, ?, ?, ?, ?)"
 
 	UPDATE_USER_DETAIL  = "UPDATE user_details SET first_name = ?, last_name = ?, phone = ?, about_me = ? WHERE uid = ?"
 	UPDATE_USER_PICTURE = "UPDATE user_details SET picture = ? WHERE uid = ?"
@@ -24,6 +28,8 @@ var (
 	SELECT_USER_PICTURE_PROFILE = "SELECT picture FROM user_details WHERE uid = ?"
 
 	DELETE_USER = "DELETE FROM users WHERE uid = ?"
+
+	FIND_USER = "SELECT uid, username, password FROM users WHERE username = ?"
 )
 
 func NewUserRepository(db *sql.DB) UserRepositoryImpl {
@@ -155,4 +161,90 @@ func (u UserRepositoryImpl) GetUserPictureID(ctx context.Context, id int64) (str
 	}
 
 	return "", errors.New("can't get user picture")
+}
+
+func (u UserRepositoryImpl) GetUserCount(ctx context.Context) (int64, error) {
+	rows, err := u.db.QueryContext(ctx, COUNT_USER)
+	if err != nil {
+		log.Println("[ERROR] GetUserCount -> error on executing query :", err)
+		return 0, err
+	}
+
+	if rows.Next() {
+		var count int64
+		err = rows.Scan(&count)
+		if err != nil {
+			log.Println("[ERROR] GetUserCount -> error scanning row :", err)
+			return 0, err
+		}
+
+		return count, nil
+	}
+
+	return 0, errors.New("can't get user count")
+}
+func (u UserRepositoryImpl) NewUser(ctx context.Context, user entity.User, userDetail entity.UserDetail) error {
+	result, err := u.db.ExecContext(ctx, INSERT_USER, user.Username, user.Password)
+	if err != nil {
+		log.Println("[ERROR] NewUser -> error on executing insert user query :", err)
+		return err
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] NewUser -> error on getting insert user rows affected :", err)
+		return err
+	}
+
+	if rows != 1 {
+		log.Println("[ERROR] NewUser -> error on inserting insert user row :", err)
+		return errors.New("Cant creare new user")
+	}
+
+	lid, err := result.LastInsertId()
+	if err != nil {
+		log.Println("[ERROR] NewUser -> error on getting uid :", err)
+		return err
+	}
+
+	result, err = u.db.ExecContext(ctx, INSERT_DEFAULT_USER_DETAIL, lid, userDetail.Email, userDetail.FirstName, userDetail.LastName, userDetail.Picture)
+	if err != nil {
+		log.Println("[ERROR] NewUser -> error on executing insert user details query :", err)
+		return err
+	}
+
+	rows, err = result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] NewUser -> error on getting insert user details rows affected :", err)
+		return err
+	}
+
+	if rows != 1 {
+		log.Println("[ERROR] NewUser -> error on inserting insert user details row  :", err)
+		return errors.New("Cant creare new user")
+	}
+
+	return nil
+}
+
+func (u UserRepositoryImpl) GetUser(ctx context.Context, username string) (entity.User, error) {
+	var user entity.User
+
+	rows, err := u.db.QueryContext(ctx, FIND_USER, username)
+	if err != nil {
+		log.Println("[ERROR] GetUser -> error on executing query :", err)
+		return user, err
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&user.UserID, &user.Username, &user.Password)
+		if err != nil {
+			log.Println("[ERROR] GetUser -> error scanning row :", err)
+			return entity.User{}, err
+		}
+
+		return user, nil
+	}
+
+	return user, errors.New("Inccorect Username or Password")
 }
