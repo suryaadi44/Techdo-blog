@@ -1,1 +1,0 @@
-DROP TRIGGER IF EXISTS log_delete_users;
