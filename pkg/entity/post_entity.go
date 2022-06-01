@@ -1,6 +1,10 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"github.com/suryaadi44/Techdo-blog/pkg/dto"
+)
 
 type BlogPost struct {
 	PostID       int64     `db:"post_id"`
@@ -25,6 +29,12 @@ type BriefBlogPost struct {
 	UpdatedAt    time.Time `db:"updated_at"`
 	Author       string    `db:"author"`
 }
+type PostTitleWithCategory struct {
+	PostID    dto.NullInt64  `db:"post_id"`
+	Title     dto.NullString `db:"title"`
+	CreatedAt dto.NullTime   `db:"created_at"`
+	Category  dto.NullString `db:"category_name"`
+}
 
 type Category struct {
 	CategoryID   int64  `db:"category_id"`
@@ -43,3 +53,4 @@ type Comment struct {
 type Categories []*Category
 type Comments []*Comment
 type BriefsBlogPost []*BriefBlogPost
+type PostsTitleWithCategory []*PostTitleWithCategory

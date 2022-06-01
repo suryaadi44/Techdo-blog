@@ -8,11 +8,13 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	middlewarePkg "github.com/suryaadi44/Techdo-blog/internal/middleware"
+	internalMiddlewarePkg "github.com/suryaadi44/Techdo-blog/internal/middleware"
+
 	postPkg "github.com/suryaadi44/Techdo-blog/internal/post/service"
 	"github.com/suryaadi44/Techdo-blog/internal/user/dto"
 	"github.com/suryaadi44/Techdo-blog/internal/user/service"
 	globalDTO "github.com/suryaadi44/Techdo-blog/pkg/dto"
+	middlewarePkg "github.com/suryaadi44/Techdo-blog/pkg/middleware"
 	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 
@@ -21,10 +23,10 @@ type UserController struct {
 	userService    service.UserServiceApi
 	sessionService service.SessionServiceApi
 	postService    postPkg.PostServiceApi
-	authMiddleware middlewarePkg.AuthMiddleware
+	authMiddleware internalMiddlewarePkg.AuthMiddleware
 }
 
-func NewUserController(router *mux.Router, userService service.UserServiceApi, sessionService service.SessionServiceApi, postService postPkg.PostServiceApi, authMiddleware middlewarePkg.AuthMiddleware) *UserController {
+func NewUserController(router *mux.Router, userService service.UserServiceApi, sessionService service.SessionServiceApi, postService postPkg.PostServiceApi, authMiddleware internalMiddlewarePkg.AuthMiddleware) *UserController {
 	return &UserController{
 		router:         router,
 		userService:    userService,
@@ -38,19 +40,22 @@ func (u *UserController) InitializeController() {
 	authRouter := u.router.PathPrefix("/").Subrouter()
 	authRouter.Use(u.authMiddleware.AuthMiddleware())
 
-	//with middleware
+	//with auth middleware
 	//API
-	authRouter.HandleFunc("/user/detail", u.updateUserDetailHandler).Methods(http.MethodPost)
-	authRouter.HandleFunc("/user/detail/picture", u.updateUserPictureHandler).Methods(http.MethodPost)
-	authRouter.HandleFunc("/user/detail", u.getUserDetailHandler).Methods(http.MethodGet)
-	authRouter.HandleFunc("/user/mini-detail", u.getUserMiniDetailHandler).Methods(http.MethodGet)
-	authRouter.HandleFunc("/user/delete", u.deleteUserHandler).Methods(http.MethodDelete)
+	secureApiRouter := authRouter.PathPrefix("/").Subrouter()
+	secureApiRouter.Use(middlewarePkg.ApiMiddleware())
+
+	secureApiRouter.HandleFunc("/user/detail", u.updateUserDetailHandler).Methods(http.MethodPost)
+	secureApiRouter.HandleFunc("/user/detail/picture", u.updateUserPictureHandler).Methods(http.MethodPost)
+	secureApiRouter.HandleFunc("/user/detail", u.getUserDetailHandler).Methods(http.MethodGet)
+	secureApiRouter.HandleFunc("/user/mini-detail", u.getUserMiniDetailHandler).Methods(http.MethodGet)
+	secureApiRouter.HandleFunc("/user/delete", u.deleteUserHandler).Methods(http.MethodDelete)
 
 	// Page
 	authRouter.HandleFunc("/user/settings", u.settingPageHandler).Methods(http.MethodGet)
 	authRouter.HandleFunc("/user", u.userDashboardPageHandler).Methods(http.MethodGet)
 
-	//without middleware
+	//without auth middleware
 	//API
 
 	// Page

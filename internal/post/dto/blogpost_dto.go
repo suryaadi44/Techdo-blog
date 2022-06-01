@@ -5,6 +5,7 @@ import (
 	"regexp"
 
 	UserDto "github.com/suryaadi44/Techdo-blog/internal/user/dto"
+	"github.com/suryaadi44/Techdo-blog/pkg/dto"
 	"github.com/suryaadi44/Techdo-blog/pkg/entity"
 	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
@@ -46,10 +47,11 @@ type BriefBlogPostResponse struct {
 }
 
 type MiniBlogPostResponse struct {
-	Index     int64
-	PostID    int64
-	Title     string
-	CreatedAt string
+	Index     int64          `json:"index"`
+	PostID    dto.NullInt64  `json:"postId"`
+	Title     dto.NullString `json:"title"`
+	CreatedAt dto.NullTime   `json:"createdAt"`
+	Category  dto.NullString `json:"category"`
 }
 
 type BlogPostRequest struct {
@@ -134,14 +136,14 @@ func NewBriefBlogPostResponse(post entity.BriefBlogPost) BriefBlogPostResponse {
 	}
 }
 
-func NewMiniBlogPostResponse(post entity.BriefBlogPost, index int64) MiniBlogPostResponse {
+func NewMiniBlogPostResponse(post entity.PostTitleWithCategory, index int64) MiniBlogPostResponse {
 	return MiniBlogPostResponse{
 		Index:     index,
 		PostID:    post.PostID,
 		Title:     post.Title,
-		CreatedAt: post.CreatedAt.Format("Jan 02, 2006"),
+		CreatedAt: post.CreatedAt,
+		Category:  post.Category,
 	}
-
 }
 
 func NewBriefsBlogPostResponse(posts entity.BriefsBlogPost) BriefsBlogPostResponse {
@@ -155,7 +157,7 @@ func NewBriefsBlogPostResponse(posts entity.BriefsBlogPost) BriefsBlogPostRespon
 	return postList
 }
 
-func NewMiniBlogPostsResponse(posts entity.BriefsBlogPost) MiniBlogPostsResponse {
+func NewMiniBlogPostsResponse(posts entity.PostsTitleWithCategory) MiniBlogPostsResponse {
 	var postList MiniBlogPostsResponse
 
 	for idx, each := range posts {

@@ -57,10 +57,12 @@ func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest) 
 		return -1, err
 	}
 
-	err = p.Repository.AddPostCategoryAssoc(ctx, reservedID, post.Category)
-	if err != nil {
-		log.Println("[ERROR] AddPost: Error adding post category data -> error:", err)
-		return -1, err
+	if post.Category != -1 {
+		err = p.Repository.AddPostCategoryAssoc(ctx, reservedID, post.Category)
+		if err != nil {
+			log.Println("[ERROR] AddPost: Error adding post category data -> error:", err)
+			return -1, err
+		}
 	}
 
 	return reservedID, nil
@@ -101,10 +103,12 @@ func (p PostServiceImpl) EditPost(ctx context.Context, post dto.BlogPostRequest,
 		return -1, err
 	}
 
-	err = p.Repository.EditPostCategoryAssoc(ctx, PostID, post.Category)
-	if err != nil {
-		log.Println("[ERROR] EditPost: Error editing post category data -> error:", err)
-		return -1, err
+	if post.Category != -1 {
+		err = p.Repository.EditPostCategoryAssoc(ctx, PostID, post.Category)
+		if err != nil {
+			log.Println("[ERROR] EditPost: Error editing post category data -> error:", err)
+			return -1, err
+		}
 	}
 
 	return PostID, nil
@@ -337,13 +341,13 @@ func (p PostServiceImpl) GetCommentsByUser(ctx context.Context, uid int64, page 
 	var commentResponse dto.UserCommentsResponse
 	offset := (page - 1) * limit
 
-	comment, err := p.Repository.GetUserComments(ctx, uid, offset, limit)
+	comment, posts, err := p.Repository.GetUserComments(ctx, uid, offset, limit)
 	if err != nil {
 		log.Println("[ERROR] Fetching list of comment -> error:", err)
 		return commentResponse, err
 	}
 
-	commentResponse = dto.NewUserCommentsResponse(comment)
+	commentResponse = dto.NewUserCommentsResponse(comment, posts)
 
 	return commentResponse, nil
 }

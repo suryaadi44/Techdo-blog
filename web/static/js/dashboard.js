@@ -22,29 +22,49 @@ navMenu.dashboardBtn.on("click", e => {
 });
 
 function makeBlogItems(blog) {
+  if (blog.title) {
+    return `
+      <div class="row card blog-items my-3">
+        <div class="row py-3 px-3">
+          <div class="col align-self-center">
+            <h5>
+              <a href="/post/${blog.postID}" class="post-link">${blog.title}</a>
+            </h5>
+          </div>
+  
+          <div class="col mt-2 align-self-center">
+            <p class="text-muted">${blog.createdAt}</p>
+          </div>
+  
+          <div class="col-3 align-self-center">
+            <div data-blogId = "${blog.postID}" class="btn btn-warning edit-post-btn mb-2">
+              <i class="fa-regular fa-pen-to-square"></i>
+            </div>
+            <div data-blogId = "${blog.postID}" class="btn btn-danger delete-post-btn mb-2">
+              <i class="fa-regular fa-trash-can"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    `
+  }
+
   return `
     <div class="row card blog-items my-3">
       <div class="row py-3 px-3">
         <div class="col align-self-center">
           <h5>
-            <a href="/post/${blog.PostID}" class="post-link">${blog.Title}</a>
+            No Post
           </h5>
-        </div>
-
-        <div class="col mt-2 align-self-center">
-          <p class="text-muted">${blog.CreatedAt}</p>
-        </div>
-
-        <div class="col-3 align-self-center">
-          <div data-blogId = "${blog.PostID}" class="btn btn-warning edit-post-btn mb-2">
-            <i class="fa-regular fa-pen-to-square"></i>
-          </div>
-          <div data-blogId = "${blog.PostID}" class="btn btn-danger delete-post-btn mb-2">
-            <i class="fa-regular fa-trash-can"></i>
-          </div>
         </div>
       </div>
     </div>
+  `
+}
+
+function makeCategoryItem(category) {
+  return `
+    <h4 style="text-transform: capitalize;">${category}</h4>
   `
 }
 
@@ -66,29 +86,29 @@ async function listenPostEvent() {
             method: "DELETE",
             credentials: 'include',
           }).then((response) => response.json())
-          .then((result) => {
-            if (result.error) {
-              Swal.fire({
-                icon: "error",
-                title: "Delete error!",
-                text: result.data,
-                confirmButtonText: "Ok",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-              });
-            } else {
-              Swal.fire({
-                title: "Success",
-                text: "Success deleting blog post",
-                icon: "success",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                confirmButtonText: "Ok",
-              })
-              restartState()
-              wrappers.dashboard.show();
-            }
-          });
+            .then((result) => {
+              if (result.error) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Delete error!",
+                  text: result.data,
+                  confirmButtonText: "Ok",
+                  allowOutsideClick: false,
+                  allowEscapeKey: false,
+                });
+              } else {
+                Swal.fire({
+                  title: "Success",
+                  text: "Success deleting blog post",
+                  icon: "success",
+                  allowOutsideClick: false,
+                  allowEscapeKey: false,
+                  confirmButtonText: "Ok",
+                })
+                restartState()
+                wrappers.dashboard.show();
+              }
+            });
         }
       })
     });
@@ -117,9 +137,26 @@ navMenu.blogBtn.on("click", async e => {
 
   blogData = blogData.data;
 
+  let dict = {}
   for (const blog of blogData) {
-    blogListContainer.append(makeBlogItems(blog))
+    if (!blog.category) {
+      blog.category = "No Category"
+    }
+
+    if (dict[blog.category]) {
+      dict[blog.category].push(blog);
+    } else {
+      dict[blog.category] = [blog]
+    }
   }
+
+  for (const [key, value] of Object.entries(dict)) {
+    blogListContainer.append(makeCategoryItem(key))
+    for (const post of value) {
+      blogListContainer.append(makeBlogItems(post))
+    }
+  }
+
   wrappers.blog.show();
   listenPostEvent();
 });
@@ -129,7 +166,9 @@ function makeCommentItem(comment) {
   <div class="row card comment-items my-3">
     <div class="row py-3 px-3">
       <div class="col align-self-center">
-        <h5>Blog Title</h5>
+        <h5>
+        <a href="/post/${comment.postID}" class="post-link">${comment.postTitle}</a>
+        </h5>
       </div>
 
       <div class="col mt-2 align-self-center">
@@ -166,29 +205,29 @@ async function listenCommentEvent() {
               commentID: id,
             }),
           }).then((response) => response.json())
-          .then((result) => {
-            if (result.error) {
-              Swal.fire({
-                icon: "error",
-                title: "Delete error!",
-                text: result.data,
-                confirmButtonText: "Ok",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-              });
-            } else {
-              Swal.fire({
-                title: "Success",
-                text: "Success deleting comment",
-                icon: "success",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                confirmButtonText: "Ok",
-              })
-              restartState()
-              wrappers.dashboard.show();
-            }
-          });
+            .then((result) => {
+              if (result.error) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Delete error!",
+                  text: result.data,
+                  confirmButtonText: "Ok",
+                  allowOutsideClick: false,
+                  allowEscapeKey: false,
+                });
+              } else {
+                Swal.fire({
+                  title: "Success",
+                  text: "Success deleting comment",
+                  icon: "success",
+                  allowOutsideClick: false,
+                  allowEscapeKey: false,
+                  confirmButtonText: "Ok",
+                })
+                restartState()
+                wrappers.dashboard.show();
+              }
+            });
         }
       })
     });
