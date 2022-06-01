@@ -13,6 +13,8 @@ import (
 	"github.com/suryaadi44/Techdo-blog/internal/user/service"
 	globalDTO "github.com/suryaadi44/Techdo-blog/pkg/dto"
 	"github.com/suryaadi44/Techdo-blog/pkg/utils"
+
+	middlewarePkg "github.com/suryaadi44/Techdo-blog/pkg/middleware"
 )
 
 type UserAuthController struct {
@@ -31,8 +33,11 @@ func NewController(router *mux.Router, userAuthService service.UserAuthServiceAp
 
 func (u *UserAuthController) InitializeController() {
 	//API
-	u.router.HandleFunc("/login", u.loginHandler).Methods(http.MethodPost)
-	u.router.HandleFunc("/signup", u.signUpHandler).Methods(http.MethodPost)
+	apiRouter := u.router.PathPrefix("/").Subrouter()
+	apiRouter.Use(middlewarePkg.ApiMiddleware())
+
+	apiRouter.HandleFunc("/login", u.loginHandler).Methods(http.MethodPost)
+	apiRouter.HandleFunc("/signup", u.signUpHandler).Methods(http.MethodPost)
 
 	// Page
 	u.router.HandleFunc("/login", u.loginPageHandler).Methods(http.MethodGet)
