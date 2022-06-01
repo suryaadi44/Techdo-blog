@@ -57,10 +57,12 @@ func (p PostServiceImpl) AddPost(ctx context.Context, post dto.BlogPostRequest) 
 		return -1, err
 	}
 
-	err = p.Repository.AddPostCategoryAssoc(ctx, reservedID, post.Category)
-	if err != nil {
-		log.Println("[ERROR] AddPost: Error adding post category data -> error:", err)
-		return -1, err
+	if post.Category != -1 {
+		err = p.Repository.AddPostCategoryAssoc(ctx, reservedID, post.Category)
+		if err != nil {
+			log.Println("[ERROR] AddPost: Error adding post category data -> error:", err)
+			return -1, err
+		}
 	}
 
 	return reservedID, nil
@@ -101,10 +103,12 @@ func (p PostServiceImpl) EditPost(ctx context.Context, post dto.BlogPostRequest,
 		return -1, err
 	}
 
-	err = p.Repository.EditPostCategoryAssoc(ctx, PostID, post.Category)
-	if err != nil {
-		log.Println("[ERROR] EditPost: Error editing post category data -> error:", err)
-		return -1, err
+	if post.Category != -1 {
+		err = p.Repository.EditPostCategoryAssoc(ctx, PostID, post.Category)
+		if err != nil {
+			log.Println("[ERROR] EditPost: Error editing post category data -> error:", err)
+			return -1, err
+		}
 	}
 
 	return PostID, nil
