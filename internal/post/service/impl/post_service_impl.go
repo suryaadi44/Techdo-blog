@@ -193,11 +193,10 @@ func (p PostServiceImpl) GetBriefsBlogPost(ctx context.Context, page int64, limi
 	return postList, nil
 }
 
-func (p PostServiceImpl) GetMiniBlogPostsByUser(ctx context.Context, id int64, page int64, limit int64) (dto.MiniBlogPostsResponse, error) {
+func (p PostServiceImpl) GetMiniBlogPostsByUser(ctx context.Context, id int64, limit int64) (dto.MiniBlogPostsResponse, error) {
 	var postList dto.MiniBlogPostsResponse
-	offset := (page - 1) * limit
 
-	postListEntity, err := p.Repository.GetMiniBlogPostsDataByUser(ctx, id, offset, limit)
+	postListEntity, err := p.Repository.GetMiniBlogPostsDataByUser(ctx, id, limit)
 	if err != nil {
 		log.Println("[ERROR] Fetching list of post -> error:", err)
 		return postList, err
@@ -350,11 +349,10 @@ func (p PostServiceImpl) GetComments(ctx context.Context, postID int64) (dto.Pos
 	return commentResponse, nil
 }
 
-func (p PostServiceImpl) GetCommentsByUser(ctx context.Context, uid int64, page int64, limit int64) (dto.UserCommentsResponse, error) {
+func (p PostServiceImpl) GetCommentsByUser(ctx context.Context, uid int64, limit int64) (dto.UserCommentsResponse, error) {
 	var commentResponse dto.UserCommentsResponse
-	offset := (page - 1) * limit
 
-	comment, posts, err := p.Repository.GetUserComments(ctx, uid, offset, limit)
+	comment, posts, err := p.Repository.GetUserComments(ctx, uid, limit)
 	if err != nil {
 		log.Println("[ERROR] Fetching list of comment -> error:", err)
 		return commentResponse, err

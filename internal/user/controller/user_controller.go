@@ -117,12 +117,12 @@ func (u *UserController) userDashboardPageHandler(w http.ResponseWriter, r *http
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
-	recentComments, err := u.postService.GetCommentsByUser(r.Context(), user.UserID, 1, 5)
+	recentComments, err := u.postService.GetCommentsByUser(r.Context(), user.UserID, 5)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}
 
-	recentPost, err := u.postService.GetMiniBlogPostsByUser(r.Context(), user.UserID, 1, 5)
+	recentPost, err := u.postService.GetMiniBlogPostsByUser(r.Context(), user.UserID, 5)
 	if err != nil {
 		panic(globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()))
 	}

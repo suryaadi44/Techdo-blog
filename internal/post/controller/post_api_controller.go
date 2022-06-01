@@ -115,26 +115,7 @@ func (p *PostController) userPostHandler(w http.ResponseWriter, r *http.Request)
 		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
 	}
 
-	queryVar := r.URL.Query()
-	limit := queryVar.Get("limit")
-	if limit == "" {
-		limit = "12"
-	}
-	page := queryVar.Get("page")
-	if page == "" {
-		page = "1"
-	}
-
-	limitConv, err := strconv.ParseInt(limit, 10, 64)
-	if err != nil {
-		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
-	}
-	pageConv, err := strconv.ParseInt(page, 10, 64)
-	if err != nil {
-		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
-	}
-
-	postData, err := p.postService.GetMiniBlogPostsByUser(r.Context(), session.UID, pageConv, limitConv)
+	postData, err := p.postService.GetMiniBlogPostsByUser(r.Context(), session.UID, 0)
 	if err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return
@@ -262,26 +243,7 @@ func (p *PostController) userCommentHandler(w http.ResponseWriter, r *http.Reque
 		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
 	}
 
-	queryVar := r.URL.Query()
-	limit := queryVar.Get("limit")
-	if limit == "" {
-		limit = "12"
-	}
-	page := queryVar.Get("page")
-	if page == "" {
-		page = "1"
-	}
-
-	limitConv, err := strconv.ParseInt(limit, 10, 64)
-	if err != nil {
-		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
-	}
-	pageConv, err := strconv.ParseInt(page, 10, 64)
-	if err != nil {
-		panic(globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()))
-	}
-
-	postData, err := p.postService.GetCommentsByUser(r.Context(), session.UID, pageConv, limitConv)
+	postData, err := p.postService.GetCommentsByUser(r.Context(), session.UID, 0)
 	if err != nil {
 		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
 		return

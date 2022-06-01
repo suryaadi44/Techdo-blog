@@ -40,7 +40,7 @@ var (
 	SELECT_COMMENT_AUTHOR                    = "SELECT uid FROM comment WHERE comment_id = ?"
 	SELECT_ID_OF_LAST_INSERT                 = "SELECT LAST_INSERT_ID() as uid"
 	SELECT_LIST_OF_POST                      = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid ORDER BY b.created_at DESC LIMIT ?, ? "
-	SELECT_LIST_OF_POST_BY_USER              = "SELECT b.post_id, b.title, b.created_at, c.category_name FROM blog_posts b LEFT JOIN category_associations a ON a.post_id = b.post_id LEFT JOIN categories c ON a.category_id = c.category_id WHERE b.author_id = ? OR b.author_id IS NULL UNION SELECT b.post_id, b.title, b.created_at, c.category_name FROM blog_posts b RIGHT JOIN category_associations a ON a.post_id = b.post_id RIGHT JOIN categories c ON a.category_id = c.category_id WHERE b.author_id = ? OR b.author_id IS NULL ORDER BY created_at DESC LIMIT ?, ?"
+	SELECT_LIST_OF_POST_BY_USER              = "SELECT b.post_id, b.title, b.created_at, c.category_name FROM blog_posts b LEFT JOIN category_associations a ON a.post_id = b.post_id LEFT JOIN categories c ON a.category_id = c.category_id WHERE b.author_id = ? OR b.author_id IS NULL UNION SELECT b.post_id, b.title, b.created_at, c.category_name FROM blog_posts b RIGHT JOIN category_associations a ON a.post_id = b.post_id RIGHT JOIN categories c ON a.category_id = c.category_id WHERE b.author_id = ? OR b.author_id IS NULL ORDER BY created_at DESC"
 	SELECT_EACH_CATEGORY_USER_POST_STATISTIC = "SELECT c.category_name, COUNT(b.post_id) AS TotalPost, SUM(b.view_count) AS TotalView FROM blog_posts b LEFT JOIN category_associations a ON a.post_id = b.post_id LEFT JOIN categories c ON a.category_id = c.category_id WHERE b.author_id = ? GROUP BY c.category_name HAVING TotalView > 0 ORDER BY TotalView DESC"
 	SELECT_LISF_OF_POST_IN_CATEGORY          = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid JOIN category_associations a ON  a.post_id =  b.post_id JOIN categories c ON c.category_id = a.category_id WHERE c.category_name = ? ORDER BY b.created_at DESC LIMIT ?, ?"
 	SELECT_FULL_TEXT_POST                    = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid"
@@ -48,7 +48,7 @@ var (
 
 	SELECT_CATEGORY                        = "SELECT category_id, category_name FROM categories"
 	SELECT_COMMENTS                        = "SELECT c.comment_id, c.uid, c.comment_body, c.created_at, c.updated_at, u.uid, u.first_name, u.last_name, u.picture FROM comment c JOIN user_details u ON c.uid= u.uid WHERE c.post_id = ? ORDER BY c.created_at DESC"
-	SELECT_COMMENTS_BY_UID                 = "SELECT c.comment_id, p.post_id, p.title, c.comment_body, c.created_at, c.updated_at FROM comment c JOIN blog_posts p ON c.post_id = p.post_id WHERE uid = ? ORDER BY created_at DESC LIMIT ?, ?"
+	SELECT_COMMENTS_BY_UID                 = "SELECT c.comment_id, p.post_id, p.title, c.comment_body, c.created_at, c.updated_at FROM comment c JOIN blog_posts p ON c.post_id = p.post_id WHERE uid = ? ORDER BY created_at DESC"
 	SELECT_POST_OF_LATEST_UPDATED_CATEGORY = "SELECT post_id, banner, title, body, view_count, comment_count, created_at, updated_at, author, category_id, category_name FROM homepage_latest"
 	SELECT_EDITOR_PICK                     = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid JOIN editor_pick e ON b.post_id = e.post_id;"
 )
@@ -203,10 +203,19 @@ func (p PostRepositoryImpl) GetBriefsBlogPostData(ctx context.Context, offset in
 	return postList, nil
 }
 
-func (p PostRepositoryImpl) GetMiniBlogPostsDataByUser(ctx context.Context, id int64, offset int64, limit int64) (entity.PostsTitleWithCategory, error) {
+func (p PostRepositoryImpl) GetMiniBlogPostsDataByUser(ctx context.Context, id int64, limit int64) (entity.PostsTitleWithCategory, error) {
 	var postList entity.PostsTitleWithCategory
+	var args []interface{}
 
-	rows, err := p.db.QueryContext(ctx, SELECT_LIST_OF_POST_BY_USER, id, id, offset, limit)
+	query := SELECT_LIST_OF_POST_BY_USER
+	args = append(args, id, id)
+
+	if limit > 0 {
+		query = query + " LIMIT ?"
+		args = append(args, limit)
+	}
+
+	rows, err := p.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		log.Println("[ERROR] GetMiniBlogPostsDataByUser -> error on executing query :", err)
 		return postList, err
@@ -695,11 +704,20 @@ func (p PostRepositoryImpl) GetCommentAuthorId(ctx context.Context, id int64) (i
 	return -1, fmt.Errorf("No comment with id %d", id)
 }
 
-func (p PostRepositoryImpl) GetUserComments(ctx context.Context, id int64, offset int64, limit int64) (entity.Comments, entity.BriefsBlogPost, error) {
+func (p PostRepositoryImpl) GetUserComments(ctx context.Context, id int64, limit int64) (entity.Comments, entity.BriefsBlogPost, error) {
 	var comments entity.Comments
 	var posts entity.BriefsBlogPost
+	var args []interface{}
 
-	rows, err := p.db.QueryContext(ctx, SELECT_COMMENTS_BY_UID, id, offset, limit)
+	query := SELECT_COMMENTS_BY_UID
+	args = append(args, id)
+
+	if limit > 0 {
+		query = query + " LIMIT ?"
+		args = append(args, limit)
+	}
+
+	rows, err := p.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		log.Println("[ERROR] GetUserComments -> error on executing query :", err)
 		return comments, posts, err
