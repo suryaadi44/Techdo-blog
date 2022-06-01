@@ -17,7 +17,7 @@ var (
 	COUNT_USER = "SELECT COUNT(*) FROM users"
 
 	INSERT_USER_DETAIL         = "INSERT INTO user_details(uid, email, first_name, last_name, picture, phone, about_me) VALUE (?, ?, ?, ?, ?, ?, ?)"
-	INSERT_USER                = "INSERT INTO users(username, password) VALUE (?, ?)"
+	INSERT_USER                = "INSERT INTO users(username, password, type) VALUE (?, ?, ?)"
 	INSERT_DEFAULT_USER_DETAIL = "INSERT INTO user_details(uid, email, first_name, last_name, picture) VALUE (?, ?, ?, ?, ?)"
 
 	UPDATE_USER_DETAIL  = "UPDATE user_details SET first_name = ?, last_name = ?, phone = ?, about_me = ? WHERE uid = ?"
@@ -184,7 +184,7 @@ func (u UserRepositoryImpl) GetUserCount(ctx context.Context) (int64, error) {
 	return 0, errors.New("can't get user count")
 }
 func (u UserRepositoryImpl) NewUser(ctx context.Context, user entity.User, userDetail entity.UserDetail) error {
-	result, err := u.db.ExecContext(ctx, INSERT_USER, user.Username, user.Password)
+	result, err := u.db.ExecContext(ctx, INSERT_USER, user.Username, user.Password, user.Type)
 	if err != nil {
 		log.Println("[ERROR] NewUser -> error on executing insert user query :", err)
 		return err

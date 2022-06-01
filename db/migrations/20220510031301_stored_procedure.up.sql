@@ -3,3 +3,11 @@ BEGIN
 	DELETE FROM sessions
 	WHERE CURRENT_TIMESTAMP > expireAt;
 END;
+
+CREATE PROCEDURE NEW_EDITOR_PICK(
+	IN id INT
+)
+BEGIN
+	DELETE FROM editor_pick;
+	INSERT INTO editor_pick(post_id) VALUE (id);
+END;

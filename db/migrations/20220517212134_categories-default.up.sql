@@ -6,5 +6,4 @@ VALUES
     ("tools"),
     ("news"),
     ("programming"),
-    ("startup"),
-    ("other");
+    ("startup");

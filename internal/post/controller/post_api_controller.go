@@ -15,7 +15,7 @@ import (
 	"github.com/suryaadi44/Techdo-blog/pkg/utils"
 )
 
-func (p *PostController) deletePostHandlder(w http.ResponseWriter, r *http.Request) {
+func (p *PostController) deletePostHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	id, err := strconv.ParseInt(vars["id"], 10, 64)
@@ -324,4 +324,38 @@ func (p *PostController) deleteCommentHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	globalDTO.NewBaseResponse(http.StatusOK, false, "Comment deleted").SendResponse(&w)
+}
+
+func (p *PostController) editorPickHandler(w http.ResponseWriter, r *http.Request) {
+	token, _ := utils.GetSessionToken(r)
+	session, err := p.sessionService.GetSession(r.Context(), token)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+	}
+
+	if session.Type != 0 {
+		globalDTO.NewBaseResponse(http.StatusUnauthorized, true, "Need Admin Account").SendResponse(&w)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var payload map[string]string
+	if err := decoder.Decode(&payload); err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	id, err := strconv.ParseInt(payload["postID"], 10, 64)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusBadRequest, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	err = p.postService.PickHeaderPost(r.Context(), id)
+	if err != nil {
+		globalDTO.NewBaseResponse(http.StatusInternalServerError, true, err.Error()).SendResponse(&w)
+		return
+	}
+
+	globalDTO.NewBaseResponse(http.StatusOK, false, nil).SendResponse(&w)
 }

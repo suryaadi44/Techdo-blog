@@ -45,6 +45,8 @@ type PostServiceApi interface {
 	GetCommentAuthorIdFromId(ctx context.Context, id int64) (int64, error)
 
 	UploadImage(ctx context.Context, filename string, image interface{}, folderID string) (*imagekit.UploadResponse, error)
+
+	PickHeaderPost(ctx context.Context, id int64) error
 }
 
 func NewPostService(DB *sql.DB) PostServiceApi {

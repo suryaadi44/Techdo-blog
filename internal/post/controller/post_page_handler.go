@@ -185,6 +185,7 @@ func (p *PostController) viewPostPageHandlder(w http.ResponseWriter, r *http.Req
 	token, isLoggedIn := utils.GetSessionToken(r)
 	data := map[string]interface{}{
 		"LoggedIn": isLoggedIn,
+		"IsAdmin":  false,
 		"Posts":    postData,
 	}
 
@@ -200,6 +201,10 @@ func (p *PostController) viewPostPageHandlder(w http.ResponseWriter, r *http.Req
 
 		if err == nil {
 			data["User"] = user
+		}
+
+		if session.Type == 0 {
+			data["IsAdmin"] = true
 		}
 	}
 
