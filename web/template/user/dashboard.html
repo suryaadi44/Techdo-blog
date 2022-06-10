@@ -218,7 +218,7 @@
                       {{range $each := .Data.RecentComments}}
                       <tr>
                         <th scope="row">{{$each.Index}}</th>
-                        <td><a href="/post/{{$each.PostID.Int64}}" class="post-link">{{$each.PostID.Int64}}</a></td>
+                        <td><a href="/post/{{$each.PostID}}" class="post-link">{{$each.PostID}}</a></td>
                         <td>{{$each.CommentBody}}</td>
                       </tr>
                       {{end}}

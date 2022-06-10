@@ -31,8 +31,9 @@ var (
 	UPDATE_POST           = "UPDATE blog_posts SET author_id = ?, banner = ?, title = ?, body = ? WHERE post_id = ?"
 	UPDATE_CATEGORY_ASSOC = "UPDATE category_associations SET category_id = ? WHERE post_id = ?"
 
-	DELETE_POST    = "DELETE FROM blog_posts WHERE post_id = ?"
-	DELETE_COMMENT = "DELETE FROM comment WHERE comment_id = ?"
+	DELETE_POST           = "DELETE FROM blog_posts WHERE post_id = ?"
+	DELETE_COMMENT        = "DELETE FROM comment WHERE comment_id = ?"
+	DELETE_CATEGORY_ASSOC = "DELETE FROM category_associations WHERE post_id = ?"
 
 	SELECT_RAW_POST                          = "SELECT post_id, author_id, banner, title, body, created_at, updated_at FROM blog_posts WHERE post_id = ?"
 	SELECT_POST                              = "SELECT b.post_id, b.author_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, u.uid, u.email, u.first_name, u.last_name, u.picture, u.phone, u.about_me, u.created_at, u.updated_at FROM blog_posts b JOIN user_details u ON b.author_id = u.uid WHERE b.post_id = ?"
@@ -579,8 +580,8 @@ func (p PostRepositoryImpl) GetCategoryList(ctx context.Context) (entity.Categor
 	return categories, nil
 }
 
-func (p PostRepositoryImpl) AddPostCategoryAssoc(ctx context.Context, posdtId int64, categoryId int64) error {
-	result, err := p.db.ExecContext(ctx, INSERT_CATEGORY_ASSOC, posdtId, categoryId)
+func (p PostRepositoryImpl) AddPostCategoryAssoc(ctx context.Context, postId int64, categoryId int64) error {
+	result, err := p.db.ExecContext(ctx, INSERT_CATEGORY_ASSOC, postId, categoryId)
 	if err != nil {
 		log.Println("[ERROR] AddPostCategoryAssoc -> error inserting row :", err)
 		return err
@@ -599,20 +600,55 @@ func (p PostRepositoryImpl) AddPostCategoryAssoc(ctx context.Context, posdtId in
 	return nil
 }
 
-func (p PostRepositoryImpl) EditPostCategoryAssoc(ctx context.Context, posdtId int64, categoryId int64) error {
-	result, err := p.db.ExecContext(ctx, UPDATE_CATEGORY_ASSOC, categoryId, posdtId)
+func (p PostRepositoryImpl) UpsertPostCategoryAssoc(ctx context.Context, postId int64, categoryId int64) error {
+	result, err := p.db.ExecContext(ctx, UPDATE_CATEGORY_ASSOC, categoryId, postId)
 	if err != nil {
-		log.Println("[ERROR] EditPostCategoryAssoc -> error inserting row :", err)
+		log.Println("[ERROR] UpsertPostCategoryAssoc -> error inserting row :", err)
 		return err
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		log.Println("[ERROR] EditPostCategoryAssoc -> error on getting rows affected :", err)
+		log.Println("[ERROR] UpsertPostCategoryAssoc -> error on getting rows affected :", err)
+		return err
+	}
+	if rowsAffected != 0 {
+		return nil
+	}
+
+	log.Println("[ERROR] UpsertPostCategoryAssoc -> error on updating row :", err)
+	result, err = p.db.ExecContext(ctx, INSERT_CATEGORY_ASSOC, postId, categoryId)
+	if err != nil {
+		log.Println("[ERROR] UpsertPostCategoryAssoc -> error inserting row")
+		return err
+	}
+
+	rowsAffected, err = result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] UpsertPostCategoryAssoc -> error on getting rows affected")
 		return err
 	}
 	if rowsAffected == 0 {
-		log.Println("[ERROR] EditPostCategoryAssoc -> error on updating row :", err)
+		return errors.New("Error editing category assoc table")
+	}
+
+	return nil
+}
+
+func (p PostRepositoryImpl) DeletePostCategoryAssoc(ctx context.Context, postId int64) error {
+	result, err := p.db.ExecContext(ctx, DELETE_CATEGORY_ASSOC, postId)
+	if err != nil {
+		log.Println("[ERROR] DeletePostCategoryAssoc -> error inserting row :", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println("[ERROR] DeletePostCategoryAssoc -> error on getting rows affected :", err)
+		return err
+	}
+	if rowsAffected == 0 {
+		log.Println("[ERROR] DeletePostCategoryAssoc -> error on updating row :", err)
 		return err
 	}
 
@@ -763,8 +799,8 @@ func (p PostRepositoryImpl) CountUserTotalComment(ctx context.Context, id int64)
 	return 0, errors.New("can't get count of total user comment")
 }
 
-func (p PostRepositoryImpl) PicHeaderPost(ctx context.Context, posdtId int64) error {
-	result, err := p.db.ExecContext(ctx, PICK_HEADER_POST, posdtId)
+func (p PostRepositoryImpl) PicHeaderPost(ctx context.Context, postId int64) error {
+	result, err := p.db.ExecContext(ctx, PICK_HEADER_POST, postId)
 	if err != nil {
 		log.Println("[ERROR] PicHeaderPost -> error inserting row :", err)
 		return err

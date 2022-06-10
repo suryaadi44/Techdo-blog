@@ -104,9 +104,15 @@ func (p PostServiceImpl) EditPost(ctx context.Context, post dto.BlogPostRequest,
 	}
 
 	if post.Category != -1 {
-		err = p.Repository.EditPostCategoryAssoc(ctx, PostID, post.Category)
+		err = p.Repository.UpsertPostCategoryAssoc(ctx, PostID, post.Category)
 		if err != nil {
 			log.Println("[ERROR] EditPost: Error editing post category data -> error:", err)
+			return -1, err
+		}
+	} else {
+		err = p.Repository.DeletePostCategoryAssoc(ctx, PostID)
+		if err != nil {
+			log.Println("[ERROR] EditPost: Error deleting post category data -> error:", err)
 			return -1, err
 		}
 	}
