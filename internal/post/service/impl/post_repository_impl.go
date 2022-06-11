@@ -52,6 +52,7 @@ var (
 	SELECT_COMMENTS_BY_UID                 = "SELECT c.comment_id, p.post_id, p.title, c.comment_body, c.created_at, c.updated_at FROM comment c JOIN blog_posts p ON c.post_id = p.post_id WHERE uid = ? ORDER BY created_at DESC"
 	SELECT_POST_OF_LATEST_UPDATED_CATEGORY = "SELECT post_id, banner, title, body, view_count, comment_count, created_at, updated_at, author, category_id, category_name FROM homepage_latest"
 	SELECT_EDITOR_PICK                     = "SELECT b.post_id, b.banner, b.title, b.body, b.view_count, b.comment_count, b.created_at, b.updated_at, CONCAT(u.first_name, ' ', u.last_name) AS author FROM blog_posts b JOIN user_details u ON b.author_id = u.uid JOIN editor_pick e ON b.post_id = e.post_id;"
+	SELECT_COUNT_OF_CATEGORY_ASSOC_OF_POST = "SELECT COUNT(*) FROM category_associations WHERE post_id = ?"
 
 	PICK_HEADER_POST = "CALL NEW_EDITOR_PICK(?)"
 )
@@ -601,37 +602,38 @@ func (p PostRepositoryImpl) AddPostCategoryAssoc(ctx context.Context, postId int
 }
 
 func (p PostRepositoryImpl) UpsertPostCategoryAssoc(ctx context.Context, postId int64, categoryId int64) error {
-	result, err := p.db.ExecContext(ctx, UPDATE_CATEGORY_ASSOC, categoryId, postId)
+	rows, err := p.db.QueryContext(ctx, SELECT_COUNT_OF_CATEGORY_ASSOC_OF_POST, postId)
+	if err != nil {
+		log.Println("[ERROR] UpsertPostCategoryAssoc -> error on executing query :", err)
+		return err
+	}
+
+	var count int64
+	if rows.Next() {
+		err = rows.Scan(&count)
+		if err != nil {
+			log.Println("[ERROR] UpsertPostCategoryAssoc -> error scanning row :", err)
+			return err
+		}
+	} else {
+		return errors.New("can't count how many record on category assoc")
+	}
+
+	if count == 0 {
+		_, err = p.db.ExecContext(ctx, INSERT_CATEGORY_ASSOC, postId, categoryId)
+		if err != nil {
+			log.Println("[ERROR] UpsertPostCategoryAssoc -> error inserting row")
+			return err
+		}
+
+		return nil
+	}
+
+	_, err = p.db.ExecContext(ctx, UPDATE_CATEGORY_ASSOC, categoryId, postId)
 	if err != nil {
 		log.Println("[ERROR] UpsertPostCategoryAssoc -> error inserting row :", err)
 		return err
 	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		log.Println("[ERROR] UpsertPostCategoryAssoc -> error on getting rows affected :", err)
-		return err
-	}
-	if rowsAffected != 0 {
-		return nil
-	}
-
-	log.Println("[ERROR] UpsertPostCategoryAssoc -> error on updating row :", err)
-	result, err = p.db.ExecContext(ctx, INSERT_CATEGORY_ASSOC, postId, categoryId)
-	if err != nil {
-		log.Println("[ERROR] UpsertPostCategoryAssoc -> error inserting row")
-		return err
-	}
-
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		log.Println("[ERROR] UpsertPostCategoryAssoc -> error on getting rows affected")
-		return err
-	}
-	if rowsAffected == 0 {
-		return errors.New("Error editing category assoc table")
-	}
-
 	return nil
 }
 
