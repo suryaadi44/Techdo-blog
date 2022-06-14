@@ -14,9 +14,15 @@ type SessionRepositoryImpl struct {
 }
 
 var (
-	INSERT_SESSION = "INSERT INTO sessions(token, uid, expireAt) VALUE (?, ?, ?)"
-	FIND_SESSION   = "SELECT s.token, s.uid, u.username, u.type, s.expireAt FROM sessions s JOIN users u ON s.uid = u.uid WHERE token = ?"
-	DELETE_SESSION = "DELETE FROM sessions WHERE token = ?"
+	INSERT_SESSION = `INSERT INTO sessions(token, uid, expireAt) 
+					  VALUE (?, ?, ?)`
+	FIND_SESSION   = `SELECT s.token, s.uid, u.username, u.type, s.expireAt 
+					  FROM sessions s 
+					  JOIN users u 
+					  ON s.uid = u.uid 
+					  WHERE token = ?`
+	DELETE_SESSION = `DELETE FROM sessions 
+					  WHERE token = ?`
 )
 
 func NewSessionRepository(db *sql.DB) SessionRepositoryImpl {

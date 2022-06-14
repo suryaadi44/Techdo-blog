@@ -14,22 +14,43 @@ type UserRepositoryImpl struct {
 }
 
 var (
-	COUNT_USER = "SELECT COUNT(*) FROM users"
+	COUNT_USER   = `SELECT COUNT(*) 
+					FROM users`
 
-	INSERT_USER_DETAIL         = "INSERT INTO user_details(uid, email, first_name, last_name, picture, phone, about_me) VALUE (?, ?, ?, ?, ?, ?, ?)"
-	INSERT_USER                = "INSERT INTO users(username, password, type) VALUE (?, ?, ?)"
-	INSERT_DEFAULT_USER_DETAIL = "INSERT INTO user_details(uid, email, first_name, last_name, picture) VALUE (?, ?, ?, ?, ?)"
+	INSERT_USER_DETAIL           = `INSERT INTO user_details(uid, email, first_name, last_name, picture, phone, about_me) 
+									VALUE (?, ?, ?, ?, ?, ?, ?)`
+	INSERT_USER                  = `INSERT INTO users(username, password, type) 
+									VALUE (?, ?, ?)`
+	INSERT_DEFAULT_USER_DETAIL   = `INSERT INTO user_details(uid, email, first_name, last_name, picture) 
+									VALUE (?, ?, ?, ?, ?)`
 
-	UPDATE_USER_DETAIL  = "UPDATE user_details SET first_name = ?, last_name = ?, phone = ?, about_me = ? WHERE uid = ?"
-	UPDATE_USER_PICTURE = "UPDATE user_details SET picture = ? WHERE uid = ?"
+	UPDATE_USER_DETAIL   = `UPDATE user_details 
+							SET first_name = ?, last_name = ?, phone = ?, about_me = ? 
+							WHERE uid = ?`
+	UPDATE_USER_PICTURE  = `UPDATE user_details 
+							SET picture = ? 
+							WHERE uid = ?`
 
-	SELECT_USER_DETAIL          = "SELECT d.uid, u.username, d.email, d.first_name, d.last_name, d.picture, d.phone, d.about_me, d.created_at, d.updated_at FROM user_details d JOIN users u ON d.uid = u.uid WHERE d.uid = ?"
-	SELECT_USER_MINI_DETAIL     = "SELECT d.uid, u.username, d.first_name, d.last_name, d.picture FROM user_details d JOIN users u ON d.uid = u.uid WHERE d.uid = ?"
-	SELECT_USER_PICTURE_PROFILE = "SELECT picture FROM user_details WHERE uid = ?"
+	SELECT_USER_DETAIL           = `SELECT d.uid, u.username, d.email, d.first_name, d.last_name, d.picture, d.phone, d.about_me, d.created_at, d.updated_at 
+									FROM user_details d 
+									JOIN users u 
+									ON d.uid = u.uid 
+									WHERE d.uid = ?`
+	SELECT_USER_MINI_DETAIL      = `SELECT d.uid, u.username, d.first_name, d.last_name, d.picture 
+									FROM user_details d 
+									JOIN users u 
+									ON d.uid = u.uid 
+									WHERE d.uid = ?`
+	SELECT_USER_PICTURE_PROFILE  = `SELECT picture 
+									FROM user_details 
+									WHERE uid = ?`
 
-	DELETE_USER = "DELETE FROM users WHERE uid = ?"
+	DELETE_USER = `DELETE FROM users 
+				   WHERE uid = ?`
 
-	FIND_USER = "SELECT uid, username, password FROM users WHERE username = ?"
+	FIND_USER = `SELECT uid, username, password 
+				 FROM users 
+				 WHERE username = ?`
 )
 
 func NewUserRepository(db *sql.DB) UserRepositoryImpl {
